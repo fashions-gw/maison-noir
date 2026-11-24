@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MAISON NOIR - Luxury Fashion</title>
+<title>CASA MODA - Luxury Fashion</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;font-family:'Georgia',serif}
   body{
@@ -56,7 +56,7 @@
 
 <div class="hero">
   <div class="top">
-    <div class="logo">MAISON NOIR<span>LUXURY PARIS</span></div>
+    <div class="logo">CASA MODA<span>LUXURY BANDUNG</span></div>
     <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
   </div>
   <div class="menu-box" id="menuBox">
@@ -76,8 +76,8 @@
   <div class="grid" id="grid"></div>
 </div>
 
-<div class="footer">© 2026 MAISON NOIR • Made with luxury in Bandung</div>
-<a class="chat-float" href="https://wa.me/6285890611111?text=Halo%20MAISON%20NOIR,%20saya%20mau%20tanya%20produk">💬</a>
+<div class="footer">© 2026 CASA MODA • Made with luxury in Bandung</div>
+<a class="chat-float" href="https://wa.me/6285890611111?text=Halo%20CASA%20MODA,%20saya%20mau%20tanya%20produk">💬</a>
 
 <div class="popup" id="popup">
   <div class="popup-box">
@@ -111,7 +111,7 @@
 const products = [
   {name:"Prestige Loafers - Brown Leather", cat:"LEATHER • LUXURY", price:1299000, img:"https://wesleybenton.com/cdn/shop/files/ChatGPT_Image_Apr_23_2026_12_40_04_AM.png?v=1776922835"},
   {name:"Royal Oxford - Brown Leather", cat:"LEATHER • PREMIUM OXFORD", price:1499000, img:"https://qutobd.com/wp-content/uploads/2026/09/WhatsApp-Image-2026-09-21-at-3.15.16-AM-2-1024x1024.webp"},
-  {name:"Noir Chelsea Boots - Black Leather", cat:"LEATHER • CHELSEA BOOTS", price:1399000, img:"https://assets.myntassets.com/assets/images/2026/SEPTEMBER/15/850eec89d28d4e908cf8a7dbcb939450.jpg"},
+  {name:"Casa Chelsea Boots - Black Leather", cat:"LEATHER • CHELSEA BOOTS", price:1399000, img:"https://assets.myntassets.com/assets/images/2026/SEPTEMBER/15/850eec89d28d4e908cf8a7dbcb939450.jpg"},
   {name:"Elegant Loafers - Tan Leather", cat:"LEATHER • LOAFERS ELEGANT", price:1199000, img:"https://img-va.myshopline.com/image/store/1717642206153/11111-26_1445x.jpg?w=1000&h=1000&q=80"},
   {name:"Classic Oxford - Brown Leather", cat:"LEATHER • HANDMADE", price:1349000, img:"https://cdn.shopify.com/s/files/1/0864/2786/1320/files/1_3_81304edf-d41e-4824-bf66-f17180628832.png_v_1773727664.png?v=1773729919"},
   {name:"Gentleman Loafers - Dark Brown", cat:"LEATHER • BUSINESS CLASS", price:1249000, img:"https://cdn.shopify.com/s/files/1/0225/7063/1245/files/fashion-gentleman-social-footwear-251004002001.jpg?v=1759549905"},
@@ -133,7 +133,7 @@ function addToCart(){ cart.push({...current, size:selectedSize}); document.getEl
 function openCart(){ document.getElementById('menuBox').style.display='none'; let html = cart.length===0 ? '<p>Keranjang masih kosong Bro, ayo belanja!</p>' : ''; let total=0; cart.forEach((c,idx)=>{ total+=c.price; html+=`<div class="cart-item"><img src="${c.img}"><div style="flex:1"><b>${c.name}</b><br><small>Ukuran: ${c.size}</small><br><span style="color:#FFD700">${fmt(c.price)}</span></div><button onclick="removeItem(${idx})" style="background:none;border:none;color:#fff">✕</button></div>`; }); document.getElementById('cartItems').innerHTML=html; document.getElementById('cartTotal').innerText = cart.length ? 'Total: ' + fmt(total) : ''; document.getElementById('cartDrawer').classList.add('open'); }
 function closeCart(){ document.getElementById('cartDrawer').classList.remove('open'); }
 function removeItem(i){ cart.splice(i,1); document.getElementById('cartCount').innerText=cart.length; openCart(); }
-function checkout(){ if(cart.length===0){ alert('Keranjang kosong!'); return; } let msg = "Halo MAISON NOIR, saya mau order:\n"; cart.forEach(c=>{ msg += "- " + c.name + " Ukuran " + c.size + " " + fmt(c.price) + "\n"; }); window.open("https://wa.me/6285890611111?text=" + encodeURIComponent(msg), "_blank"); }
+function checkout(){ if(cart.length===0){ alert('Keranjang kosong!'); return; } let msg = "Halo CASA MODA, saya mau order:\n"; cart.forEach(c=>{ msg += "- " + c.name + " Ukuran " + c.size + " " + fmt(c.price) + "\n"; }); window.open("https://wa.me/6285890611111?text=" + encodeURIComponent(msg), "_blank"); }
 render();
 </script>
 </body>
