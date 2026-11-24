@@ -3,10 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MAISON NOIR - Sepatu Dinas TNI Polri Satpam | Cibaduyut</title>
+<title>MAISON NOIR - Luxury Fashion</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;font-family:'Georgia',serif}
-  body{ background-image: linear-gradient(rgba(0,0,0,0.30), rgba(0,0,0,0.78)), url('background-emas.jpg'); background-size: cover; background-position: center top; background-repeat: no-repeat; background-color:#000; color:#fff; overflow-x:hidden }
+  body{
+    background-image: linear-gradient(rgba(0,0,0,0.30), rgba(0,0,0,0.78)), url('background-emas.jpg');
+    background-size: cover; background-position: center top; background-repeat: no-repeat;
+    background-color:#000; color:#fff; overflow-x:hidden
+  }
   .hero{ background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.55)); padding:20px 20px 10px 20px; text-align:center; position:relative}
   .top{ display:flex; justify-content:space-between; align-items:center; padding:10px 0}
   .logo{ font-size:24px; letter-spacing:3px; font-weight:bold; text-shadow:0 2px 10px #000; text-align:left}
@@ -28,6 +32,7 @@
   .card-body small{ color:#FFD700; font-size:11px; letter-spacing:1px}
   .card-body h3{ font-size:16px; margin:5px 0; text-shadow:0 1px 5px #000}
   .price{ color:#FFD700; font-weight:bold}
+  .price s{ color:#ddd; font-size:12px; margin-left:5px}
   .add{ width:100%; background:#FFD700; border:none; padding:10px; border-radius:12px; font-weight:bold; margin-top:8px; cursor:pointer}
   .footer{ text-align:center; padding:30px 30px 90px 30px; color:#fff; font-size:13px; background:rgba(0,0,0,0.85)}
   .chat-float{ position:fixed; bottom:20px; right:20px; background:#25D366; color:#fff; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px; box-shadow:0 5px 20px rgba(0,0,0,0.5); z-index:100; text-decoration:none; border:2px solid #fff}
@@ -38,7 +43,7 @@
   .popup-body{ padding:18px}
   .popup-body h3{ font-size:24px; margin:5px 0}
   .close{ float:right; font-size:24px; cursor:pointer; background:none; border:none; color:#fff}
-  .size-btn{ background:#222; color:#fff; border:1px solid #555; padding:10px 14px; border-radius:10px; margin:5px 5px 0 0; cursor:pointer; font-weight:bold}
+  .size-btn{ background:#222; color:#fff; border:1px solid #555; padding:10px 16px; border-radius:10px; margin:5px 5px 0 0; cursor:pointer; font-weight:bold}
   .size-btn.active{ background:#FFD700; color:#000; border-color:#FFD700}
   .buy-btn{ width:100%; background:#FFD700; border:none; padding:14px; border-radius:14px; font-weight:bold; margin-top:15px; font-size:15px; cursor:pointer}
   .cart-drawer{ display:none; position:fixed; top:0; right:0; width:85%; max-width:350px; height:100%; background:#111; z-index:300; padding:20px; border-left:2px solid #FFD700; overflow-y:auto}
@@ -51,28 +56,28 @@
 
 <div class="hero">
   <div class="top">
-    <div class="logo">MAISON NOIR<span>SEPATU DINAS • CIBADUYUT</span></div>
+    <div class="logo">MAISON NOIR<span>LUXURY PARIS</span></div>
     <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
   </div>
   <div class="menu-box" id="menuBox">
     <a href="#">🏠 Home</a>
-    <a href="#produk">🥾 Sepatu Dinas</a>
-    <a href="#">✨ Tentang Kami</a>
-    <a href="#" onclick="openCart();return false">🛒 Keranjang • <span id="cartCount">0</span></a>
+    <a href="#produk">🛍️ Collection</a>
+    <a href="#">✨ About Us</a>
+    <a href="#" onclick="openCart();return false">🛒 Cart • <span id="cartCount">0</span></a>
     <a href="https://wa.me/6285890611111">💬 Chat Admin</a>
   </div>
-  <h1>Siap<br><em>Bertugas.</em></h1>
-  <p>Produksi langsung pabrik Cibaduyut, Bandung. Sepatu PDL TNI, PDH Polri & Satpam. Kulit asli, awet, gagah, harga pabrik. Bisa grosir & partai besar.</p>
+  <h1>Wear<br><em>Your Power.</em></h1>
+  <p>Exclusive premium fashion for those who refuse to be ordinary. Limited edition. Handcrafted.</p>
 </div>
 
 <div class="section" id="produk">
-  <h2>Sepatu <i>Dinas</i></h2>
-  <p style="text-align:left;margin:0;color:#eee;font-size:13px">Klik sepatu untuk liat detail & ukuran. Bisa order satuan & grosir!</p>
+  <h2>Featured <i>Collection</i></h2>
+  <p style="text-align:left;margin:0;color:#eee;font-size:13px">Handpicked for you - Klik produk untuk liat dalemnya!</p>
   <div class="grid" id="grid"></div>
 </div>
 
-<div class="footer">© 2026 MAISON NOIR • Produksi Cibaduyut, Bandung<br>Meladi TNI • Polri • Satpam • Security • Grosir<br>WhatsApp: 0858-9061-1111</div>
-<a class="chat-float" href="https://wa.me/6285890611111?text=Halo%20MAISON%20NOIR,%20saya%20mau%20tanya%20sepatu%20dinas">💬</a>
+<div class="footer">© 2026 MAISON NOIR • Made with luxury in Bandung<br>Instagram: @maison.noir • WhatsApp: 0858-9061-1111</div>
+<a class="chat-float" href="https://wa.me/6285890611111?text=Halo%20MAISON%20NOIR,%20saya%20mau%20tanya%20produk">💬</a>
 
 <div class="popup" id="popup">
   <div class="popup-box">
@@ -82,23 +87,19 @@
       <small id="pCat" style="color:#FFD700"></small>
       <h3 id="pName"></h3>
       <div id="pPrice" style="color:#FFD700;font-weight:bold;font-size:18px"></div>
-      <p style="margin:10px 0;text-align:left;max-width:none">Kulit asli sapi, sol karet anti slip, jahitan kuat. Nyaman dipakai 12 jam jaga. Standar dinas. Garansi jahit!</p>
+      <p style="margin:10px 0;text-align:left;max-width:none">Premium material, handcrafted in Bandung. Limited stock. Dijamin bikin lu keliatan mahal pas dipake!</p>
       <b>Pilih Ukuran:</b><br>
-      <button class="size-btn" onclick="pickSize(this)">39</button>
-      <button class="size-btn" onclick="pickSize(this)">40</button>
-      <button class="size-btn active" onclick="pickSize(this)">41</button>
-      <button class="size-btn" onclick="pickSize(this)">42</button>
-      <button class="size-btn" onclick="pickSize(this)">43</button>
-      <button class="size-btn" onclick="pickSize(this)">44</button>
-      <button class="size-btn" onclick="pickSize(this)">45</button>
-      <button class="size-btn" onclick="pickSize(this)">46</button>
+      <button class="size-btn" onclick="pickSize(this)">S</button>
+      <button class="size-btn" onclick="pickSize(this)">M</button>
+      <button class="size-btn active" onclick="pickSize(this)">L</button>
+      <button class="size-btn" onclick="pickSize(this)">XL</button>
       <button class="buy-btn" onclick="addToCart()">+ Add to Cart - <span id="pPrice2"></span></button>
     </div>
   </div>
 </div>
 
 <div class="cart-drawer" id="cartDrawer">
-  <h2>🛒 Keranjang <button onclick="closeCart()" style="float:right;background:none;border:none;color:#fff;font-size:22px">✕</button></h2>
+  <h2>🛒 Keranjang Lu <button onclick="closeCart()" style="float:right;background:none;border:none;color:#fff;font-size:22px">✕</button></h2>
   <div id="cartItems" style="margin-top:15px"></div>
   <div id="cartTotal" style="font-weight:bold;margin-top:10px;font-size:18px"></div>
   <button class="buy-btn" onclick="checkout()">Checkout via WhatsApp 💬</button>
@@ -106,12 +107,12 @@
 
 <script>
 const products = [
-  {name:"Sepatu PDL TNI - Boots Tinggi", cat:"TNI • PDL • BEST SELLER", price:385000, img:"https://images.unsplash.com/photo-1520639888713-7851133b1ed0?w=500"},
-  {name:"Sepatu PDH Polri - Pantofel", cat:"POLRI • PDH • RESMI", price:325000, img:"https://images.unsplash.com/photo-1614252369475-531eba835eb1?w=500"},
-  {name:"Sepatu Satpam - PDL Hitam", cat:"SATPAM • SECURITY • KUAT", price:295000, img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500"},
-  {name:"Sepatu PDL Jatah - Tactical", cat:"TACTICAL • LAPANGAN", price:425000, img:"https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=500"},
+  {name:"Midnight Blazer", cat:"SUIT • PREMIUM", price:2499000, img:"https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=500"},
+  {name:"Golden Satin Gown", cat:"DRESS • LUXURY", price:3899000, img:"https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=500"},
+  {name:"Silk White Shirt", cat:"SHIRT • SILK", price:899000, img:"https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500"},
+  {name:"Noir Leather Jacket", cat:"JACKET • LIMITED", price:1999000, img:"https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=500"},
 ];
-let cart = []; let current = products[0]; let selectedSize = "41";
+let cart = []; let current = products[0]; let selectedSize = "L";
 function fmt(n){ return "Rp " + n.toLocaleString('id-ID'); }
 function render(){
   document.getElementById('grid').innerHTML = products.map((p,i)=>`
@@ -125,10 +126,10 @@ function openDetail(i){ current=products[i]; document.getElementById('pImg').src
 function closePopup(){ document.getElementById('popup').classList.remove('open'); }
 function pickSize(el){ document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); selectedSize=el.innerText; }
 function addToCart(){ cart.push({...current, size:selectedSize}); document.getElementById('cartCount').innerText=cart.length; closePopup(); alert('Masuk keranjang! 🔥 ' + current.name + ' Ukuran ' + selectedSize); }
-function openCart(){ document.getElementById('menuBox').style.display='none'; let html = cart.length===0 ? '<p>Keranjang masih kosong, ayo order!</p>' : ''; let total=0; cart.forEach((c,idx)=>{ total+=c.price; html+=`<div class="cart-item"><img src="${c.img}"><div style="flex:1"><b>${c.name}</b><br><small>Ukuran: ${c.size}</small><br><span style="color:#FFD700">${fmt(c.price)}</span></div><button onclick="removeItem(${idx})" style="background:none;border:none;color:#fff">✕</button></div>`; }); document.getElementById('cartItems').innerHTML=html; document.getElementById('cartTotal').innerText = cart.length ? 'Total: ' + fmt(total) : ''; document.getElementById('cartDrawer').classList.add('open'); }
+function openCart(){ document.getElementById('menuBox').style.display='none'; let html = cart.length===0 ? '<p>Keranjang masih kosong Bro, ayo belanja!</p>' : ''; let total=0; cart.forEach((c,idx)=>{ total+=c.price; html+=`<div class="cart-item"><img src="${c.img}"><div style="flex:1"><b>${c.name}</b><br><small>Ukuran: ${c.size}</small><br><span style="color:#FFD700">${fmt(c.price)}</span></div><button onclick="removeItem(${idx})" style="background:none;border:none;color:#fff">✕</button></div>`; }); document.getElementById('cartItems').innerHTML=html; document.getElementById('cartTotal').innerText = cart.length ? 'Total: ' + fmt(total) : ''; document.getElementById('cartDrawer').classList.add('open'); }
 function closeCart(){ document.getElementById('cartDrawer').classList.remove('open'); }
 function removeItem(i){ cart.splice(i,1); document.getElementById('cartCount').innerText=cart.length; openCart(); }
-function checkout(){ if(cart.length===0){ alert('Keranjang kosong!'); return; } let msg = "Halo MAISON NOIR, saya mau order sepatu dinas:\n"; cart.forEach(c=>{ msg += "- " + c.name + " Ukuran " + c.size + " " + fmt(c.price) + "\n"; }); window.open("https://wa.me/6285890611111?text=" + encodeURIComponent(msg), "_blank"); }
+function checkout(){ if(cart.length===0){ alert('Keranjang kosong!'); return; } let msg = "Halo MAISON NOIR, saya mau order:\n"; cart.forEach(c=>{ msg += "- " + c.name + " Ukuran " + c.size + " " + fmt(c.price) + "\n"; }); window.open("https://wa.me/6285890611111?text=" + encodeURIComponent(msg), "_blank"); }
 render();
 </script>
 </body>
