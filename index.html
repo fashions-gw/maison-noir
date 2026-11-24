@@ -89,10 +89,12 @@
       <div id="pPrice" style="color:#FFD700;font-weight:bold;font-size:18px"></div>
       <p style="margin:10px 0;text-align:left;max-width:none">Premium material, handcrafted in Bandung. Limited stock. Dijamin bikin lu keliatan mahal pas dipake!</p>
       <b>Pilih Ukuran:</b><br>
-      <button class="size-btn" onclick="pickSize(this)">S</button>
-      <button class="size-btn" onclick="pickSize(this)">M</button>
-      <button class="size-btn active" onclick="pickSize(this)">L</button>
-      <button class="size-btn" onclick="pickSize(this)">XL</button>
+      <button class="size-btn" onclick="pickSize(this)">39</button>
+      <button class="size-btn" onclick="pickSize(this)">40</button>
+      <button class="size-btn" onclick="pickSize(this)">41</button>
+      <button class="size-btn active" onclick="pickSize(this)">42</button>
+      <button class="size-btn" onclick="pickSize(this)">43</button>
+      <button class="size-btn" onclick="pickSize(this)">44</button>
       <button class="buy-btn" onclick="addToCart()">+ Add to Cart - <span id="pPrice2"></span></button>
     </div>
   </div>
@@ -107,12 +109,14 @@
 
 <script>
 const products = [
-  {name:"Midnight Blazer", cat:"SUIT • PREMIUM", price:2499000, img:"https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=500"},
-  {name:"Golden Satin Gown", cat:"DRESS • LUXURY", price:3899000, img:"https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=500"},
-  {name:"Silk White Shirt", cat:"SHIRT • SILK", price:899000, img:"https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500"},
-  {name:"Noir Leather Jacket", cat:"JACKET • LIMITED", price:1999000, img:"https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=500"},
+  {name:"Prestige Loafers - Brown Leather", cat:"LEATHER • LUXURY", price:1299000, img:"https://wesleybenton.com/cdn/shop/files/ChatGPT_Image_Apr_23_2026_12_40_04_AM.png?v=1776922835"},
+  {name:"Royal Oxford - Brown Leather", cat:"LEATHER • PREMIUM OXFORD", price:1499000, img:"https://qutobd.com/wp-content/uploads/2026/09/WhatsApp-Image-2026-09-21-at-3.15.16-AM-2-1024x1024.webp"},
+  {name:"Noir Chelsea Boots - Black Leather", cat:"LEATHER • CHELSEA BOOTS", price:1399000, img:"https://assets.myntassets.com/assets/images/2026/SEPTEMBER/15/850eec89d28d4e908cf8a7dbcb939450.jpg"},
+  {name:"Elegant Loafers - Tan Leather", cat:"LEATHER • LOAFERS ELEGANT", price:1199000, img:"https://img-va.myshopline.com/image/store/1717642206153/11111-26_1445x.jpg?w=1000&h=1000&q=80"},
+  {name:"Classic Oxford - Brown Leather", cat:"LEATHER • HANDMADE", price:1349000, img:"https://cdn.shopify.com/s/files/1/0864/2786/1320/files/1_3_81304edf-d41e-4824-bf66-f17180628832.png_v_1773727664.png?v=1773729919"},
+  {name:"Gentleman Loafers - Dark Brown", cat:"LEATHER • BUSINESS CLASS", price:1249000, img:"https://cdn.shopify.com/s/files/1/0225/7063/1245/files/fashion-gentleman-social-footwear-251004002001.jpg?v=1759549905"},
 ];
-let cart = []; let current = products[0]; let selectedSize = "L";
+let cart = []; let current = products[0]; let selectedSize = "42";
 function fmt(n){ return "Rp " + n.toLocaleString('id-ID'); }
 function render(){
   document.getElementById('grid').innerHTML = products.map((p,i)=>`
