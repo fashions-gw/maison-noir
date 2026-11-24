@@ -6,24 +6,25 @@
 <title>MAISON NOIR - Luxury Fashion</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;font-family:'Georgia',serif}
-  /* BACKGROUND EMAS BUAT 1 HALAMAN PENUH */
   body{
     background-image: url('background-emas.jpg');
     background-size: cover;
     background-position: center top;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    background-color:#000;
-    color:#fff;overflow-x:hidden
+    background-color:#000; color:#fff; overflow-x:hidden
   }
-  .hero{
-    background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.65));
-    padding:20px 20px 10px 20px; text-align:center;
-  }
+  .hero{ background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.65)); padding:20px 20px 10px 20px; text-align:center; position:relative}
   .top{ display:flex; justify-content:space-between; align-items:center; padding:10px 0}
-  .logo{ font-size:24px; letter-spacing:3px; font-weight:bold; text-shadow:0 2px 10px #000}
+  .logo{ font-size:24px; letter-spacing:3px; font-weight:bold; text-shadow:0 2px 10px #000; text-align:left}
   .logo span{ color:#FFD700; font-size:11px; display:block; letter-spacing:5px}
-  .cart{ background:#FFD700; color:#000; padding:8px 14px; border-radius:20px; font-weight:bold; font-size:13px}
+  /* MENU BUTTON PENGGANTI CART */
+  .menu-btn{ background:#FFD700; color:#000; padding:8px 16px; border-radius:20px; font-weight:bold; font-size:14px; border:none; cursor:pointer}
+  /* MENU DROPDOWN */
+  .menu-box{ display:none; position:absolute; top:65px; right:20px; background:rgba(0,0,0,0.90); border:1px solid #FFD700; border-radius:15px; width:180px; text-align:left; z-index:99; overflow:hidden}
+  .menu-box a{ display:block; color:#fff; text-decoration:none; padding:13px 16px; border-bottom:1px solid #333; font-size:14px}
+  .menu-box a:hover{ background:#FFD700; color:#000}
+  .menu-box a:last-child{ border-bottom:none}
   h1{ font-size:34px; line-height:1.1; margin:15px 0 10px 0; text-shadow:0 2px 15px #000}
   h1 em{ color:#FFD700; font-style:italic}
   p{ color:#eee; font-size:14px; line-height:1.6; max-width:320px; margin:0 auto; text-shadow:0 1px 5px #000}
@@ -31,8 +32,8 @@
   .section h2{ font-size:26px; margin-bottom:5px; text-shadow:0 2px 10px #000}
   .section h2 i{ color:#FFD700}
   .grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:15px}
-  /* KARTU BENERAN TRANSPARAN */
-  .card{ background:rgba(0,0,0,0.35); backdrop-filter:blur(2px); border-radius:20px; overflow:hidden; border:1px solid rgba(255,215,0,0.5)}
+  /* 85% TRANSPARAN = 15% HITAM DOANG, BIAR NYAMBUNG SAMA ATAS */
+  .card{ background:rgba(0,0,0,0.15); backdrop-filter:blur(2px); border-radius:20px; overflow:hidden; border:1px solid rgba(255,215,0,0.5)}
   .card img{ width:100%; height:180px; object-fit:cover; display:block}
   .card-body{ padding:12px; text-align:left; background:transparent}
   .card-body small{ color:#FFD700; font-size:11px; letter-spacing:1px}
@@ -40,7 +41,9 @@
   .price{ color:#FFD700; font-weight:bold; text-shadow:0 1px 5px #000}
   .price s{ color:#ddd; font-size:12px; margin-left:5px}
   .add{ width:100%; background:#FFD700; border:none; padding:10px; border-radius:12px; font-weight:bold; margin-top:8px}
-  .footer{ text-align:center; padding:30px; color:#fff; font-size:13px; background:rgba(0,0,0,0.6); text-shadow:0 1px 5px #000}
+  .footer{ text-align:center; padding:30px 30px 90px 30px; color:#fff; font-size:13px; background:rgba(0,0,0,0.6); text-shadow:0 1px 5px #000}
+  /* TOMBOL CHAT MELAYANG */
+  .chat-float{ position:fixed; bottom:20px; right:20px; background:#25D366; color:#fff; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px; box-shadow:0 5px 20px rgba(0,0,0,0.5); z-index:100; text-decoration:none; border:2px solid #fff}
 </style>
 </head>
 <body>
@@ -48,13 +51,22 @@
 <div class="hero">
   <div class="top">
     <div class="logo">MAISON NOIR<span>LUXURY PARIS</span></div>
-    <div class="cart">🛒 Cart • 2</div>
+    <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
   </div>
+  <!-- MENU ISI NYA -->
+  <div class="menu-box" id="menuBox">
+    <a href="#">🏠 Home</a>
+    <a href="#produk">🛍️ Collection</a>
+    <a href="#">✨ About Us</a>
+    <a href="#">🛒 Cart • 2</a>
+    <a href="https://wa.me/6281234567890">💬 Chat Admin</a>
+  </div>
+
   <h1>Wear<br><em>Your Power.</em></h1>
   <p>Exclusive premium fashion for those who refuse to be ordinary. Limited edition. Handcrafted.</p>
 </div>
 
-<div class="section">
+<div class="section" id="produk">
   <h2>Featured <i>Collection</i></h2>
   <p style="text-align:left;margin:0;color:#eee;font-size:13px;text-shadow:0 1px 5px #000">Handpicked for you</p>
   <div class="grid">
@@ -78,6 +90,16 @@
 </div>
 
 <div class="footer">© 2026 MAISON NOIR • Made with luxury in Bandung<br>Instagram: @maison.noir • WhatsApp Order</div>
+
+<!-- TOMBOL CHAT MELAYANG - KLIK LANGSUNG KE WA -->
+<a class="chat-float" href="https://wa.me/6281234567890?text=Halo%20MAISON%20NOIR,%20saya%20mau%20tanya%20produk">💬</a>
+
+<script>
+function toggleMenu(){
+  var m = document.getElementById('menuBox');
+  if(m.style.display === 'block'){ m.style.display = 'none'; } else { m.style.display = 'block'; }
+}
+</script>
 
 </body>
 </html>
