@@ -21,17 +21,18 @@
   h1{ font-size:34px; line-height:1.1; margin:15px 0 10px 0; text-shadow:0 2px 15px #000}
   h1 em{ color:#FFD700; font-style:italic}
   p{ color:#eee; font-size:14px; line-height:1.6; max-width:320px; margin:0 auto; text-shadow:0 1px 5px #000}
-  .section{ padding:15px 20px 20px 20px; background:#000}
+  .section{ padding:15px 20px 20px 20px; background:transparent}
   .section h2{ font-size:26px; margin-bottom:5px}
   .section h2 i{ color:#FFD700}
   .grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:15px}
-  .card{ background:#111; border-radius:20px; overflow:hidden; border:1px solid #333}
-  .card img{ width:100%; height:180px; object-fit:cover}
-  .card-body{ padding:12px; text-align:left}
+  /* INI YANG GUA BIKIN TRANSPARAN BRO */
+  .card{ background:transparent; border-radius:20px; overflow:hidden; border:1px solid rgba(255,215,0,0.4)}
+  .card img{ width:100%; height:180px; object-fit:cover; display:block}
+  .card-body{ padding:12px; text-align:left; background:transparent}
   .card-body small{ color:#FFD700; font-size:11px; letter-spacing:1px}
-  .card-body h3{ font-size:16px; margin:5px 0}
-  .price{ color:#FFD700; font-weight:bold}
-  .price s{ color:#888; font-size:12px; margin-left:5px}
+  .card-body h3{ font-size:16px; margin:5px 0; text-shadow:0 1px 5px #000}
+  .price{ color:#FFD700; font-weight:bold; text-shadow:0 1px 5px #000}
+  .price s{ color:#ccc; font-size:12px; margin-left:5px}
   .add{ width:100%; background:#FFD700; border:none; padding:10px; border-radius:12px; font-weight:bold; margin-top:8px}
   .footer{ text-align:center; padding:30px; color:#888; font-size:13px; background:#000}
 </style>
