@@ -6,12 +6,18 @@
 <title>MAISON NOIR - Luxury Fashion</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;font-family:'Georgia',serif}
-  body{background:#000;color:#fff;overflow-x:hidden}
-  .hero{
-    background-image: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.75)), url('background-emas.jpg');
+  /* BACKGROUND EMAS BUAT 1 HALAMAN PENUH */
+  body{
+    background-image: url('background-emas.jpg');
     background-size: cover;
-    background-position: center;
+    background-position: center top;
     background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-color:#000;
+    color:#fff;overflow-x:hidden
+  }
+  .hero{
+    background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.65));
     padding:20px 20px 10px 20px; text-align:center;
   }
   .top{ display:flex; justify-content:space-between; align-items:center; padding:10px 0}
@@ -22,19 +28,19 @@
   h1 em{ color:#FFD700; font-style:italic}
   p{ color:#eee; font-size:14px; line-height:1.6; max-width:320px; margin:0 auto; text-shadow:0 1px 5px #000}
   .section{ padding:15px 20px 20px 20px; background:transparent}
-  .section h2{ font-size:26px; margin-bottom:5px}
+  .section h2{ font-size:26px; margin-bottom:5px; text-shadow:0 2px 10px #000}
   .section h2 i{ color:#FFD700}
   .grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:15px}
-  /* INI YANG GUA BIKIN TRANSPARAN BRO */
-  .card{ background:transparent; border-radius:20px; overflow:hidden; border:1px solid rgba(255,215,0,0.4)}
+  /* KARTU BENERAN TRANSPARAN */
+  .card{ background:rgba(0,0,0,0.35); backdrop-filter:blur(2px); border-radius:20px; overflow:hidden; border:1px solid rgba(255,215,0,0.5)}
   .card img{ width:100%; height:180px; object-fit:cover; display:block}
   .card-body{ padding:12px; text-align:left; background:transparent}
   .card-body small{ color:#FFD700; font-size:11px; letter-spacing:1px}
   .card-body h3{ font-size:16px; margin:5px 0; text-shadow:0 1px 5px #000}
   .price{ color:#FFD700; font-weight:bold; text-shadow:0 1px 5px #000}
-  .price s{ color:#ccc; font-size:12px; margin-left:5px}
+  .price s{ color:#ddd; font-size:12px; margin-left:5px}
   .add{ width:100%; background:#FFD700; border:none; padding:10px; border-radius:12px; font-weight:bold; margin-top:8px}
-  .footer{ text-align:center; padding:30px; color:#888; font-size:13px; background:#000}
+  .footer{ text-align:center; padding:30px; color:#fff; font-size:13px; background:rgba(0,0,0,0.6); text-shadow:0 1px 5px #000}
 </style>
 </head>
 <body>
@@ -50,7 +56,7 @@
 
 <div class="section">
   <h2>Featured <i>Collection</i></h2>
-  <p style="text-align:left;margin:0;color:#aaa;font-size:13px">Handpicked for you</p>
+  <p style="text-align:left;margin:0;color:#eee;font-size:13px;text-shadow:0 1px 5px #000">Handpicked for you</p>
   <div class="grid">
     <div class="card">
       <img src="https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=500">
