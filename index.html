@@ -3,135 +3,129 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MAISON NOIR - Premium Leather Shoes | Cibaduyut</title>
+<title>NOIR - Leather Boots Cibaduyut | Sepatu Kulit Premium</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box;font-family:'Georgia',serif}
-  body{ background-image: linear-gradient(rgba(0,0,0,0.30), rgba(0,0,0,0.78)), url('background-emas.jpg'); background-size: cover; background-position: center top; background-repeat: no-repeat; background-color:#000; color:#fff; overflow-x:hidden }
-  .hero{ background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.55)); padding:20px 20px 10px 20px; text-align:center; position:relative}
-  .top{ display:flex; justify-content:space-between; align-items:center; padding:10px 0}
-  .logo{ font-size:24px; letter-spacing:3px; font-weight:bold; text-shadow:0 2px 10px #000; text-align:left}
-  .logo span{ color:#FFD700; font-size:11px; display:block; letter-spacing:5px}
-  .menu-btn{ background:#FFD700; color:#000; padding:8px 16px; border-radius:20px; font-weight:bold; font-size:14px; border:none; cursor:pointer}
-  .menu-box{ display:none; position:absolute; top:65px; right:20px; background:rgba(0,0,0,0.92); border:1px solid #FFD700; border-radius:15px; width:180px; text-align:left; z-index:99; overflow:hidden}
-  .menu-box a{ display:block; color:#fff; text-decoration:none; padding:13px 16px; border-bottom:1px solid #333; font-size:14px}
-  .menu-box a:hover{ background:#FFD700; color:#000}
-  h1{ font-size:36px; line-height:1.1; margin:15px 0 10px 0; text-shadow:0 2px 15px #000}
-  h1 em{ color:#FFD700; font-style:italic}
-  p{ color:#eee; font-size:14px; line-height:1.6; max-width:320px; margin:0 auto; text-shadow:0 1px 5px #000}
-  .section{ padding:15px 20px 20px 20px; background:linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.85))}
-  .section h2{ font-size:26px; margin-bottom:5px; text-shadow:0 2px 10px #000}
-  .section h2 i{ color:#FFD700}
-  .grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:15px}
-  .card{ background:rgba(0,0,0,0.55); backdrop-filter:blur(2px); border-radius:20px; overflow:hidden; border:1px solid rgba(255,215,0,0.5); cursor:pointer}
-  .card img{ width:100%; height:180px; object-fit:cover; display:block}
-  .card-body{ padding:12px; text-align:left}
-  .card-body small{ color:#FFD700; font-size:11px; letter-spacing:1px}
-  .card-body h3{ font-size:16px; margin:5px 0; text-shadow:0 1px 5px #000}
-  .price{ color:#FFD700; font-weight:bold}
-  .add{ width:100%; background:#FFD700; border:none; padding:10px; border-radius:12px; font-weight:bold; margin-top:8px; cursor:pointer}
-  .footer{ text-align:center; padding:30px 30px 90px 30px; color:#fff; font-size:13px; background:rgba(0,0,0,0.85)}
-  .chat-float{ position:fixed; bottom:20px; right:20px; background:#25D366; color:#fff; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px; box-shadow:0 5px 20px rgba(0,0,0,0.5); z-index:100; text-decoration:none; border:2px solid #fff}
-  .popup{ display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:200; align-items:flex-end; justify-content:center}
-  .popup.open{ display:flex}
-  .popup-box{ background:#111; width:100%; max-width:420px; border-radius:25px 25px 0 0; overflow:hidden; max-height:90vh; overflow-y:auto; border-top:2px solid #FFD700}
-  .popup-box img{ width:100%; height:300px; object-fit:cover}
-  .popup-body{ padding:18px}
-  .popup-body h3{ font-size:24px; margin:5px 0}
-  .close{ float:right; font-size:24px; cursor:pointer; background:none; border:none; color:#fff}
-  .size-btn{ background:#222; color:#fff; border:1px solid #555; padding:10px 14px; border-radius:10px; margin:5px 5px 0 0; cursor:pointer; font-weight:bold}
-  .size-btn.active{ background:#FFD700; color:#000; border-color:#FFD700}
-  .buy-btn{ width:100%; background:#FFD700; border:none; padding:14px; border-radius:14px; font-weight:bold; margin-top:15px; font-size:15px; cursor:pointer}
-  .cart-drawer{ display:none; position:fixed; top:0; right:0; width:85%; max-width:350px; height:100%; background:#111; z-index:300; padding:20px; border-left:2px solid #FFD700; overflow-y:auto}
-  .cart-drawer.open{ display:block}
-  .cart-item{ display:flex; gap:10px; background:#222; padding:10px; border-radius:12px; margin-bottom:10px; align-items:center}
-  .cart-item img{ width:60px; height:60px; object-fit:cover; border-radius:8px}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
+body{background:#0f0f0f;color:#fff}
+a{color:inherit;text-decoration:none}
+header{position:sticky;top:0;z-index:99;background:rgba(15,15,15,.95);backdrop-filter:blur(10px);padding:16px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222}
+.logo{font-size:24px;font-weight:900;letter-spacing:4px}
+.logo span{color:#c9a86a}
+nav{display:flex;gap:18px;font-size:13px;letter-spacing:1px;color:#ccc}
+.btn-gold{background:#c9a86a;color:#000;padding:10px 18px;border-radius:999px;font-weight:800;font-size:13px;border:none;cursor:pointer}
+.hero{padding:60px 20px 30px;text-align:center;background:radial-gradient(600px 300px at 50% 0%, #2a2115, #0f0f0f)}
+.hero small{letter-spacing:4px;color:#c9a86a;font-weight:700}
+.hero h1{font-size:42px;line-height:1.05;margin:14px 0 12px;font-weight:900}
+.hero h1 i{color:#c9a86a;font-style:normal}
+.hero p{color:#aaa;max-width:520px;margin:0 auto 22px;line-height:1.6}
+.hero-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn-white{background:#fff;color:#000;padding:12px 22px;border-radius:999px;font-weight:800;border:none;cursor:pointer}
+.btn-outline{background:transparent;color:#fff;padding:12px 22px;border-radius:999px;font-weight:700;border:1px solid #444;cursor:pointer}
+.badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.badges span{background:#1c1c1c;border:1px solid #2a2a2a;padding:8px 14px;border-radius:999px;font-size:12px;color:#ddd}
+.section{padding:36px 16px;max-width:1100px;margin:0 auto}
+.section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:18px}
+.section-head h2{font-size:26px}
+.section-head p{color:#888;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(min-width:700px){.grid{grid-template-columns:repeat(3,1fr)}.hero h1{font-size:56px}}
+.card{background:#1a1a1a;border:1px solid #262626;border-radius:18px;overflow:hidden}
+.card img{width:100%;height:230px;object-fit:cover;display:block;background:#222}
+.card-body{padding:14px}
+.cat{font-size:10px;letter-spacing:2px;color:#c9a86a;font-weight:800}
+.card-body h3{font-size:16px;margin:6px 0 4px}
+.stars{color:#ffb400;font-size:13px}
+.price-row{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.price{font-size:18px;font-weight:900;color:#fff}
+.price small{font-size:11px;color:#888;text-decoration:line-through;font-weight:400;margin-left:4px}
+.add{background:#c9a86a;color:#000;border:none;padding:9px 14px;border-radius:999px;font-weight:800;cursor:pointer}
+.why{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.why div{background:#1a1a1a;border:1px solid #262626;padding:16px;border-radius:16px}
+.why b{display:block;margin-bottom:6px}
+.why p{color:#999;font-size:13px;line-height:1.5}
+.banner{margin:10px 16px;background:linear-gradient(135deg,#c9a86a,#8a6d35);color:#000;border-radius:20px;padding:22px;text-align:center}
+.banner h3{font-size:22px}
+.banner p{font-size:13px;margin:8px 0 14px}
+.banner button{background:#000;color:#fff;border:none;padding:12px 20px;border-radius:999px;font-weight:800;cursor:pointer}
+footer{padding:30px 20px;text-align:center;color:#777;font-size:12px;line-height:1.7;border-top:1px solid #222;margin-top:20px}
+.wa{position:fixed;bottom:18px;right:18px;background:#25D366;color:#fff;padding:14px 18px;border-radius:999px;font-weight:800;box-shadow:0 10px 30px rgba(0,0,0,.5);z-index:100}
 </style>
 </head>
 <body>
 
+<header>
+  <div class="logo">NOIR<span>.</span></div>
+  <nav><a href="#">HOME</a><a href="#produk">PRODUK</a><a href="#kenapa">KENAPA NOIR</a></nav>
+  <button class="btn-gold" onclick="document.getElementById('produk').scrollIntoView({behavior:'smooth'})">BELI SEKARANG</button>
+</header>
+
 <div class="hero">
-  <div class="top">
-    <div class="logo">MAISON NOIR<span>PREMIUM LEATHER • CIBADUYUT</span></div>
-    <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
+  <small>✦ CIBADUYUT • BANDUNG • HANDMADE LEATHER</small>
+  <h1>SEPATU KULIT<br><i>YANG BIKIN LO<br>KELIATAN MAHAL.</i></h1>
+  <p>Boots kulit asli Cibaduyut. Dibuat tangan, bahan kulit asli, sol kuat, nyaman dipakai harian sampai acara formal.</p>
+  <div class="hero-btns">
+    <button class="btn-white" onclick="document.getElementById('produk').scrollIntoView({behavior:'smooth'})">Lihat Koleksi →</button>
+    <button class="btn-outline" onclick="window.open('https://wa.me/6281234567890?text=Halo%20NOIR,%20mau%20tanya%20sepatu%20kulit','_blank')">Chat WhatsApp</button>
   </div>
-  <div class="menu-box" id="menuBox">
-    <a href="#">🏠 Home</a>
-    <a href="#produk">👞 Leather Collection</a>
-    <a href="#">✨ About Us</a>
-    <a href="#" onclick="openCart();return false">🛒 Cart • <span id="cartCount">0</span></a>
-    <a href="https://wa.me/6285890611111">💬 Chat Admin</a>
-  </div>
-  <h1>Walk In<br><em>Luxury.</em></h1>
-  <p>Genuine leather shoes, handcrafted by Cibaduyut artisans, Bandung. Timeless, elegant, built to last. Premium quality, factory price.</p>
+  <div class="badges"><span>✔ Kulit Asli 100%</span><span>✔ Handmade Cibaduyut</span><span>✔ Garansi 30 Hari</span><span>⭐ 4.9 / 1.200+ Pembeli</span></div>
 </div>
 
 <div class="section" id="produk">
-  <h2>Leather <i>Collection</i></h2>
-  <p style="text-align:left;margin:0;color:#eee;font-size:13px">100% Kulit Asli - Klik sepatu untuk liat detail & ukuran!</p>
+  <div class="section-head"><div><h2>Koleksi Best Seller</h2><p>6 boots paling laris, stok terbatas.</p></div><p>🔥 Laris minggu ini</p></div>
   <div class="grid" id="grid"></div>
 </div>
 
-<div class="footer">© 2026 MAISON NOIR • Handcrafted in Cibaduyut, Bandung<br>Genuine Leather • Premium Quality • Wholesale<br>WhatsApp: 0858-9061-1111</div>
-<a class="chat-float" href="https://wa.me/6285890611111?text=Halo%20MAISON%20NOIR,%20saya%20mau%20tanya%20sepatu%20kulit">💬</a>
-
-<div class="popup" id="popup">
-  <div class="popup-box">
-    <div style="padding:10px"><button class="close" onclick="closePopup()">✕</button></div>
-    <img id="pImg" src="">
-    <div class="popup-body">
-      <small id="pCat" style="color:#FFD700"></small>
-      <h3 id="pName"></h3>
-      <div id="pPrice" style="color:#FFD700;font-weight:bold;font-size:18px"></div>
-      <p style="margin:10px 0;text-align:left;max-width:none">100% genuine leather, hand-stitched, premium sole. Nyaman, awet, dan bikin penampilan lu keliatan mahal!</p>
-      <b>Select Size:</b><br>
-      <button class="size-btn" onclick="pickSize(this)">39</button>
-      <button class="size-btn" onclick="pickSize(this)">40</button>
-      <button class="size-btn active" onclick="pickSize(this)">41</button>
-      <button class="size-btn" onclick="pickSize(this)">42</button>
-      <button class="size-btn" onclick="pickSize(this)">43</button>
-      <button class="size-btn" onclick="pickSize(this)">44</button>
-      <button class="size-btn" onclick="pickSize(this)">45</button>
-      <button class="size-btn" onclick="pickSize(this)">46</button>
-      <button class="buy-btn" onclick="addToCart()">+ Add to Cart - <span id="pPrice2"></span></button>
-    </div>
+<div class="section" id="kenapa">
+  <h2 style="margin-bottom:14px">Kenapa Pilih NOIR?</h2>
+  <div class="why">
+    <div><b>🐄 Kulit Asli Cibaduyut</b><p>Bukan sintetis. Makin lama dipakai makin bagus, makin lentur, makin keren.</p></div>
+    <div><b>✋ Handmade Pengrajin</b><p>Dijahit & dirakit tangan oleh pengrajin berpengalaman di Cibaduyut, Bandung.</p></div>
+    <div><b>💪 Sol Kuat & Nyaman</b><p>Sol tebal anti licin, empuk dipakai jalan jauh, awet bertahun-tahun.</p></div>
+    <div><b>🚚 Kirim Cepat Seluruh Indonesia</b><p>Order hari ini, besok langsung dikirim. Bisa COD Bandung & cek dulu.</p></div>
   </div>
 </div>
 
-<div class="cart-drawer" id="cartDrawer">
-  <h2>🛒 Your Cart <button onclick="closeCart()" style="float:right;background:none;border:none;color:#fff;font-size:22px">✕</button></h2>
-  <div id="cartItems" style="margin-top:15px"></div>
-  <div id="cartTotal" style="font-weight:bold;margin-top:10px;font-size:18px"></div>
-  <button class="buy-btn" onclick="checkout()">Checkout via WhatsApp 💬</button>
+<div class="banner">
+  <h3>PROMO HARI INI: GRATIS ONGKIR + KAOS KAKI KULIT</h3>
+  <p>Untuk 20 pembeli pertama hari ini. Stok boots terbatas karena handmade.</p>
+  <button onclick="window.open('https://wa.me/6281234567890?text=Halo%20NOIR,%20mau%20klaim%20promo%20gratis%20ongkir','_blank')">Klaim Promo di WhatsApp →</button>
 </div>
+
+<footer>
+  <b style="color:#fff;font-size:16px;letter-spacing:3px">NOIR.</b><br>
+  Leather Boots • Cibaduyut - Bandung, Jawa Barat<br>
+  WhatsApp: 0812-3456-7890 • Instagram: @noir.leather<br><br>
+  © 2026 NOIR Leather. Dibuat dengan bangga di Cibaduyut, Bandung.
+</footer>
+
+<a class="wa" href="https://wa.me/6281234567890?text=Halo%20NOIR,%20mau%20tanya%20sepatu" target="_blank">💬 Chat WA</a>
 
 <script>
 const products = [
-  {name:"Noir Leather Boots", cat:"LEATHER BOOTS • BEST SELLER", price:499000, img:"https://images.unsplash.com/photo-1520639888713-7851133b1ed0?w=500"},
-  {name:"Classic Oxford Leather", cat:"OXFORD • PREMIUM LEATHER", price:425000, img:"https://images.unsplash.com/photo-1614252369475-531eba835eb1?w=500"},
-  {name:"Elegant Loafers Leather", cat:"LOAFERS • GENUINE LEATHER", price:385000, img:"https://images.unsplash.com/photo-1533867617858-e7b97e060509?w=500"},
-  {name:"Casual Leather Sneakers", cat:"CASUAL • LEATHER", price:349000, img:"https://images.unsplash.com/photo-1560343090-f0409e92791a?w=500"},
-  {name:"Premium Derby Shoes", cat:"DERBY • HANDMADE LEATHER", price:459000, img:"https://images.unsplash.com/photo-1608256246200-53e635b5b65f?w=500"},
-  {name:"Monk Strap Leather", cat:"MONK STRAP • LUXURY LEATHER", price:475000, img:"https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=500"},
+  {name:"Noir Boots - Black Leather", cat:"LEATHER BOOTS • CIBADUYUT ORIGINAL", price:499000, old:699000, img:"https://concept-fashionlab.com/cdn/shop/files/S9ed70cd2b38a4133a486c9c422a0de64j_280fd5e7-bf5f-4ef0-8fe6-42c0afe87954-Photoroom.jpg?crop=region&crop_height=2048&crop_left=204&crop_top=0&crop_width=1638&v=1770701602&width=925"},
+  {name:"Classic Boots - Black Leather", cat:"LEATHER BOOTS • HANDMADE CIBADUYUT", price:449000, old:599000, img:"https://static.pairetfils.com/imgproxy/size/620c735/themes/pairetfils/images/catalog/product/PROFIL36.jpg"},
+  {name:"Tan Boots - Brown Leather", cat:"LEATHER BOOTS • PREMIUM", price:475000, old:649000, img:"http://www.beckettsimonon.com/cdn/shop/collections/beckett-simonon-lopez-boots-tan-lifestyle-2_1200x630.jpg?v=1782155618"},
+  {name:"Dark Brown Boots - Leather", cat:"LEATHER BOOTS • CIBADUYUT", price:465000, old:629000, img:"https://www.merchant1948.com.au/cdn/shop/files/mens_2048x2048_bestsellers_2.jpg?v=1778110872&width=1100"},
+  {name:"Zipper Boots - Black Leather", cat:"LEATHER BOOTS • BEST SELLER", price:489000, old:689000, img:"https://ae01.alicdn.com/kf/Ha2125b8d186a4055ac1415e2087c86f1s/Autumn-Winter-Free-Shipping-Leather-Big-Size-Plush-British-High-Top-Short-Boots-Chelsea-Boots-male.jpg"},
+  {name:"Sleek Boots - Black Leather", cat:"LEATHER BOOTS • ELEGANT", price:439000, old:589000, img:"https://elnero.shop/cdn/shop/files/3_151671ff-2913-4628-83bf-7857b0b3d1cf.png?v=1762146639&width=1426"},
 ];
-let cart = []; let current = products[0]; let selectedSize = "41";
-function fmt(n){ return "Rp " + n.toLocaleString('id-ID'); }
-function render(){
-  document.getElementById('grid').innerHTML = products.map((p,i)=>`
-    <div class="card" onclick="openDetail(${i})">
-      <img src="${p.img}">
-      <div class="card-body"><small>${p.cat}</small><h3>${p.name}</h3><div class="price">${fmt(p.price)}</div><button class="add" onclick="event.stopPropagation();openDetail(${i})">View Detail →</button></div>
-    </div>`).join('');
-}
-function toggleMenu(){ var m=document.getElementById('menuBox'); m.style.display = m.style.display==='block' ? 'none':'block'; }
-function openDetail(i){ current=products[i]; document.getElementById('pImg').src=current.img; document.getElementById('pCat').innerText=current.cat; document.getElementById('pName').innerText=current.name; document.getElementById('pPrice').innerText=fmt(current.price); document.getElementById('pPrice2').innerText=fmt(current.price); document.getElementById('popup').classList.add('open'); }
-function closePopup(){ document.getElementById('popup').classList.remove('open'); }
-function pickSize(el){ document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); selectedSize=el.innerText; }
-function addToCart(){ cart.push({...current, size:selectedSize}); document.getElementById('cartCount').innerText=cart.length; closePopup(); alert('Added to cart! 🔥 ' + current.name + ' Size ' + selectedSize); }
-function openCart(){ document.getElementById('menuBox').style.display='none'; let html = cart.length===0 ? '<p>Your cart is empty, lets shop!</p>' : ''; let total=0; cart.forEach((c,idx)=>{ total+=c.price; html+=`<div class="cart-item"><img src="${c.img}"><div style="flex:1"><b>${c.name}</b><br><small>Size: ${c.size}</small><br><span style="color:#FFD700">${fmt(c.price)}</span></div><button onclick="removeItem(${idx})" style="background:none;border:none;color:#fff">✕</button></div>`; }); document.getElementById('cartItems').innerHTML=html; document.getElementById('cartTotal').innerText = cart.length ? 'Total: ' + fmt(total) : ''; document.getElementById('cartDrawer').classList.add('open'); }
-function closeCart(){ document.getElementById('cartDrawer').classList.remove('open'); }
-function removeItem(i){ cart.splice(i,1); document.getElementById('cartCount').innerText=cart.length; openCart(); }
-function checkout(){ if(cart.length===0){ alert('Cart is empty!'); return; } let msg = "Halo MAISON NOIR, saya mau order sepatu kulit:\n"; cart.forEach(c=>{ msg += "- " + c.name + " Size " + c.size + " " + fmt(c.price) + "\n"; }); window.open("https://wa.me/6285890611111?text=" + encodeURIComponent(msg), "_blank"); }
-render();
+
+const grid = document.getElementById('grid');
+grid.innerHTML = products.map(p => `
+  <div class="card">
+    <img src="${p.img}" alt="${p.name}" loading="lazy">
+    <div class="card-body">
+      <div class="cat">${p.cat}</div>
+      <h3>${p.name}</h3>
+      <div class="stars">★★★★★ (4.9)</div>
+      <div class="price-row">
+        <div class="price">Rp ${p.price.toLocaleString('id-ID')} <small>Rp ${p.old.toLocaleString('id-ID')}</small></div>
+        <button class="add" onclick="window.open('https://wa.me/6281234567890?text=Halo%20NOIR,%20mau%20order%20${encodeURIComponent(p.name)}%20Rp%20${p.price.toLocaleString('id-ID')}','_blank')">Beli →</button>
+      </div>
+    </div>
+  </div>
+`).join('');
 </script>
+
 </body>
 </html>
