@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CASA MODA</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+body{background:#fff;color:#000}
+.page{display:none;min-height:100vh;padding:30px 20px}
+.page.show{display:block}
+.chrome h1{font-size:24px;font-weight:400}
+.chrome p{color:#5f6368;font-size:14px;line-height:1.6}
+.firefox{text-align:center;padding-top:80px}
+.firefox h1{font-size:28px;font-weight:300}
+.generic{text-align:center;padding-top:100px}
+.generic h1{font-size:100px;font-weight:200;color:#ccc}
+.btn{margin-top:20px;background:#1a73e8;color:#fff;border:none;padding:10px 20px;border-radius:20px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- 404 ALA CHROME -->
+<div class="page chrome" id="page-chrome">
+<div style="font-size:70px">😕</div>
+<h1>This site can’t be reached</h1>
+<p><b>admin.html</b>’s server IP address could not be found.<br>Try running Windows Network Diagnostics.</p>
+<p style="margin-top:16px">ERR_NAME_NOT_RESOLVED</p>
+<button class="btn" onclick="location.href='index.html'">Reload</button>
+</div>
+
+<!-- 404 ALA FIREFOX -->
+<div class="page firefox" id="page-firefox">
+<div style="font-size:60px">😢</div>
+<h1>Hmm. We’re having trouble finding that site.</h1>
+<p>We can’t connect to the server at admin.html.</p>
+<button class="btn" onclick="location.href='index.html'" style="background:#0060df">Try Again</button>
+</div>
+
+<!-- 404 GENERIC -->
+<div class="page generic" id="page-generic">
+<h1>404</h1>
+<h2 style="font-weight:400">Not Found</h2>
+<p>The requested URL /admin.html was not found on this server.</p>
+<button class="btn" onclick="location.href='index.html'" style="background:#000">Back to Home</button>
+</div>
+
+<script>
+// ===== PENGAMAN 2 LAPIS - BIAR GAK KETAHUAN JEBAKAN =====
+(function(){
+  let params = new URLSearchParams(location.search);
+  let ref = document.referrer || "";
+  let isOwnSite = ref.includes(location.hostname);
+
+  // HITUNG PERCOBAAN DIA - simpen di sessionStorage (hemat, gak pake server)
+  let coba = Number(sessionStorage.getItem('admin_coba') || 0) + 1;
+  sessionStorage.setItem('admin_coba', coba);
+
+  // === TANDA-TANDA DIA MAKSA MASUK (FORCED ENTRY) ===
+  let maksa = false;
+  let alasan = "";
+
+  // 1. Dia pake parameter aneh-aneh buat nembus: ?code=, ?admin=, ?bypass, ?login, ?pass, dll
+  if(params.toString() !== ""){
+    maksa = true; alasan = "pake parameter";
+  }
+  // 2. Dia dateng dari luar (bukan dari web lu), tapi langsung nembak admin.html
+  if(ref && !isOwnSite){
+    maksa = true; alasan = "dateng dari luar";
+  }
+  // 3. Dia refresh / coba berkali-kali (udah 2x+ buka admin.html)
+  if(coba >= 2){
+    maksa = true; alasan = "coba berkali-kali";
+  }
+  // 4. Dia buka admin.html pake cara aneh: view-source, dll (ketahuan dari referrer kosong tapi udah pernah coba)
+  if(coba >= 3){
+    maksa = true; alasan = "maksa banget";
+  }
+
+  // === LAPIS 1: KALAU CUMA NEMBAK LANGSUNG (BARU 1x, GAK PAKE PARAMETER, GAK DARI LUAR) ===
+  if(!maksa){
+    // Keliatan natural: lempar ke depan, kayak website normal!
+    // Pake replace biar tombol Back dia gak bisa balik ke admin.html lagi
+    window.location.replace('index.html');
+    return;
+  }
+
+  // === LAPIS 2: KALAU UDAH KETAHUAN MAKSA, BARU KASIH 404 SESUAI BROWSER DIA ===
+  let ua = navigator.userAgent.toLowerCase();
+  let page = 'generic';
+  if(ua.includes('edg') || (ua.includes('chrome') && !ua.includes('opr'))){
+    page = 'chrome'; document.title = "This site can’t be reached";
+  } else if(ua.includes('firefox')){
+    page = 'firefox'; document.title = "Hmm. We’re having trouble finding that site.";
+  } else if(ua.includes('safari') && !ua.includes('chrome')){
+    page = 'generic'; document.title = "404 Not Found";
+  } else if(ua.includes('opr') || ua.includes('opera')){
+    page = 'chrome'; document.title = "This site can’t be reached";
+  }
+  document.getElementById('page-' + page).classList.add('show');
+  console.log("Forced entry detected:", alasan); // cuma buat lu liat di console, gak keliatan sama dia
+})();
+</script>
+</body>
+</html>
