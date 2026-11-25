@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DEBUG MEMBER - CASA MODA</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body{background:#000;color:#fff;font-family:Arial;padding:16px}
+button{width:100%;padding:14px;margin:8px 0;border-radius:10px;border:none;background:#FFD700;font-weight:bold}
+input{width:100%;padding:12px;margin:6px 0;border-radius:10px;background:#222;color:#fff;border:1px solid #444;box-sizing:border-box}
+#out{background:#111;border:1px solid #FFD700;border-radius:12px;padding:12px;font-size:12px;white-space:pre-wrap;word-break:break-all;min-height:200px;margin-top:10px}
+</style>
+</head>
+<body>
+<h2>DEBUG MEMBER - CASA MODA</h2>
+<p style="font-size:12px;color:#ccc">Halaman ini cuma buat ngetes. Abis ketauan masalahnya, kita balikin ke yang Luxury.</p>
+<button onclick="cekSemua()">1. LIHAT SEMUA MEMBER DI SUPABASE</button>
+<input id="waTes" placeholder="WA yang mau dites, contoh 085890611111">
+<input id="passTes" placeholder="Password yang mau dites">
+<button onclick="cekLogin()">2. TES LOGIN WA + PASSWORD ITU</button>
+<div id="out">Belum dites. Klik tombol di atas...</div>
+<script>
+const SUPABASE_URL = "https://tnpkepfjrltfryhuqnvo.supabase.co";
+const SUPABASE_KEY = "sb_publishable_D_RB0mj9X66SOlj9-4jgug_s7fvHEYO";
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+function tulis(t){ document.getElementById('out').innerText = t; }
+async function cekSemua(){
+  tulis('Lagi ngambil data...\nURL: '+SUPABASE_URL);
+  try{
+    let { data, error } = await supabase.from('member').select('*').limit(10);
+    if(error){ tulis('❌ GAGAL NGAMBIL!\n\nError asli dari Supabase:\n'+error.message+'\nCode: '+error.code+'\n\nARTINYA:\n- Kalau ada kata "row-level security" = RLS masih NYALA, matiin dulu!\n- Kalau ada kata "relation does not exist" = Tabel member GAK ADA / namanya beda!\n- Kalau "Failed to fetch" = URL / Key salah / internet mati'); return; }
+    if(!data || data.length===0){ tulis('✅ KONEKSI BERHASIL, TAPI TABEL MEMBER KOSONG!\n\nArtinya admin lu NYIMPEN KE TEMPAT LAIN, bukan ke sini!\nCek admin.html lu, URL-nya sama gak sama yang ini?\n'+SUPABASE_URL); return; }
+    let isi = data.map((m,i)=> (i+1)+'. Nama: '+m.nama+'\n   WA di DB: ['+m.wa+']\n   Password di DB: ['+m.password+']\n   Semua kolom: '+Object.keys(m).join(', ')+'\n').join('\n');
+    tulis('✅ KONEKSI BERHASIL! Ketemu '+data.length+' member:\n\n'+isi+'\n\nCOCOKIN: WA + Password yang lu ketik pas login, SAMA PERSIS gak sama yang di atas? Termasuk spasi / 0 / 62 nya?');
+  }catch(e){ tulis('❌ ERROR BESAR: '+e.message); }
+}
+async function cekLogin(){
+  let wa = document.getElementById('waTes').value.trim();
+  let pass = document.getElementById('passTes').value.trim();
+  if(!wa||!pass) return alert('Isi WA + Password dulu');
+  tulis('Ngetes login...\nWA yang lu ketik: ['+wa+']\nPass yang lu ketik: ['+pass+']');
+  let { data, error } = await supabase.from('member').select('*').eq('wa', wa).eq('password', pass).maybeSingle();
+  if(error){ tulis('❌ ERROR LOGIN: '+error.message); return; }
+  if(!data){ tulis('❌ GAK KETEMU!\n\nWA ['+wa+'] + Pass ['+pass+'] gak ada yang cocok di database.\n\nKlik tombol no 1 di atas, liat WA + Password ASLI di database itu apa, terus copy-paste persis dari sana! Jangan diketik manual, suka beda spasi / angka!'); return; }
+  tulis('✅ LOGIN BERHASIL!!!\n\nKetemu: '+data.nama+' - '+data.wa+'\n\nBerarti member.html lu yang lama yang error, bukan datanya! Kasih tau gw, gw bikinin yang baru!');
+}
+</script>
+</body>
+</html>
