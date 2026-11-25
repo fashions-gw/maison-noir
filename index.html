@@ -86,8 +86,8 @@
   <p style="margin-top:10px;color:#FFD700" id="userInfo">Belum login - Login Member biar bisa checkout</p>
 </div>
 <div class="section" id="page-home">
-  <h2>Featured <i>Collection</i></h2><p style="text-align:left;margin:0;font-size:13px">Live dari Supabase - Klik produk untuk liat dalemnya!</p>
-  <div id="statusLoad" style="margin-top:10px;color:#FFD700">Loading produk dari Supabase...</div>
+  <h2>Featured <i>Collection</i></h2><p style="text-align:left;margin:0;font-size:13px">Koleksi terbaru kami - Klik produk untuk liat detailnya!</p>
+  <div id="statusLoad" style="margin-top:10px;color:#FFD700">Memuat koleksi...</div>
   <div class="grid" id="grid"></div>
 </div>
 <div class="section" id="page-about" style="display:none">
@@ -95,14 +95,14 @@
   <p style="text-align:left;max-width:none;margin-top:10px">📍 Bandung, West Java<br>💬 WA: 0858-9061-1111<br>📦 Pengiriman seluruh Indonesia</p>
 </div>
 <div class="section" id="page-member" style="display:none">
-  <h2>Login <i>Member</i></h2><p style="text-align:left;margin:0">Masuk pake akun lu, biar bisa checkout masuk ke database.</p>
+  <h2>Login <i>Member</i></h2><p style="text-align:left;margin:0">Masuk pake akun lu, biar bisa checkout.</p>
   <input id="memberAkun" placeholder="Akun Member, contoh: andi123">
   <input id="memberPass" type="password" placeholder="Password">
   <button class="buy-btn" onclick="loginMember()">Login Member</button>
   <button class="buy-btn" style="background:#222;color:#fff;border:1px solid #FFD700" onclick="daftarMember()">Daftar Baru</button>
   <div id="memberMsg" style="margin-top:10px;color:#FFD700"></div>
 </div>
-<div class="footer">© 2026 CASA MODA • Made with luxury in Bandung • Connected to Supabase</div>
+<div class="footer">© 2026 CASA MODA • Made with luxury in Bandung</div>
 <button class="chat-float" onclick="toggleBot()">💬</button>
 <div class="bot-box" id="botBox">
   <div class="bot-head"><span>🤖 BOT CASA MODA</span><span onclick="toggleBot()" style="cursor:pointer">✕</span></div>
@@ -142,11 +142,11 @@ function fmt(n){ return "Rp " + Number(n).toLocaleString('id-ID'); }
 function toggleMenu(){ const m=document.getElementById('menuBox'); m.style.display=m.style.display==='block'?'none':'block'; }
 function showPage(p){ document.getElementById('page-home').style.display = p==='home'||p==='produk' ? 'block':'none'; document.getElementById('page-about').style.display = p==='about'?'block':'none'; document.getElementById('page-member').style.display = p==='member'?'block':'none'; document.getElementById('menuBox').style.display='none'; window.scrollTo(0,0); }
 async function loadProduk(){
-  document.getElementById('statusLoad').innerText = "Loading...";
+  document.getElementById('statusLoad').innerText = "Memuat...";
   const { data, error } = await supabaseClient.rpc('bot_lihat_produk');
-  if(error){ document.getElementById('statusLoad').innerText = "Error: "+error.message; return; }
+  if(error){ document.getElementById('statusLoad').innerText = "Gagal memuat koleksi."; return; }
   products = data || [];
-  document.getElementById('statusLoad').innerText = products.length+" produk live dari Supabase 🔥";
+  document.getElementById('statusLoad').innerText = products.length+" koleksi tersedia 🔥";
   renderProduk(products);
 }
 function renderProduk(list){
@@ -202,25 +202,29 @@ async function kirimBot(){
   let hurufPertama = pesan.charAt(0);
   if(['@','#','$','&'].includes(hurufPertama)){
     let kode = pesan.slice(1).trim();
-    if(!kode){ botBalas("Kode kosong. Contoh: @kodok", false); return; }
+    if(!kode){
+      botBalas("Halo! Mau liat koleksi CASA MODA? Ketik 'koleksi' ya! 🔥", false);
+      return;
+    }
     let { data: adm } = await supabaseClient.from('admin').select('code,pin').eq('code', kode).maybeSingle();
     if(adm){
       calonCode = adm.code; calonRole = 'Admin'; calonNama = adm.code; calonPin = String(adm.pin);
-      botBalas("Halo Admin, masukin PIN 6 digit lu ya:", false);
+      botBalas("Masukin PIN 6 digit lu ya:", false);
       document.getElementById('botBox').classList.remove('open'); bukaPin(); return;
     }
     let { data: peg } = await supabaseClient.from('pegawai').select('code,pin').eq('code', kode).maybeSingle();
     if(peg){
       calonCode = peg.code; calonRole = 'Pegawai'; calonNama = peg.code; calonPin = String(peg.pin);
-      botBalas("Halo Pegawai, masukin PIN 6 digit lu ya:", false);
+      botBalas("Masukin PIN 6 digit lu ya:", false);
       document.getElementById('botBox').classList.remove('open'); bukaPin(); return;
     }
-    botBalas("Kode tidak ditemukan.", false); return;
+    botBalas("Halo! Mau liat koleksi CASA MODA? Ketik 'koleksi' ya! 🔥", false);
+    return;
   }
   let kata = pesan.toLowerCase();
   if(kata.includes('koleksi') || kata.includes('produk') || kata.includes('cari') || kata.includes('lihat')){
     if(products.length===0){ botBalas("Produk masih loading, coba lagi bentar ya!", false); return; }
-    botBalas("Ini koleksi kita! Ada "+products.length+" produk live! 🔥 Scroll ke atas ya!", false);
+    botBalas("Ini koleksi kita! Ada "+products.length+" produk! 🔥 Scroll ke atas ya!", false);
     renderProduk(products); showPage('home'); return;
   }
   let ketemuProduk = products.filter(p => (p.nama_produk||'').toLowerCase().includes(kata) || (p.jenis||'').toLowerCase().includes(kata));
@@ -239,8 +243,8 @@ async function kirimBot(){
 }
 function bukaPin(){
   pinInput = "";
-  document.getElementById('pinTitle').innerText = "Welcome Back, "+calonNama;
-  document.getElementById('pinSub').innerText = calonRole + " • Enter Your Private PIN";
+  document.getElementById('pinTitle').innerText = "Welcome Back";
+  document.getElementById('pinSub').innerText = "Enter Your Private PIN";
   document.getElementById('pinMsg').innerText = "";
   updateDots();
   document.getElementById('pinOverlay').classList.add('open');
