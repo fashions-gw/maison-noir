@@ -45,6 +45,31 @@
   .bot-input{display:flex;gap:8px;padding:10px;background:#000}
   .bot-input input{margin:0}
   .bot-input button{background:#FFD700;border:none;padding:12px 16px;border-radius:10px;font-weight:bold}
+  /* PIN LUXURY - CASA MODA PRIVATE */
+  .pin-overlay{display:none;position:fixed;inset:0;background:radial-gradient(circle at 50% 20%, #2a2100 0%, #000 55%, #000 100%);z-index:500;align-items:center;justify-content:center;flex-direction:column;padding:24px}
+  .pin-overlay.open{display:flex}
+  .pin-card{width:100%;max-width:340px;background:linear-gradient(180deg, rgba(255,215,0,0.12), rgba(255,255,255,0.02));border:1px solid rgba(255,215,0,0.45);border-radius:28px;padding:28px 20px 22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,215,0,0.15) inset}
+  .pin-logo{font-size:11px;letter-spacing:6px;color:#FFD700}
+  .pin-logo-b{font-size:26px;letter-spacing:4px;font-weight:bold;margin:6px 0 2px}
+  .pin-line{width:44px;height:1px;background:linear-gradient(90deg,transparent,#FFD700,transparent);margin:10px auto}
+  .pin-title{font-size:17px;font-style:italic;color:#fff}
+  .pin-sub{color:#c9a900;font-size:12px;letter-spacing:1px;margin:6px 0 2px;text-transform:uppercase}
+  .pin-msg{color:#ff6b6b;font-size:12px;letter-spacing:1px;height:16px;margin-top:6px}
+  .pin-dots{display:flex;gap:12px;justify-content:center;margin:16px 0 20px}
+  .pin-dot{width:14px;height:14px;border-radius:50%;border:1px solid rgba(255,215,0,0.8);background:transparent;transition:all .15s}
+  .pin-dot.filled{background:radial-gradient(circle at 30% 30%, #fff7c0, #FFD700 60%, #b8860b);box-shadow:0 0 12px rgba(255,215,0,0.9);border-color:#FFD700}
+  .pin-dot.error{border-color:#ff4444;background:#ff4444;box-shadow:0 0 10px #ff4444}
+  .pin-keypad{display:grid;grid-template-columns:repeat(3,72px);gap:12px;justify-content:center}
+  .pin-key{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.04);color:#fff;border:1px solid rgba(255,215,0,0.35);font-size:22px;font-family:'Georgia',serif;cursor:pointer;position:relative;backdrop-filter:blur(2px)}
+  .pin-key small{display:block;font-size:9px;letter-spacing:2px;color:#FFD700;margin-top:-2px}
+  .pin-key:active{background:linear-gradient(180deg,#FFD700,#c9a900);color:#000;transform:scale(0.96);box-shadow:0 0 18px rgba(255,215,0,0.7)}
+  .pin-key.empty{background:transparent;border:none;cursor:default}
+  .pin-key.del{font-size:18px;color:#FFD700}
+  .pin-cancel{margin-top:18px;background:none;border:none;color:#999;font-size:12px;letter-spacing:2px;cursor:pointer;text-transform:uppercase}
+  .pin-cancel:hover{color:#FFD700}
+  .pin-foot{margin-top:14px;font-size:10px;letter-spacing:2px;color:#666;text-transform:uppercase}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .shake{animation:shake .3s}
 </style>
 </head>
 <body>
@@ -93,6 +118,29 @@
   <div class="bot-input"><input id="botInput" placeholder="Ketik di sini..." onkeypress="if(event.key==='Enter') kirimBot()"><button onclick="kirimBot()">Kirim</button></div>
 </div>
 
+<!-- PIN LUXURY -->
+<div class="pin-overlay" id="pinOverlay">
+  <div class="pin-card" id="pinCard">
+    <div class="pin-logo">✦ CASA MODA ✦</div>
+    <div class="pin-logo-b">PRIVATE ACCESS</div>
+    <div class="pin-line"></div>
+    <div class="pin-title" id="pinTitle">Welcome Back</div>
+    <div class="pin-sub" id="pinSub">Halo Admin</div>
+    <div class="pin-msg" id="pinMsg"></div>
+    <div class="pin-dots" id="pinDots">
+      <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+    </div>
+    <div class="pin-keypad">
+      <button class="pin-key" onclick="tekanPin('1')">1<small>•</small></button><button class="pin-key" onclick="tekanPin('2')">2<small>ABC</small></button><button class="pin-key" onclick="tekanPin('3')">3<small>DEF</small></button>
+      <button class="pin-key" onclick="tekanPin('4')">4<small>GHI</small></button><button class="pin-key" onclick="tekanPin('5')">5<small>JKL</small></button><button class="pin-key" onclick="tekanPin('6')">6<small>MNO</small></button>
+      <button class="pin-key" onclick="tekanPin('7')">7<small>PQRS</small></button><button class="pin-key" onclick="tekanPin('8')">8<small>TUV</small></button><button class="pin-key" onclick="tekanPin('9')">9<small>WXYZ</small></button>
+      <button class="pin-key empty"></button><button class="pin-key" onclick="tekanPin('0')">0<small>+</small></button><button class="pin-key del" onclick="hapusPin()">⌫</button>
+    </div>
+    <button class="pin-cancel" onclick="tutupPin()">✕ Cancel</button>
+    <div class="pin-foot">Secure • Encrypted • Bandung</div>
+  </div>
+</div>
+
 <div class="popup" id="popup"><div class="popup-box"><div style="padding:10px"><button class="close" onclick="closePopup()">✕</button></div><img id="pImg"><div class="popup-body"><small id="pCat" style="color:#FFD700"></small><h3 id="pName"></h3><div id="pPrice" style="color:#FFD700;font-weight:bold;font-size:18px"></div><p style="margin:10px 0;text-align:left;max-width:none" id="pDesc"></p><b>Pilih Ukuran:</b><br><div id="sizeBox"></div><button class="buy-btn" onclick="addToCart()">+ Add to Cart - <span id="pPrice2"></span></button></div></div></div>
 
 <div class="drawer" id="cartDrawer"><h2>🛒 Keranjang Lu <button onclick="closeCart()" style="float:right;background:none;border:none;color:#fff;font-size:22px">✕</button></h2><div id="cartItems" style="margin-top:15px"></div><div id="cartTotal" style="font-weight:bold;margin-top:10px;font-size:18px"></div><button class="buy-btn" onclick="checkout()">Checkout ke Supabase + WhatsApp 💬</button></div>
@@ -102,7 +150,7 @@ const SUPABASE_URL = "https://rwbrwcmtzlevjpxmhyqz.supabase.co";
 const SUPABASE_KEY = "sb_publishable_HN_7Kf9QCpepykVbPMrwfQ_07wM0Rh6";
 const WA_NUMBER = "6285890611111";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-let products = []; let cart = []; let current = null; let selectedSize = "42"; let currentUser = null; let adminUser = null;
+let products = []; let cart = []; let current = null; let selectedSize = "42"; let currentUser = null;
 function fmt(n){ return "Rp " + Number(n).toLocaleString('id-ID'); }
 function toggleMenu(){ const m=document.getElementById('menuBox'); m.style.display=m.style.display==='block'?'none':'block'; }
 function showPage(p){ document.getElementById('page-home').style.display = p==='home'||p==='produk' ? 'block':'none'; document.getElementById('page-about').style.display = p==='about'?'block':'none'; document.getElementById('page-member').style.display = p==='member'?'block':'none'; document.getElementById('menuBox').style.display='none'; window.scrollTo(0,0); }
@@ -151,7 +199,7 @@ async function checkout(){
   cart=[]; document.getElementById('cartCount').innerText=0; closeCart();
   window.open("https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent(msg), "_blank");
 }
-let calonCode = null; let calonRole = null; let calonNama = null;
+let calonCode = null; let calonRole = null; let calonNama = null; let pinInput = "";
 function toggleBot(){ document.getElementById('botBox').classList.toggle('open'); }
 function botBalas(teks, isUser){
   let div = document.createElement('div');
@@ -166,16 +214,6 @@ async function kirimBot(){
   if(!pesan) return;
   botBalas(pesan, true);
   input.value = '';
-  if(calonCode){
-    let { data } = await supabaseClient.rpc('bot_login_pin', { p_pin: pesan });
-    if(data && data.length > 0 && data[0].code.toLowerCase() === calonCode.toLowerCase()){
-      botBalas("PIN bener! Halo "+data[0].nama+" ("+data[0].role+"), ngantar ke halaman lu...", false);
-      let role = data[0].role;
-      calonCode = null;
-      setTimeout(()=>{ window.location.href = (role === 'Admin' ? 'ass.html' : 'pew.html'); }, 800);
-    } else { botBalas("PIN salah! Coba lagi:", false); }
-    return;
-  }
   let hurufPertama = pesan.charAt(0);
   if(['@','#','$','&','/'].includes(hurufPertama)){
     let { data, error } = await supabaseClient.rpc('bot_cek_kode', { p_input: pesan });
@@ -183,12 +221,56 @@ async function kirimBot(){
       botBalas("Halo! Mau liat koleksi CASA MODA? Ketik 'koleksi' ya! 🔥", false);
     } else {
       calonCode = data[0].code; calonRole = data[0].role; calonNama = data[0].nama;
-      botBalas("Halo "+calonNama+" ("+calonRole+"), masukin PIN lu aja:", false);
+      botBalas("Halo "+calonNama+" ("+calonRole+"), masukin PIN 6 digit lu ya:", false);
+      document.getElementById('botBox').classList.remove('open');
+      bukaPin();
     }
     return;
   }
   if(pesan.toLowerCase().includes('koleksi')) botBalas("Ini koleksi kita! Scroll ke atas, ada "+products.length+" produk live! 🔥", false);
   else botBalas("Halo! Mau liat koleksi CASA MODA? Ketik 'koleksi' ya! 🔥", false);
+}
+function bukaPin(){
+  pinInput = "";
+  document.getElementById('pinTitle').innerText = "Welcome Back, "+calonNama;
+  document.getElementById('pinSub').innerText = calonRole + " • Enter Your Private PIN";
+  document.getElementById('pinMsg').innerText = "";
+  updateDots();
+  document.getElementById('pinOverlay').classList.add('open');
+}
+function tutupPin(){
+  document.getElementById('pinOverlay').classList.remove('open');
+  calonCode = null; pinInput = "";
+}
+function updateDots(){
+  document.querySelectorAll('.pin-dot').forEach((d,i)=>{
+    d.classList.toggle('filled', i < pinInput.length);
+    d.classList.remove('error');
+  });
+}
+async function tekanPin(angka){
+  if(pinInput.length >= 6) return;
+  pinInput += angka;
+  updateDots();
+  if(pinInput.length === 6){
+    let { data } = await supabaseClient.rpc('bot_login_pin', { p_pin: pinInput });
+    if(data && data.length > 0 && data[0].code.toLowerCase() === calonCode.toLowerCase()){
+      document.getElementById('pinMsg').innerText = "";
+      document.getElementById('pinMsg').style.color = "#FFD700";
+      document.getElementById('pinMsg').innerText = "✦ Access Granted ✦";
+      setTimeout(()=>{ document.getElementById('pinOverlay').classList.remove('open'); let role = data[0].role; window.location.href = (role === 'Admin' ? 'ass.html' : 'pew.html'); }, 500);
+    } else {
+      document.getElementById('pinMsg').style.color = "#ff6b6b";
+      document.getElementById('pinMsg').innerText = "PIN Salah — Coba Lagi";
+      document.querySelectorAll('.pin-dot').forEach(d=>d.classList.add('error'));
+      let card = document.getElementById('pinCard'); card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+      setTimeout(()=>{ pinInput = ""; updateDots(); document.getElementById('pinMsg').innerText = ""; }, 700);
+    }
+  }
+}
+function hapusPin(){
+  pinInput = pinInput.slice(0, -1);
+  updateDots();
 }
 loadProduk();
 </script>
