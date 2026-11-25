@@ -184,7 +184,7 @@ async function checkout(){
   cart=[]; document.getElementById('cartCount').innerText=0; closeCart();
   window.open("https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent(msg), "_blank");
 }
-let calonCode = null; let calonRole = null; let calonNama = null; let calonPin = null; let pinInput = "";
+let calonCode = null; let calonRole = null; let calonPinOK = false; let pinInput = "";
 function toggleBot(){ document.getElementById('botBox').classList.toggle('open'); }
 function botBalas(teks, isUser){
   let div = document.createElement('div');
@@ -200,27 +200,24 @@ async function kirimBot(){
   botBalas(pesan, true);
   input.value = '';
   let hurufPertama = pesan.charAt(0);
+  // 1. PINTU MASUK - HANYA @ # $ & - LEWAT RPC, BUKAN SELECT TABEL LANGSUNG
   if(['@','#','$','&'].includes(hurufPertama)){
     let kode = pesan.slice(1).trim();
     if(!kode){
       botBalas("Halo! Mau liat koleksi CASA MODA? Ketik 'koleksi' ya! 🔥", false);
       return;
     }
-    let { data: adm } = await supabaseClient.from('admin').select('code,pin').eq('code', kode).maybeSingle();
-    if(adm){
-      calonCode = adm.code; calonRole = 'Admin'; calonNama = adm.code; calonPin = String(adm.pin);
+    let { data, error } = await supabaseClient.rpc('bot_cek_kode', { p_input: kode });
+    if(!error && data && data.length > 0 && data[0].ditemukan){
+      calonCode = data[0].code; calonRole = data[0].role; calonPinOK = false;
       botBalas("Masukin PIN 6 digit lu ya:", false);
       document.getElementById('botBox').classList.remove('open'); bukaPin(); return;
     }
-    let { data: peg } = await supabaseClient.from('pegawai').select('code,pin').eq('code', kode).maybeSingle();
-    if(peg){
-      calonCode = peg.code; calonRole = 'Pegawai'; calonNama = peg.code; calonPin = String(peg.pin);
-      botBalas("Masukin PIN 6 digit lu ya:", false);
-      document.getElementById('botBox').classList.remove('open'); bukaPin(); return;
-    }
+    // KODE SALAH = JAWAB SAMA KAYAK PENGUNJUNG BIASA
     botBalas("Halo! Mau liat koleksi CASA MODA? Ketik 'koleksi' ya! 🔥", false);
     return;
   }
+  // 2. BOT PRODUK
   let kata = pesan.toLowerCase();
   if(kata.includes('koleksi') || kata.includes('produk') || kata.includes('cari') || kata.includes('lihat')){
     if(products.length===0){ botBalas("Produk masih loading, coba lagi bentar ya!", false); return; }
@@ -233,6 +230,7 @@ async function kirimBot(){
     botBalas(teks, false);
     renderProduk(ketemuProduk); showPage('home'); return;
   }
+  // 3. CHAT BIASA - TABEL bot
   let { data: jawab } = await supabaseClient.from('bot').select('*').ilike('kata_kunci', '%'+pesan+'%').maybeSingle();
   if(!jawab){
     let r2 = await supabaseClient.from('bot').select('*').ilike('pertanyaan', '%'+pesan+'%').maybeSingle();
@@ -251,7 +249,7 @@ function bukaPin(){
 }
 function tutupPin(){
   document.getElementById('pinOverlay').classList.remove('open');
-  calonCode = null; calonPin = null; pinInput = "";
+  calonCode = null; calonRole = null; pinInput = "";
 }
 function updateDots(){
   document.querySelectorAll('.pin-dot').forEach((d,i)=>{
@@ -264,7 +262,9 @@ async function tekanPin(angka){
   pinInput += angka;
   updateDots();
   if(pinInput.length === 6){
-    if(pinInput === calonPin){
+    // CEK PIN LEWAT RPC - PIN TIDAK PERNAH DIKIRIM KE BROWSER, CUMA JAWAB TRUE/FALSE
+    let { data: ok } = await supabaseClient.rpc('bot_login_pin', { p_code: calonCode, p_pin: pinInput });
+    if(ok === true){
       sessionStorage.setItem('casa_auth', JSON.stringify({ role: calonRole, code: calonCode, waktu: Date.now() }));
       document.getElementById('pinMsg').style.color = "#FFD700";
       document.getElementById('pinMsg').innerText = "✦ Access Granted ✦";
