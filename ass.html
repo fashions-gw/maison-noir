@@ -40,6 +40,7 @@ body{background:#000;color:#fff;overflow-x:hidden}
 .btn-add.green{background:#22C55E;color:#000}
 .btn-add.dark{background:#222;color:#fff;border:1px solid #FFD700}
 .btn-add.red{background:#FF2D2D;color:#fff}
+.btn-add.blue{background:#2563EB;color:#fff}
 input,select,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid #444;background:#222;color:#fff;margin-top:8px}
 label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 .detail-row{display:flex;justify-content:space-between;font-size:13px;color:#ccc;padding:4px 0;border-bottom:1px dashed #333}
@@ -76,7 +77,7 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 </div>
 <div class="section" id="page-admin">
 <h2>Dashboard <i>Admin</i></h2>
-<p class="sub">Sumber data: <b style="color:#FFD700">Supabase Baru</b> • Kalau kolom gak ada, otomatis dibikinin pas pencet Simpan!</p>
+<p class="sub">Sumber data: <b style="color:#FFD700">Supabase Baru</b> • Kalau dihadang polisi (42501), pencet USIR POLISI!</p>
 <div class="stats">
 <div class="stat" onclick="filterTab(null,'semua')"><small>📦 Total Produk</small><b id="statProduk">0</b><span>Semua, termasuk Habis</span></div>
 <div class="stat" onclick="filterTab(null,'stok-tipis')"><small>⚠️ Stok Menipis</small><b id="statStok">0</b><span>Stok &lt; 5</span></div>
@@ -86,7 +87,9 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 <div class="menu-top" id="menuTop"></div>
 <button class="btn-add" onclick="openForm()">+ TAMBAH BARANG BARU</button>
 <button class="btn-add dark" onclick="perbaikiDB()">🛠️ PERBAIKI DATABASE - Klik Kalau Gagal Simpan</button>
+<button class="btn-add blue" onclick="usirPolisi()">🚔 USIR POLISI - Klik Kalau Dihadang 42501</button>
 <p id="dbStatus" style="font-size:12px;color:#FFD700;text-align:center;margin-top:-8px;margin-bottom:12px"></p>
+<p id="polisiStatus" style="font-size:12px;color:#FFD700;text-align:center;margin-top:-8px;margin-bottom:12px"></p>
 <button class="btn-add red" id="btnBersihin" onclick="hapusSemuaHabis()">🗑️ BERSIHIN SAMPAH - Hapus Semua yang Habis (0)</button>
 <button class="btn-add dark" onclick="lihatDepan()">👀 Lihat Halaman Depan (Kayak Pembeli)</button>
 <div id="listProduk"></div>
@@ -197,6 +200,19 @@ async function rpcEnsure(){
     return true;
   }catch(e){ return false; }
 }
+async function usirPolisi(){
+  let el = document.getElementById('polisiStatus');
+  if(el) el.innerText = 'Lagi ngusir polisi... tunggu bentar...';
+  try{
+    let res = await fetch(SUPABASE_URL + "/rest/v1/rpc/usir_polisi", { method:"POST", headers: HEADERS, body:"{}" });
+    if(!res.ok) throw new Error(await res.text());
+    if(el) el.innerText = '✅ BERES! Polisi udah diusir! Sekarang pencet Simpan lagi.';
+    await loadAdmin();
+  }catch(e){
+    if(el) el.innerText = '❌ Gagal usir. Jalankan SQL usir_polisi di Supabase dulu.';
+    alert('Gagal usir polisi: '+e.message+'\n\nPastikan di Supabase udah jalanin SQL CREATE FUNCTION usir_polisi() yang gw kasih.');
+  }
+}
 async function perbaikiDB(){
   let el = document.getElementById('dbStatus');
   if(el) el.innerText = 'Lagi dibenerin... tunggu bentar...';
@@ -213,6 +229,9 @@ async function sbAuto(method, table, body, query){
   try{ return await sb(method, table, body, query); }
   catch(e){
     let msg = String(e.message||'');
+    if(msg.includes('42501') || msg.includes('row-level security') || msg.includes('violates row-level')){
+      throw new Error('DIHADANG POLISI (42501)! Pencet tombol 🚔 USIR POLISI dulu, baru pencet Simpan lagi.');
+    }
     if(msg.includes('Could not find') || msg.includes('PGRST204') || msg.includes('does not exist') || (msg.includes('relation') && msg.includes('does not exist'))){
       let ok = await rpcEnsure();
       if(ok){
