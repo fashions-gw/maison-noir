@@ -22,7 +22,7 @@ button.abu{background:#222;color:#fff;border:1px solid #FFD700}
 .info{background:rgba(0,0,0,0.55);border:1px solid rgba(255,215,0,0.4);border-radius:12px;padding:14px;margin-top:10px;font-size:14px;line-height:1.9;text-align:left}
 .badge{display:inline-block;background:#FFD700;color:#000;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:bold}
 .hidden{display:none}
-#status{text-align:center;font-size:13px;color:#FFD700;min-height:18px}
+#status{text-align:center;font-size:13px;color:#FFD700;min-height:18px;word-break:break-word}
 a{color:#FFD700}
 </style>
 </head>
@@ -44,7 +44,7 @@ a{color:#FFD700}
     <button id="btnFoto" onclick="document.getElementById('inputFoto').click()">📸</button>
     <input type="file" id="inputFoto" accept="image/*" style="display:none" onchange="uploadFoto(this)">
   </div>
-  <p id="status"></p>
+  <p id="status2"></p>
   <div class="info" id="infoMember"></div>
   <button onclick="logout()" class="abu">KELUAR</button>
   <a href="index.html"><button class="abu" style="margin-top:4px">🛍️ Belanja Lagi</button></a>
@@ -55,15 +55,45 @@ const SUPABASE_URL = "https://tnpkepfjrltfryhuqnvo.supabase.co";
 const SUPABASE_KEY = "sb_publishable_D_RB0mj9X66SOlj9-4jgug_s7fvHEYO";
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let userSaatIni = null;
+
+// Bikin semua versi WA: 0858..., 62858..., +62858...
+function variasiWA(wa){
+  let w = wa.replace(/[^0-9]/g,'');
+  if(w.startsWith('62')) w = '0' + w.slice(2);
+  if(!w.startsWith('0')) w = '0' + w;
+  let v1 = w; // 0858...
+  let v2 = '62' + w.slice(1); // 62858...
+  let v3 = '+' + v2;
+  return [...new Set([wa, v1, v2, v3])];
+}
+
 async function login(){
-  const wa = document.getElementById('loginWa').value.trim();
+  const waRaw = document.getElementById('loginWa').value.trim();
   const pass = document.getElementById('loginPass').value.trim();
-  if(!wa || !pass) return alert('Isi WA & Password dulu');
+  if(!waRaw || !pass) return alert('Isi WA & Password dulu');
   document.getElementById('status').innerText = 'Mengecek...';
-  const { data, error } = await supabase.from('member').select('*').eq('wa', wa).eq('password', pass).single();
-  if(error || !data){ document.getElementById('status').innerText = 'WA / Password salah!'; return; }
-  userSaatIni = data;
-  localStorage.setItem('casa_member', JSON.stringify(data));
+  let ketemu = null;
+  let lastError = '';
+  // Coba semua variasi WA
+  for(let wa of variasiWA(waRaw)){
+    let { data, error } = await supabase.from('member').select('*').eq('wa', wa).eq('password', pass).maybeSingle();
+    if(data){ ketemu = data; break; }
+    if(error) lastError = error.message;
+  }
+  // Kalau masih gak ketemu, coba tanpa password dulu buat cek apakah WA-nya ketemu tapi password salah
+  if(!ketemu){
+    for(let wa of variasiWA(waRaw)){
+      let { data } = await supabase.from('member').select('*').eq('wa', wa).maybeSingle();
+      if(data){
+        document.getElementById('status').innerText = 'WA ketemu, tapi Password salah! Cek password di kasir. (WA di DB: '+data.wa+')';
+        return;
+      }
+    }
+    document.getElementById('status').innerText = 'WA / Password salah! ' + (lastError ? 'Error: '+lastError : 'Coba cek RLS di Supabase masih nyala atau tidak.');
+    return;
+  }
+  userSaatIni = ketemu;
+  localStorage.setItem('casa_member', JSON.stringify(ketemu));
   tampilProfil();
 }
 function tampilProfil(){
@@ -84,18 +114,18 @@ async function uploadFoto(input){
   const file = input.files[0];
   if(!file) return;
   if(!userSaatIni) return alert('Login dulu');
-  document.getElementById('status').innerText = 'Uploading... Ke Database ☁️';
+  document.getElementById('status2').innerText = 'Uploading...';
   const namaFile = `member-${userSaatIni.id}-${Date.now()}.jpg`;
   const { error: upErr } = await supabase.storage.from('foto-profil').upload(namaFile, file, { upsert: true, contentType: file.type });
-  if(upErr){ document.getElementById('status').innerText = 'Gagal upload: ' + upErr.message; return; }
+  if(upErr){ document.getElementById('status2').innerText = 'Gagal upload: ' + upErr.message; return; }
   const { data: urlData } = supabase.storage.from('foto-profil').getPublicUrl(namaFile);
   const fotoUrl = urlData.publicUrl;
   const { error: dbErr } = await supabase.from('member').update({ foto_url: fotoUrl }).eq('id', userSaatIni.id);
-  if(dbErr){ document.getElementById('status').innerText = 'Gagal simpan: ' + dbErr.message; return; }
+  if(dbErr){ document.getElementById('status2').innerText = 'Gagal simpan: ' + dbErr.message; return; }
   userSaatIni.foto_url = fotoUrl;
   localStorage.setItem('casa_member', JSON.stringify(userSaatIni));
   document.getElementById('fotoPreview').src = fotoUrl;
-  document.getElementById('status').innerText = 'Foto tersimpan di Database! ☁️✅';
+  document.getElementById('status2').innerText = 'Foto tersimpan! ☁️✅';
 }
 const saved = localStorage.getItem('casa_member');
 if(saved){ try{ userSaatIni = JSON.parse(saved); tampilProfil(); }catch(e){} }
