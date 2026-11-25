@@ -13,7 +13,7 @@ body{background:#000;color:#fff;overflow-x:hidden}
 .logout{background:#FFD700;color:#000;padding:8px 16px;border-radius:20px;font-weight:bold;border:none;cursor:pointer}
 .admin-info{margin-top:15px;background:rgba(0,0,0,0.55);border:1px solid rgba(255,215,0,0.6);border-radius:18px;padding:14px;display:flex;gap:12px;align-items:center;text-align:left}
 .admin-info img{width:55px;height:55px;border-radius:50%;object-fit:cover;border:2px solid #FFD700}
-.section{padding:15px 20px 110px;background:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.65)),url('background-emas.jpg');background-size:cover;background-position:center;min-height:100vh}
+.section{padding:15px 20px 170px;background:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.65)),url('background-emas.jpg');background-size:cover;background-position:center;min-height:100vh}
 .section h2{font-size:22px;margin-bottom:12px}.section h2 i{color:#FFD700}
 .sub{font-size:12px;color:#ccc;text-align:left;margin-bottom:12px}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
@@ -34,8 +34,8 @@ body{background:#000;color:#fff;overflow-x:hidden}
 .badge-aman{background:#22C55E;color:#000;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:bold;margin-left:5px}
 .badge-habis{background:#888;color:#000;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:bold;margin-left:5px}
 .btn-row{display:flex;gap:8px;margin-top:10px}
-.btn-edit{flex:1;background:#FFD700;border:none;padding:10px;border-radius:10px;font-weight:bold;cursor:pointer}
-.btn-hapus{flex:1;background:transparent;color:#FFD700;border:1px solid #FFD700;padding:10px;border-radius:10px;font-weight:bold;cursor:pointer}
+.btn-edit{flex:1;background:#FFD700;border:none;padding:12px;border-radius:10px;font-weight:bold;cursor:pointer;min-height:44px}
+.btn-hapus{flex:1;background:transparent;color:#FFD700;border:1px solid #FFD700;padding:12px;border-radius:10px;font-weight:bold;cursor:pointer;min-height:44px}
 .btn-add{width:100%;background:#FFD700;border:none;padding:15px;border-radius:14px;font-weight:bold;font-size:15px;cursor:pointer;margin-bottom:12px}
 .btn-add.green{background:#22C55E;color:#000}
 .btn-add.dark{background:#222;color:#fff;border:1px solid #FFD700}
@@ -45,8 +45,9 @@ input,select,textarea{width:100%;padding:12px;border-radius:10px;border:1px soli
 label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 .detail-row{display:flex;justify-content:space-between;font-size:13px;color:#ccc;padding:4px 0;border-bottom:1px dashed #333}
 .detail-row b{color:#fff;text-align:right;max-width:60%}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.95);border-top:1px solid #FFD700;display:flex;justify-content:space-around;padding:16px 0 18px;z-index:99}
-.bottom-nav a{color:#fff;text-decoration:none;font-size:13px;text-align:center;cursor:pointer;flex:1;line-height:1.5;padding:4px 2px}
+/* ===== BOTTOM NAV - DIBENERIN BIAR GAK NUTUPIN TOMBOL! ===== */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.98);border-top:1px solid #FFD700;display:flex;justify-content:space-around;padding:10px 2px 14px;z-index:999}
+.bottom-nav a{color:#fff;text-decoration:none;font-size:11px;text-align:center;cursor:pointer;flex:1;line-height:1.4;padding:4px 1px;white-space:nowrap;overflow:hidden}
 .bottom-nav a.active{color:#FFD700}
 .popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;align-items:flex-end;justify-content:center}.popup.open{display:flex}
 .popup-box{background:#111;width:100%;max-width:420px;border-radius:25px 25px 0 0;max-height:92vh;overflow-y:auto;border-top:2px solid #FFD700;padding:18px}
@@ -68,7 +69,6 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 .cam-snap{width:70px;height:70px;border-radius:50%;background:#FFD700;border:4px solid #fff;font-size:30px;cursor:pointer}
 .cam-close{background:#222;color:#fff;border:1px solid #FFD700;padding:12px 20px;border-radius:20px;font-weight:bold;cursor:pointer}
 .cam-switch{background:#222;color:#fff;border:1px solid #FFD700;padding:12px 20px;border-radius:20px;font-weight:bold;cursor:pointer}
-/* ===== NOTIF ADMIN - BARU ===== */
 .notif-badge{background:#FF2D2D;color:#fff;min-width:22px;height:22px;border-radius:11px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;padding:0 6px}
 @keyframes goyang{0%,100%{transform:rotate(0)}25%{transform:rotate(15deg)}75%{transform:rotate(-15deg)}}
 .bell-goyang{animation:goyang .5s ease 3}
@@ -76,20 +76,17 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 </head>
 <body>
 <div class="hero">
-<div class="top"><div class="logo">CASA MODA<span>ADMIN LUXURY</span></div><div style="display:flex;gap:8px;align-items:center"><button id="bellAdmin" onclick="scrollKeNotif()" style="background:#222;border:1px solid #FFD700;padding:8px 14px;border-radius:20px;color:#fff;font-weight:bold;cursor:pointer">🔔 <span id="bellCount" class="notif-badge">0</span></button><button class="logout" onclick="logout()">Logout</button></div></div>
+<div class="top"><div class="logo">CASA MODA<span>ADMIN LUXURY</span></div><div style="display:flex;gap:8px;align-items:center"><button id="bellAdmin" onclick="scrollKeNotif()" style="background:#222;border:1px solid #FFD700;padding:8px 14px;border-radius:20px;color:#fff;font-weight:bold;cursor:pointer;min-height:44px">🔔 <span id="bellCount" class="notif-badge">0</span></button><button class="logout" onclick="logout()" style="min-height:44px">Logout</button></div></div>
 <div class="admin-info"><img src="https://via.placeholder.com/100" id="adminFoto"><div><b id="adminNama">Admin CASA MODA</b><br><small style="color:#FFD700" id="adminCode">Code: -</small><br><small id="adminWA">WA: -</small></div></div>
 </div>
 <div class="section" id="page-admin">
 <h2>Dashboard <i>Admin</i></h2>
 <p class="sub">Sumber data: <b style="color:#FFD700">Supabase Baru</b> • Kalau dihadang polisi (42501), pencet USIR POLISI!</p>
-
-<!-- ===== NOTIF ADMIN - TOP UP + TARIK SALDO - BARU! ===== -->
 <div id="notifAdminBox" style="display:none;background:linear-gradient(135deg,#FF2D2D,#FF6B6B);border:1px solid #fff;border-radius:18px;padding:14px;margin-bottom:14px;text-align:left">
 <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:16px">🔔 NOTIF - Ada Request Baru!</h3><span id="notifCount" class="notif-badge" style="background:#fff;color:#FF2D2D;font-size:13px;min-width:24px;height:24px">0</span></div>
 <p style="font-size:12px;margin-top:4px;opacity:.95">Ada member yang minta Top Up / Tarik Saldo! Setujui / tolak di sini, saldo otomatis keubah!</p>
 <div id="notifList"></div>
 </div>
-
 <div class="stats">
 <div class="stat" onclick="filterTab(null,'semua')"><small>📦 Total Produk</small><b id="statProduk">0</b><span>Semua, termasuk Habis</span></div>
 <div class="stat" onclick="filterTab(null,'stok-tipis')"><small>⚠️ Stok Menipis</small><b id="statStok">0</b><span>Stok &lt; 5</span></div>
@@ -132,15 +129,13 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 <div class="section" id="page-member" style="display:none">
 <h2>Kelola <i>Member</i></h2>
 <p class="sub">Edit member, Top Up Saldo, liat foto member. Total: <b style="color:#FFD700" id="memberTotal">0</b> member • Total Saldo: <b style="color:#FFD700" id="memberTotalSaldo">Rp. 0,-</b></p>
-
-<!-- ===== REQUEST DI HALAMAN MEMBER JUGA - BARU! ===== -->
-<div class="card" style="border:2px solid #FF2D2D"><b>🔔 Request Top Up - Menunggu Verifikasi</b><div id="listTopupPending" style="margin-top:10px"></div></div>
-<div class="card" style="border:2px solid #FF2D2D"><b>💸 Request Tarik Saldo - Menunggu Verifikasi</b><div id="listWithdrawPending" style="margin-top:10px"></div></div>
+<div class="card" style="border:2px solid #FF2D2D"><b>🔔 Request Top Up - Menunggu Verifikasi</b><div id="listTopupPending" style="margin-top:10px"><p style="color:#ccc;font-size:13px">Lagi ngecek database...</p></div></div>
+<div class="card" style="border:2px solid #FF2D2D"><b>💸 Request Tarik Saldo - Menunggu Verifikasi</b><div id="listWithdrawPending" style="margin-top:10px"><p style="color:#ccc;font-size:13px">Lagi ngecek database...</p></div></div>
 <div class="card"><b>📜 Riwayat Request Terakhir</b><div id="listRequestRiwayat" style="margin-top:10px"></div></div>
-
 <input id="cariMember" placeholder="Cari nama / WA member..." oninput="renderMemberList()">
 <div id="listMember" style="margin-top:12px"></div>
 <button class="btn-add dark" onclick="showPageAdmin('admin')">← Kembali ke Dashboard</button>
+<div style="height:30px"></div>
 </div>
 <div class="section" id="page-pengaturan" style="display:none">
 <h2>Pengaturan <i>Toko</i></h2>
@@ -320,8 +315,6 @@ function navAdmin(el, p){ document.querySelectorAll('.bottom-nav a').forEach(a=>
 function logout(){ sessionStorage.removeItem('casa_login'); window.location.href='index.html'; }
 function lihatDepan(){ window.location.href='index.html'; }
 function scrollKeNotif(){ let el=document.getElementById('notifAdminBox'); if(el && el.style.display!=='none'){ el.scrollIntoView({behavior:'smooth'}); } else { showPageAdmin('member'); } }
-
-// ===== NOTIF ADMIN - DARI DATABASE casa_topup + casa_withdraw - BARU! =====
 let lastNotifCount = -1;
 function bunyiNotif(){ try{ let ctx=new (window.AudioContext||window.webkitAudioContext)(); let o=ctx.createOscillator(), g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value=880; o.type='sine'; g.gain.setValueAtTime(0.3,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.6); o.start(); o.stop(ctx.currentTime+0.6); setTimeout(()=>{ let o2=ctx.createOscillator(), g2=ctx.createGain(); o2.connect(g2); g2.connect(ctx.destination); o2.frequency.value=1100; g2.gain.setValueAtTime(0.3,ctx.currentTime); g2.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.6); o2.start(); o2.stop(ctx.currentTime+0.6); },200); }catch(e){} if(navigator.vibrate) navigator.vibrate([200,100,200]); }
 async function loadNotifAdmin(popupBaru){
@@ -339,16 +332,15 @@ async function loadNotifAdmin(popupBaru){
       else{
         box.style.display='block';
         document.getElementById('notifList').innerHTML = semua.map(x=>{
-          if(x._type==='TOPUP') return `<div style="background:rgba(0,0,0,.35);padding:12px;border-radius:12px;margin-top:10px"><b>💰 TOP UP - ${x.member||'-'}</b><br>${fmt(x.nominal)} • Via ${x.metode}<br><small>${new Date(x.at||x.created_at).toLocaleString('id-ID')}</small><div style="display:flex;gap:8px;margin-top:8px"><button onclick="setujuiTopupReq(${x.id})" style="flex:1;background:#22C55E;border:none;padding:10px;border-radius:10px;font-weight:bold;color:#fff;cursor:pointer">✅ Setujui + Tambah Saldo</button><button onclick="tolakTopupReq(${x.id})" style="flex:1;background:#fff;color:#FF2D2D;border:none;padding:10px;border-radius:10px;font-weight:bold;cursor:pointer">❌ Tolak</button></div></div>`;
-          return `<div style="background:rgba(0,0,0,.35);padding:12px;border-radius:12px;margin-top:10px"><b>💸 TARIK SALDO - ${x.member||'-'}</b><br>${fmt(x.nominal)} • Ke ${x.metode} - ${x.nomor} (${x.nama_rek})<br><small>${new Date(x.at||x.created_at).toLocaleString('id-ID')}</small><div style="display:flex;gap:8px;margin-top:8px"><button onclick="setujuiWithdrawReq(${x.id})" style="flex:1;background:#22C55E;border:none;padding:10px;border-radius:10px;font-weight:bold;color:#fff;cursor:pointer">✅ Sudah TF + Potong Saldo</button><button onclick="tolakWithdrawReq(${x.id})" style="flex:1;background:#fff;color:#FF2D2D;border:none;padding:10px;border-radius:10px;font-weight:bold;cursor:pointer">❌ Tolak</button></div></div>`;
+          if(x._type==='TOPUP') return `<div style="background:rgba(0,0,0,.35);padding:12px;border-radius:12px;margin-top:10px"><b>💰 TOP UP - ${x.member||'-'}</b><br>${fmt(x.nominal)} • Via ${x.metode}<br><small>${new Date(x.at||x.created_at).toLocaleString('id-ID')}</small><div style="display:flex;gap:8px;margin-top:8px"><button onclick="setujuiTopupReq(${x.id})" style="flex:1;background:#22C55E;border:none;padding:12px;border-radius:10px;font-weight:bold;color:#fff;cursor:pointer;min-height:44px">✅ Setujui</button><button onclick="tolakTopupReq(${x.id})" style="flex:1;background:#fff;color:#FF2D2D;border:none;padding:12px;border-radius:10px;font-weight:bold;cursor:pointer;min-height:44px">❌ Tolak</button></div></div>`;
+          return `<div style="background:rgba(0,0,0,.35);padding:12px;border-radius:12px;margin-top:10px"><b>💸 TARIK SALDO - ${x.member||'-'}</b><br>${fmt(x.nominal)} • Ke ${x.metode} - ${x.nomor} (${x.nama_rek})<br><small>${new Date(x.at||x.created_at).toLocaleString('id-ID')}</small><div style="display:flex;gap:8px;margin-top:8px"><button onclick="setujuiWithdrawReq(${x.id})" style="flex:1;background:#22C55E;border:none;padding:12px;border-radius:10px;font-weight:bold;color:#fff;cursor:pointer;min-height:44px">✅ Sudah TF</button><button onclick="tolakWithdrawReq(${x.id})" style="flex:1;background:#fff;color:#FF2D2D;border:none;padding:12px;border-radius:10px;font-weight:bold;cursor:pointer;min-height:44px">❌ Tolak</button></div></div>`;
         }).join('');
       }
     }
     let elTop = document.getElementById('listTopupPending');
-    if(elTop) elTop.innerHTML = topPending.length ? topPending.map(x=>`<div style="background:#222;padding:10px;border-radius:10px;margin-top:8px"><b>💰 ${x.member} - ${fmt(x.nominal)}</b><br>Via ${x.metode} • ${new Date(x.at||x.created_at).toLocaleString('id-ID')}<div style="display:flex;gap:8px;margin-top:8px"><button onclick="setujuiTopupReq(${x.id})" style="flex:1;background:#22C55E;border:none;padding:9px;border-radius:8px;font-weight:bold;color:#fff;cursor:pointer">✅ Setujui</button><button onclick="tolakTopupReq(${x.id})" style="flex:1;background:#400;color:#fff;border:1px solid #ff4444;padding:9px;border-radius:8px;font-weight:bold;cursor:pointer">❌ Tolak</button></div></div>`).join('') : '<p style="color:#ccc;font-size:13px">Gak ada request Top Up 🎉</p>';
+    if(elTop) elTop.innerHTML = topPending.length ? topPending.map(x=>`<div style="background:#222;padding:10px;border-radius:10px;margin-top:8px"><b>💰 ${x.member} - ${fmt(x.nominal)}</b><br>Via ${x.metode} • ${new Date(x.at||x.created_at).toLocaleString('id-ID')}<div style="display:flex;gap:8px;margin-top:8px"><button onclick="setujuiTopupReq(${x.id})" style="flex:1;background:#22C55E;border:none;padding:12px;border-radius:8px;font-weight:bold;color:#fff;cursor:pointer;min-height:44px">✅ Setujui</button><button onclick="tolakTopupReq(${x.id})" style="flex:1;background:#400;color:#fff;border:1px solid #ff4444;padding:12px;border-radius:8px;font-weight:bold;cursor:pointer;min-height:44px">❌ Tolak</button></div></div>`).join('') : '<p style="color:#ccc;font-size:13px">Gak ada request Top Up 🎉</p>';
     let elWd = document.getElementById('listWithdrawPending');
-    if(elWd) elWd.innerHTML = wdPending.length ? wdPending.map(x=>`<div style="background:#222;padding:10px;border-radius:10px;margin-top:8px"><b>💸 ${x.member} - ${fmt(x.nominal)}</b><br>Ke ${x.metode} - ${x.nomor} (${x.nama_rek}) • ${new Date(x.at||x.created_at).toLocaleString('id-ID')}<div style="display:flex;gap:8px;margin-top:8px"><button onclick="setujuiWithdrawReq(${x.id})" style="flex:1;background:#22C55E;border:none;padding:9px;border-radius:8px;font-weight:bold;color:#fff;cursor:pointer">✅ Sudah TF</button><button onclick="tolakWithdrawReq(${x.id})" style="flex:1;background:#400;color:#fff;border:1px solid #ff4444;padding:9px;border-radius:8px;font-weight:bold;cursor:pointer">❌ Tolak</button></div></div>`).join('') : '<p style="color:#ccc;font-size:13px">Gak ada request Tarik Saldo 🎉</p>';
-    // Riwayat terakhir
+    if(elWd) elWd.innerHTML = wdPending.length ? wdPending.map(x=>`<div style="background:#222;padding:10px;border-radius:10px;margin-top:8px"><b>💸 ${x.member} - ${fmt(x.nominal)}</b><br>Ke ${x.metode} - ${x.nomor} (${x.nama_rek}) • ${new Date(x.at||x.created_at).toLocaleString('id-ID')}<div style="display:flex;gap:8px;margin-top:8px"><button onclick="setujuiWithdrawReq(${x.id})" style="flex:1;background:#22C55E;border:none;padding:12px;border-radius:8px;font-weight:bold;color:#fff;cursor:pointer;min-height:44px">✅ Sudah TF</button><button onclick="tolakWithdrawReq(${x.id})" style="flex:1;background:#400;color:#fff;border:1px solid #ff4444;padding:12px;border-radius:8px;font-weight:bold;cursor:pointer;min-height:44px">❌ Tolak</button></div></div>`).join('') : '<p style="color:#ccc;font-size:13px">Gak ada request Tarik Saldo 🎉</p>';
     let elRiwayat = document.getElementById('listRequestRiwayat');
     if(elRiwayat){
       let topSemua = await sb("GET","casa_topup","", "?select=*&order=created_at.desc&limit=5");
@@ -363,7 +355,7 @@ async function loadNotifAdmin(popupBaru){
       if(baru) alert('ADA REQUEST BARU! 🔔\n\n'+(baru._type==='TOPUP'?'💰 TOP UP\n'+baru.member+' mau Top Up '+fmt(baru.nominal)+' via '+baru.metode:'💸 TARIK SALDO\n'+baru.member+' mau tarik '+fmt(baru.nominal)+' ke '+baru.metode+' - '+baru.nomor));
     }
     lastNotifCount=count;
-  }catch(e){ /* tabel belum ada = diam aja, biar gak ganggu dashboard */ }
+  }catch(e){}
 }
 async function setujuiTopupReq(id){
   let r=await sb("GET","casa_topup","", "?select=*&id=eq."+id); let item=r[0]; if(!item) return;
@@ -390,7 +382,6 @@ async function tolakWithdrawReq(id){
   await sb("PATCH","casa_withdraw",{status:'Ditolak'}, "?id=eq."+id); alert('Penarikan ditolak'); await loadNotifAdmin(false);
 }
 setInterval(()=>{ loadNotifAdmin(true); }, 5000);
-
 async function loadAdmin(){
   try{
     await rpcEnsure();
@@ -728,4 +719,4 @@ async function hapusPegawai(id){
 loadAdmin();
 </script>
 </body>
-  </html>
+</html>
