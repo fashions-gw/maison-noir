@@ -254,12 +254,12 @@ function tekanPin(angka){
   pinInput += angka; updateDots();
   if(pinInput.length === total){ setTimeout(cekPin, 250); }
 }
-// === BOT UDAH DIBERSIHIN - GAK PAKE ?code= LAGI ===
+// === FIX FINAL: admin -> ass.html (KAMUFLASE, JANGAN DIHAPUS!) ===
 function cekPin(){
   if(!pendingAdmin){ closeLock(); return; }
   if(pinInput === String(pendingAdmin.pin).trim()){
     sessionStorage.setItem('casa_login', JSON.stringify({code: pendingAdmin.code, role: pendingAdmin.role, at: Date.now()}));
-    let tujuan = pendingAdmin.role === 'pegawai' ? 'pegawai.html' : 'admin.html';
+    let tujuan = pendingAdmin.role === 'pegawai' ? 'pegawai.html' : 'ass.html';
     window.location.href = tujuan;
     return;
   }
