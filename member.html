@@ -39,10 +39,17 @@ textarea{min-height:70px;resize:vertical}
 label.small{font-size:12px;color:#aaa;margin-top:12px;display:block}
 input.locked{background:#333;border-color:#222;color:#888}
 .hint{font-size:11px;color:#aaa;margin-top:4px}
+.notif-badge{background:#FF2D2D;color:#fff;min-width:20px;height:20px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;padding:0 5px}
 </style>
 </head>
 <body>
-<div class="top"><div class="logo">CASA MODA<span>LUXURY BANDUNG</span></div><a href="index.html" class="btn-back">← Home</a></div>
+<div class="top"><div class="logo">CASA MODA<span>LUXURY BANDUNG</span></div><div style="display:flex;gap:8px;align-items:center"><button id="bellAdmin" onclick="scrollKeAdmin()" style="display:none;background:#222;border:1px solid #FFD700;padding:8px 12px;border-radius:20px;color:#fff;font-weight:bold;cursor:pointer;position:relative">🔔 <span id="bellCount" class="notif-badge">0</span></button><a href="index.html" class="btn-back">← Home</a></div></div>
+
+<div id="adminNotifBox" style="display:none;background:linear-gradient(135deg,#FF2D2D,#FF6B6B);border-radius:18px;padding:16px;margin-top:14px;color:#fff;box-shadow:0 10px 25px rgba(255,45,45,.35)">
+  <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:16px">🔔 NOTIF ADMIN - Ada Request Baru!</h3><span id="adminNotifCount" class="notif-badge" style="background:#fff;color:#FF2D2D;font-size:13px;min-width:24px;height:24px">0</span></div>
+  <p style="font-size:12px;margin-top:4px;opacity:.9">Ada member yang minta Top Up / Tarik Saldo! Cek di bawah, setujui / tolak! (Dari database, nyambung semua HP!)</p>
+  <div id="adminNotifList"></div>
+</div>
 
 <div class="tabs" id="tabsBox"><button class="tab" id="tabDaftar" onclick="gantiTab('daftar')">DAFTAR</button><button class="tab active" id="tabMasuk" onclick="gantiTab('masuk')">MASUK</button></div>
 
@@ -122,202 +129,91 @@ const SUPABASE_KEY = "sb_publishable_D_RB0mj9X66SOlj9-4jgug_s7fvHEYO";
 const HEADERS = { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=representation" };
 const SALDO_MENGENDAP = 10000;
 const MIN_TARIK = 10000;
+const ADMIN_WA = "085890611111";
 function maksBisaDitarik(saldo){ return Math.max(0, Number(saldo||0) - SALDO_MENGENDAP); }
-// ===== FORMAT RUPIAH: Rp. 10.000.000,- =====
 function fmt(n){ return "Rp. " + Number(n||0).toLocaleString('id-ID') + ",-"; }
 function angkaDariRupiah(str){ return Number(String(str||'').replace(/[^0-9]/g,'')) || 0; }
-function formatRupiahInput(val){
-  let angka = String(val||'').replace(/[^0-9]/g,'');
-  if(!angka) return '';
-  let n = Number(angka);
-  return "Rp. " + n.toLocaleString('id-ID') + ",-";
-}
+function formatRupiahInput(val){ let angka = String(val||'').replace(/[^0-9]/g,''); if(!angka) return ''; return "Rp. " + Number(angka).toLocaleString('id-ID') + ",-"; }
+function isAdmin(){ let m=getMember(); return m && bersihWA(m.wa)===ADMIN_WA; }
 async function sb(method, table, body, query){ let url = SUPABASE_URL + "/rest/v1/" + table + (query || ""); let res = await fetch(url, { method, headers: HEADERS, body: body ? JSON.stringify(body) : undefined }); if(!res.ok) throw new Error(await res.text()); let txt = await res.text(); return txt ? JSON.parse(txt) : []; }
 function bersihWA(wa){ return String(wa||'').replace(/[^0-9]/g,''); }
-function validasiWA(wa){
-  let w = bersihWA(wa);
-  if(!w) return 'No WA wajib diisi!';
-  if(w.length < 10) return 'No WA minimal 10 digit!\nLu isi cuma '+w.length+' digit, kurang!';
-  if(w.length > 14) return 'No WA kepanjangan! Max 14 digit!';
-  if(!w.startsWith('0')) return 'No WA harus diawali 0!\nEx: 085890611111 atau 092123332321';
-  return null;
-}
-function validasiPass(pass){
-  if(!pass) return 'Password wajib diisi!';
-  if(pass.length < 6) return 'Password minimal 6 karakter!\nLu isi cuma '+pass.length+' karakter, kurang!';
-  return null;
-}
+function validasiWA(wa){ let w = bersihWA(wa); if(!w) return 'No WA wajib diisi!'; if(w.length < 10) return 'No WA minimal 10 digit!\nLu isi cuma '+w.length+' digit, kurang!'; if(w.length > 14) return 'No WA kepanjangan! Max 14 digit!'; if(!w.startsWith('0')) return 'No WA harus diawali 0!\nEx: 085890611111 atau 092123332321'; return null; }
+function validasiPass(pass){ if(!pass) return 'Password wajib diisi!'; if(pass.length < 6) return 'Password minimal 6 karakter!\nLu isi cuma '+pass.length+' karakter, kurang!'; return null; }
 let _res=null;
 function showToast(m){ let t=document.getElementById('casaToast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+function bunyiNotif(){ try{ let ctx=new (window.AudioContext||window.webkitAudioContext)(); let o=ctx.createOscillator(), g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value=880; o.type='sine'; g.gain.setValueAtTime(0.3,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.6); o.start(); o.stop(ctx.currentTime+0.6); setTimeout(()=>{ let o2=ctx.createOscillator(), g2=ctx.createGain(); o2.connect(g2); g2.connect(ctx.destination); o2.frequency.value=1100; g2.gain.setValueAtTime(0.3,ctx.currentTime); g2.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.6); o2.start(); o2.stop(ctx.currentTime+0.6); },200); }catch(e){} if(navigator.vibrate) navigator.vibrate([200,100,200]); }
 function casaAlert(msg,title,icon){ return new Promise(r=>{ document.getElementById('casaModalIcon').innerText=icon||'✨'; document.getElementById('casaModalTitle').innerText=title||'CASA MODA'; document.getElementById('casaModalMsg').innerText=msg; document.getElementById('casaModalBtns').innerHTML=`<button class="casa-btn-yes" onclick="tutupCasa(true)">OK, Siap! ✨</button>`; _res=r; document.getElementById('casaModal').classList.add('open'); }); }
 function casaConfirm(msg,title,icon,yes,no){ return new Promise(r=>{ document.getElementById('casaModalIcon').innerText=icon||'💰'; document.getElementById('casaModalTitle').innerText=title||'Yakin?'; document.getElementById('casaModalMsg').innerText=msg; document.getElementById('casaModalBtns').innerHTML=`<button class="casa-btn-no" onclick="tutupCasa(false)">${no||'Batal'}</button><button class="casa-btn-yes" onclick="tutupCasa(true)">${yes||'Ya, Lanjut!'}</button>`; _res=r; document.getElementById('casaModal').classList.add('open'); }); }
 function tutupCasa(v){ document.getElementById('casaModal').classList.remove('open'); if(_res){ let r=_res; _res=null; r(v); } }
 function gantiTab(t){ document.getElementById('tabDaftar').classList.toggle('active',t==='daftar'); document.getElementById('tabMasuk').classList.toggle('active',t==='masuk'); document.getElementById('boxDaftar').style.display=t==='daftar'?'block':'none'; document.getElementById('boxMasuk').style.display=t==='masuk'?'block':'none'; }
 function getCart(){ try{ return JSON.parse(localStorage.getItem('casa_cart')||'[]'); }catch(e){ return []; } }
 function getMember(){ try{ return JSON.parse(localStorage.getItem('casa_member')||'null'); }catch(e){ return null; } }
-// ===== UPLOAD FOTO KE SUPABASE + KOMPRES BIAR DB GAK JEBOL =====
-function kompresFotoMember(file){
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        let w = img.width, h = img.height;
-        const MAX = 600;
-        if(w > MAX || h > MAX){
-          let ratio = Math.min(MAX / w, MAX / h);
-          w = Math.round(w * ratio); h = Math.round(h * ratio);
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        let hasil = canvas.toDataURL('image/jpeg', 0.6);
-        if(hasil.length > 150 * 1024) hasil = canvas.toDataURL('image/jpeg', 0.4);
-        resolve(hasil);
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-async function gantiFotoProfil(e){
-  let f = e.target.files[0]; if(!f) return;
-  let m = getMember(); if(!m || !m.id) return showToast('Login dulu!');
-  if(f.size > 5 * 1024 * 1024) return showToast('Fotonya kegedean! Max 5MB!');
-  showToast('Mengompres foto... sabar...');
+// ===== NOTIF ADMIN - DARI DATABASE SUPABASE, BUKAN LOCALSTORAGE LAGI! =====
+let lastNotifCount = -1;
+function scrollKeAdmin(){ document.getElementById('adminNotifBox').scrollIntoView({behavior:'smooth'}); }
+async function getPendingAdminDB(){
   try{
-    let ukuranAwal = f.size;
-    let fotoKecil = await kompresFotoMember(f);
-    let ukuranAkhir = Math.round(fotoKecil.length * 0.75);
-    localStorage.setItem('casa_foto_profil', fotoKecil);
-    tampilFotoProfil();
-    let r = await sb("PATCH","member", { foto_url: fotoKecil }, "?id=eq."+m.id);
-    if(r[0]) m = r[0];
-    m.foto_url = fotoKecil;
-    localStorage.setItem('casa_member', JSON.stringify(m));
-    showToast('Foto ke-upload! Dari ' + Math.round(ukuranAwal/1024) + 'KB jadi ' + Math.round(ukuranAkhir/1024) + 'KB! ✅');
-  }catch(err){
-    showToast('Gagal upload: ' + err.message);
+    let top = await sb("GET","casa_topup","", "?select=*&status=eq.Menunggu Verifikasi&order=created_at.desc");
+    let wd = await sb("GET","casa_withdraw","", "?select=*&status=eq.Menunggu Verifikasi&order=created_at.desc");
+    let all = [...top.map(x=>({...x,_type:'TOPUP'})), ...wd.map(x=>({...x,_type:'WITHDRAW'}))];
+    all.sort((a,b)=>new Date(b.at||b.created_at)-new Date(a.at||a.created_at));
+    return all;
+  }catch(e){ return []; }
+}
+async function renderAdminNotif(munculkanPopUp){
+  if(!isAdmin()){ document.getElementById('adminNotifBox').style.display='none'; document.getElementById('bellAdmin').style.display='none'; return; }
+  let pending = await getPendingAdminDB();
+  let count = pending.length;
+  document.getElementById('bellAdmin').style.display='inline-block';
+  document.getElementById('bellCount').innerText=count;
+  document.getElementById('adminNotifCount').innerText=count;
+  if(count===0){ document.getElementById('adminNotifBox').style.display='none'; }
+  else{
+    document.getElementById('adminNotifBox').style.display='block';
+    document.getElementById('adminNotifList').innerHTML=pending.map(x=>{
+      if(x._type==='TOPUP') return `<div style="background:rgba(0,0,0,.25);padding:12px;border-radius:12px;margin-top:10px"><b>💰 TOP UP - ${x.member||'-'}</b><br>${fmt(x.nominal)} • Via ${x.metode}<br><small>${new Date(x.at||x.created_at).toLocaleString('id-ID')}</small><div style="display:flex;gap:8px;margin-top:8px"><button onclick="setujuiTopup(${x.id})" style="flex:1;background:#22C55E;border:none;padding:10px;border-radius:10px;font-weight:bold;color:#fff;cursor:pointer">✅ Setujui + Tambah Saldo</button><button onclick="tolakTopup(${x.id})" style="flex:1;background:#fff;color:#FF2D2D;border:none;padding:10px;border-radius:10px;font-weight:bold;cursor:pointer">❌ Tolak</button></div></div>`;
+      else return `<div style="background:rgba(0,0,0,.25);padding:12px;border-radius:12px;margin-top:10px"><b>💸 TARIK SALDO - ${x.member||'-'}</b><br>${fmt(x.nominal)} • Ke ${x.metode} - ${x.nomor} (${x.nama_rek})<br><small>${new Date(x.at||x.created_at).toLocaleString('id-ID')}</small><div style="display:flex;gap:8px;margin-top:8px"><button onclick="setujuiWithdraw(${x.id})" style="flex:1;background:#22C55E;border:none;padding:10px;border-radius:10px;font-weight:bold;color:#fff;cursor:pointer">✅ Setujui - Sudah TF + Potong Saldo</button><button onclick="tolakWithdraw(${x.id})" style="flex:1;background:#fff;color:#FF2D2D;border:none;padding:10px;border-radius:10px;font-weight:bold;cursor:pointer">❌ Tolak</button></div></div>`;
+    }).join('');
   }
-  e.target.value = '';
+  if(lastNotifCount!==-1 && count>lastNotifCount && munculkanPopUp!==false){
+    bunyiNotif();
+    let baru=pending[0];
+    await casaAlert('ADA REQUEST BARU! 🔔\n\n'+(baru._type==='TOPUP'?'💰 TOP UP\n'+baru.member+' mau Top Up '+fmt(baru.nominal)+' via '+baru.metode:'💸 TARIK SALDO\n'+baru.member+' mau tarik '+fmt(baru.nominal)+' ke '+baru.metode+' - '+baru.nomor),'Ada Request Baru! 🔔','🔔');
+  }
+  lastNotifCount=count;
 }
-function tampilFotoProfil(){
-  let m = getMember();
-  let foto = (m && (m.foto_url || m.foto)) || localStorage.getItem('casa_foto_profil');
-  let img = document.getElementById('fotoProfil');
-  let kosong = document.getElementById('fotoKosong');
-  if(!img) return;
-  if(foto){ img.src = foto; img.style.display='block'; kosong.style.display='none'; }
-  else { img.style.display='none'; kosong.style.display='flex'; }
+async function setujuiTopup(id){
+  let r=await sb("GET","casa_topup","", "?select=*&id=eq."+id); let item=r[0]; if(!item) return;
+  let ok=await casaConfirm('Setujui Top Up '+fmt(item.nominal)+' dari '+item.member+'?\nSaldo dia akan nambah '+fmt(item.nominal),'Setujui Top Up? ✅','✅','Ya, Setujui!','Batal'); if(!ok) return;
+  try{ let m=await sb("GET","member","", "?select=*&id=eq."+item.member_id); if(m[0]){ await sb("PATCH","member",{saldo:Number(m[0].saldo||0)+Number(item.nominal)}, "?id=eq."+item.member_id); } }catch(e){}
+  await sb("PATCH","casa_topup",{status:'Disetujui'}, "?id=eq."+id);
+  await casaAlert('Top Up '+fmt(item.nominal)+' dari '+item.member+' BERHASIL disetujui! ✅\nSaldo dia udah nambah!','Disetujui! ✅','✅'); renderAdminNotif(false); tampilMember();
 }
-function openEditProfil(){
-  let m = getMember(); if(!m) return;
-  document.getElementById('eNama').value = m.nama || '';
-  document.getElementById('eWa').value = m.wa || '';
-  document.getElementById('eAlamat').value = m.alamat || localStorage.getItem('casa_alamat_'+m.id) || '';
-  document.getElementById('eKota').value = m.kota || localStorage.getItem('casa_kota_'+m.id) || '';
-  document.getElementById('ePass').value = '';
-  document.getElementById('eSaldo').value = fmt(m.saldo) + ' 🔒 Terkunci!';
-  document.getElementById('ePoin').value = (m.poin||0) + ' 🔒 Terkunci!';
-  document.getElementById('editPopup').classList.add('open');
+async function tolakTopup(id){ let r=await sb("GET","casa_topup","", "?select=*&id=eq."+id); let item=r[0]; if(!item) return; let ok=await casaConfirm('Tolak Top Up '+fmt(item.nominal)+' dari '+item.member+'?','Tolak? ❌','❌','Ya, Tolak','Batal'); if(!ok) return; await sb("PATCH","casa_topup",{status:'Ditolak'}, "?id=eq."+id); showToast('Top Up ditolak'); renderAdminNotif(false); tampilMember(); }
+async function setujuiWithdraw(id){
+  let r=await sb("GET","casa_withdraw","", "?select=*&id=eq."+id); let item=r[0]; if(!item) return;
+  let ok=await casaConfirm('Lu udah TF '+fmt(item.nominal)+' ke '+item.metode+' - '+item.nomor+' ('+item.nama_rek+')?\nKalau YA, saldo '+item.member+' akan dipotong '+fmt(item.nominal),'Sudah TF? ✅','✅','Ya, Sudah TF! Potong Saldo!','Belum TF'); if(!ok) return;
+  try{ let m=await sb("GET","member","", "?select=*&id=eq."+item.member_id); if(m[0]){ await sb("PATCH","member",{saldo:Number(m[0].saldo||0)-Number(item.nominal)}, "?id=eq."+item.member_id); } }catch(e){}
+  await sb("PATCH","casa_withdraw",{status:'Disetujui - Sudah Ditransfer'}, "?id=eq."+id);
+  await casaAlert('Penarikan '+fmt(item.nominal)+' dari '+item.member+' BERHASIL! ✅\nLu udah TF, saldo dia udah dipotong!','Disetujui! ✅','✅'); renderAdminNotif(false); tampilMember();
 }
+async function tolakWithdraw(id){ let r=await sb("GET","casa_withdraw","", "?select=*&id=eq."+id); let item=r[0]; if(!item) return; let ok=await casaConfirm('Tolak penarikan '+fmt(item.nominal)+' dari '+item.member+'?\nSaldo dia TIDAK akan dipotong.','Tolak? ❌','❌','Ya, Tolak','Batal'); if(!ok) return; await sb("PATCH","casa_withdraw",{status:'Ditolak'}, "?id=eq."+id); showToast('Penarikan ditolak'); renderAdminNotif(false); tampilMember(); }
+// Polling tiap 5 detik ke database, biar notif nyampe walau HP beda!
+setInterval(()=>{ if(isAdmin()) renderAdminNotif(true); }, 5000);
+// ===== UPLOAD FOTO =====
+function kompresFotoMember(file){ return new Promise((resolve) => { const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { let w = img.width, h = img.height; const MAX = 600; if(w > MAX || h > MAX){ let ratio = Math.min(MAX / w, MAX / h); w = Math.round(w * ratio); h = Math.round(h * ratio); } const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); let hasil = canvas.toDataURL('image/jpeg', 0.6); if(hasil.length > 150 * 1024) hasil = canvas.toDataURL('image/jpeg', 0.4); resolve(hasil); }; img.src = e.target.result; }; reader.readAsDataURL(file); }); }
+async function gantiFotoProfil(e){ let f = e.target.files[0]; if(!f) return; let m = getMember(); if(!m || !m.id) return showToast('Login dulu!'); if(f.size > 5 * 1024 * 1024) return showToast('Fotonya kegedean! Max 5MB!'); showToast('Mengompres foto... sabar...'); try{ let ukuranAwal = f.size; let fotoKecil = await kompresFotoMember(f); let ukuranAkhir = Math.round(fotoKecil.length * 0.75); localStorage.setItem('casa_foto_profil', fotoKecil); tampilFotoProfil(); let r = await sb("PATCH","member", { foto_url: fotoKecil }, "?id=eq."+m.id); if(r[0]) m = r[0]; m.foto_url = fotoKecil; localStorage.setItem('casa_member', JSON.stringify(m)); showToast('Foto ke-upload! Dari ' + Math.round(ukuranAwal/1024) + 'KB jadi ' + Math.round(ukuranAkhir/1024) + 'KB! ✅'); }catch(err){ showToast('Gagal upload: ' + err.message); } e.target.value = ''; }
+function tampilFotoProfil(){ let m = getMember(); let foto = (m && (m.foto_url || m.foto)) || localStorage.getItem('casa_foto_profil'); let img = document.getElementById('fotoProfil'); let kosong = document.getElementById('fotoKosong'); if(!img) return; if(foto){ img.src = foto; img.style.display='block'; kosong.style.display='none'; } else { img.style.display='none'; kosong.style.display='flex'; } }
+function openEditProfil(){ let m = getMember(); if(!m) return; document.getElementById('eNama').value = m.nama || ''; document.getElementById('eWa').value = m.wa || ''; document.getElementById('eAlamat').value = m.alamat || localStorage.getItem('casa_alamat_'+m.id) || ''; document.getElementById('eKota').value = m.kota || localStorage.getItem('casa_kota_'+m.id) || ''; document.getElementById('ePass').value = ''; document.getElementById('eSaldo').value = fmt(m.saldo) + ' 🔒 Terkunci!'; document.getElementById('ePoin').value = (m.poin||0) + ' 🔒 Terkunci!'; document.getElementById('editPopup').classList.add('open'); }
 function closeEditProfil(){ document.getElementById('editPopup').classList.remove('open'); }
-async function simpanEditProfil(){
-  let m = getMember(); if(!m) return;
-  let nama = document.getElementById('eNama').value.trim();
-  let wa = bersihWA(document.getElementById('eWa').value);
-  let alamat = document.getElementById('eAlamat').value.trim();
-  let kota = document.getElementById('eKota').value.trim();
-  let pass = document.getElementById('ePass').value.trim();
-  if(!nama){ await casaAlert('Nama wajib diisi!', 'Belum Lengkap!', '⚠️'); return; }
-  let errWA = validasiWA(wa); if(errWA){ await casaAlert(errWA, 'No WA Salah!', '📱'); return; }
-  if(pass){ let errP = validasiPass(pass); if(errP){ await casaAlert(errP, 'Password Kurang!', '🔒'); return; } }
-  let data = { nama, wa, alamat, kota };
-  if(pass) data.password = pass;
-  try{ let r = await sb("PATCH","member", data, "?id=eq."+m.id); if(r[0]) m = r[0]; }catch(e){
-    try{ let r2 = await sb("PATCH","member", { nama, wa, ...(pass?{password:pass}:{}) }, "?id=eq."+m.id); if(r2[0]) m = r2[0]; }catch(e2){}
-  }
-  m.nama = nama; m.wa = wa; m.alamat = alamat; m.kota = kota; if(pass) m.password = pass;
-  localStorage.setItem('casa_member', JSON.stringify(m));
-  localStorage.setItem('casa_alamat_'+m.id, alamat);
-  localStorage.setItem('casa_kota_'+m.id, kota);
-  closeEditProfil();
-  await casaAlert('Profil berhasil diupdate! ✅\n\nNama: '+nama+'\nWA: '+wa+'\nAlamat: '+(alamat||'-')+'\n\nSaldo lu aman, gak berubah! 😂', 'Profil Diupdate! ✅', '✅');
-  tampilMember();
-}
-async function daftar(){
-  let nama=document.getElementById('dNama').value.trim(), wa=bersihWA(document.getElementById('dWa').value), pass=document.getElementById('dPass').value.trim();
-  if(!nama){ await casaAlert('Nama wajib diisi!', 'Belum Lengkap!', '⚠️'); return; }
-  let errWA = validasiWA(wa); if(errWA){ await casaAlert(errWA, 'No WA Salah!', '📱'); return; }
-  let errP = validasiPass(pass); if(errP){ await casaAlert(errP, 'Password Kurang!', '🔒'); return; }
-  let cek = await sb("GET","member","", "?select=*&wa=eq."+wa);
-  if(cek.length){ await casaAlert('No WA ini udah terdaftar! Langsung Masuk aja.', 'Udah Terdaftar!', '⚠️'); gantiTab('masuk'); return; }
-  let baru = await sb("POST","member", { nama, wa, password: pass, saldo: 0, poin: 0, total_belanja: 0, keranjang: [] }, "?select=*");
-  localStorage.setItem('casa_member', JSON.stringify(baru[0]));
-  await casaAlert('Selamat datang, '+nama+'! 🎉\nAkun lu berhasil dibuat.', 'Daftar Berhasil! 🎉', '🎉');
-  tampilMember();
-}
-async function masuk(){
-  let wa=bersihWA(document.getElementById('mWa').value), pass=document.getElementById('mPass').value.trim();
-  let errWA = validasiWA(wa); if(errWA){ await casaAlert(errWA, 'No WA Salah!', '📱'); return; }
-  let errP = validasiPass(pass); if(errP){ await casaAlert(errP, 'Password Kurang!', '🔒'); return; }
-  let r = await sb("GET","member","", "?select=*&wa=eq."+wa);
-  if(!r.length){ await casaAlert('WA belum terdaftar! Daftar dulu ya.', 'Belum Terdaftar!', '⚠️'); gantiTab('daftar'); return; }
-  if(String(r[0].password)!==String(pass)){ await casaAlert('Password salah!', 'Password Salah!', '🔒'); return; }
-  localStorage.setItem('casa_member', JSON.stringify(r[0]));
-  await casaAlert('Berhasil masuk!\nHalo, '+r[0].nama+'! ✨', 'Berhasil Masuk! 🎉', '🎉');
-  tampilMember();
-}
-async function tampilMember(){
-  let m = getMember();
-  if(!m){
-    document.getElementById('memberBox').style.display='none';
-    document.getElementById('formBox').style.display='block';
-    document.getElementById('tabsBox').style.display='flex';
-    document.getElementById('bawahBox').style.display='none';
-    document.getElementById('listMemberBox').style.display='none';
-    return;
-  }
-  if(m.id){ try{ let r=await sb("GET","member","", "?select=*&id=eq."+m.id); if(r[0]){ m=r[0]; m.alamat = m.alamat || localStorage.getItem('casa_alamat_'+m.id) || ''; m.kota = m.kota || localStorage.getItem('casa_kota_'+m.id) || ''; localStorage.setItem('casa_member', JSON.stringify(m)); } }catch(e){} }
-  document.getElementById('formBox').style.display='none'; document.getElementById('tabsBox').style.display='none'; document.getElementById('memberBox').style.display='block'; document.getElementById('bawahBox').style.display='flex'; document.getElementById('listMemberBox').style.display='block';
-  document.getElementById('namaMember').innerText=m.nama; document.getElementById('levelMember').innerText = Number(m.total_belanja||0) >= 1000000 ? 'Gold member' : 'Silver member'; document.getElementById('saldoMember').innerText=fmt(m.saldo); document.getElementById('bisaDitarik').innerText=fmt(maksBisaDitarik(m.saldo)); document.getElementById('poinMember').innerText=m.poin||0; document.getElementById('belanjaMember').innerText=fmt(m.total_belanja); tampilFotoProfil();
-  let cart=getCart(), total=0;
-  document.getElementById('cartList').innerHTML = cart.length ? cart.map((c,i)=>{ total+=Number(c.harga); return `<div class="cart-item"><img src="${c.foto||''}"><div style="flex:1"><b>${c.nama||'Tanpa Nama'}</b><br><small>Ukuran: ${c.size}</small><br><span style="color:#FFD700">${fmt(c.harga)}</span></div><button onclick="hapusCart(${i})" style="background:none;border:none;color:#fff">✕</button></div>`; }).join('') : '<p style="color:#aaa;margin-top:10px">Keranjang kosong, ayo belanja di Home!</p>';
-  document.getElementById('cartTotal').innerText = cart.length ? 'Total: '+fmt(total) : '';
-  let riw = JSON.parse(localStorage.getItem('casa_topup')||'[]').filter(x=>x.member_id===m.id);
-  document.getElementById('riwayatTopup').innerHTML = riw.length ? riw.slice(-5).reverse().map(x=>`<div class="member-item">${fmt(x.nominal)} • ${x.metode} • ${x.status}<br><small>${new Date(x.at).toLocaleString('id-ID')}</small></div>`).join('') : '<p style="color:#aaa;margin-top:8px">Belum ada Top Up</p>';
-  let riwW = JSON.parse(localStorage.getItem('casa_withdraw')||'[]').filter(x=>x.member_id===m.id);
-  document.getElementById('riwayatWithdraw').innerHTML = riwW.length ? riwW.slice(-5).reverse().map(x=>`<div class="member-item">-${fmt(x.nominal)} • ${x.metode} ke ${x.nomor} (${x.nama_rek}) • ${x.status}<br><small>${new Date(x.at).toLocaleString('id-ID')}</small></div>`).join('') : '<p style="color:#aaa;margin-top:8px">Belum ada penarikan</p>';
-  loadList();
-}
+async function simpanEditProfil(){ let m = getMember(); if(!m) return; let nama = document.getElementById('eNama').value.trim(); let wa = bersihWA(document.getElementById('eWa').value); let alamat = document.getElementById('eAlamat').value.trim(); let kota = document.getElementById('eKota').value.trim(); let pass = document.getElementById('ePass').value.trim(); if(!nama){ await casaAlert('Nama wajib diisi!', 'Belum Lengkap!', '⚠️'); return; } let errWA = validasiWA(wa); if(errWA){ await casaAlert(errWA, 'No WA Salah!', '📱'); return; } if(pass){ let errP = validasiPass(pass); if(errP){ await casaAlert(errP, 'Password Kurang!', '🔒'); return; } } let data = { nama, wa, alamat, kota }; if(pass) data.password = pass; try{ let r = await sb("PATCH","member", data, "?id=eq."+m.id); if(r[0]) m = r[0]; }catch(e){ try{ let r2 = await sb("PATCH","member", { nama, wa, ...(pass?{password:pass}:{}) }, "?id=eq."+m.id); if(r2[0]) m = r2[0]; }catch(e2){} } m.nama = nama; m.wa = wa; m.alamat = alamat; m.kota = kota; if(pass) m.password = pass; localStorage.setItem('casa_member', JSON.stringify(m)); localStorage.setItem('casa_alamat_'+m.id, alamat); localStorage.setItem('casa_kota_'+m.id, kota); closeEditProfil(); await casaAlert('Profil berhasil diupdate! ✅\n\nNama: '+nama+'\nWA: '+wa+'\nAlamat: '+(alamat||'-')+'\n\nSaldo lu aman, gak berubah! 😂', 'Profil Diupdate! ✅', '✅'); tampilMember(); }
+async function daftar(){ let nama=document.getElementById('dNama').value.trim(), wa=bersihWA(document.getElementById('dWa').value), pass=document.getElementById('dPass').value.trim(); if(!nama){ await casaAlert('Nama wajib diisi!', 'Belum Lengkap!', '⚠️'); return; } let errWA = validasiWA(wa); if(errWA){ await casaAlert(errWA, 'No WA Salah!', '📱'); return; } let errP = validasiPass(pass); if(errP){ await casaAlert(errP, 'Password Kurang!', '🔒'); return; } let cek = await sb("GET","member","", "?select=*&wa=eq."+wa); if(cek.length){ await casaAlert('No WA ini udah terdaftar! Langsung Masuk aja.', 'Udah Terdaftar!', '⚠️'); gantiTab('masuk'); return; } let baru = await sb("POST","member", { nama, wa, password: pass, saldo: 0, poin: 0, total_belanja: 0, keranjang: [] }, "?select=*"); localStorage.setItem('casa_member', JSON.stringify(baru[0])); await casaAlert('Selamat datang, '+nama+'! 🎉\nAkun lu berhasil dibuat.', 'Daftar Berhasil! 🎉', '🎉'); tampilMember(); }
+async function masuk(){ let wa=bersihWA(document.getElementById('mWa').value), pass=document.getElementById('mPass').value.trim(); let errWA = validasiWA(wa); if(errWA){ await casaAlert(errWA, 'No WA Salah!', '📱'); return; } let errP = validasiPass(pass); if(errP){ await casaAlert(errP, 'Password Kurang!', '🔒'); return; } let r = await sb("GET","member","", "?select=*&wa=eq."+wa); if(!r.length){ await casaAlert('WA belum terdaftar! Daftar dulu ya.', 'Belum Terdaftar!', '⚠️'); gantiTab('daftar'); return; } if(String(r[0].password)!==String(pass)){ await casaAlert('Password salah!', 'Password Salah!', '🔒'); return; } localStorage.setItem('casa_member', JSON.stringify(r[0])); await casaAlert('Berhasil masuk!\nHalo, '+r[0].nama+'! ✨', 'Berhasil Masuk! 🎉', '🎉'); tampilMember(); }
+async function tampilMember(){ let m = getMember(); if(!m){ document.getElementById('memberBox').style.display='none'; document.getElementById('formBox').style.display='block'; document.getElementById('tabsBox').style.display='flex'; document.getElementById('bawahBox').style.display='none'; document.getElementById('listMemberBox').style.display='none'; renderAdminNotif(false); return; } if(m.id){ try{ let r=await sb("GET","member","", "?select=*&id=eq."+m.id); if(r[0]){ m=r[0]; m.alamat = m.alamat || localStorage.getItem('casa_alamat_'+m.id) || ''; m.kota = m.kota || localStorage.getItem('casa_kota_'+m.id) || ''; localStorage.setItem('casa_member', JSON.stringify(m)); } }catch(e){} } document.getElementById('formBox').style.display='none'; document.getElementById('tabsBox').style.display='none'; document.getElementById('memberBox').style.display='block'; document.getElementById('bawahBox').style.display='flex'; document.getElementById('listMemberBox').style.display='block'; document.getElementById('namaMember').innerText=m.nama; document.getElementById('levelMember').innerText = Number(m.total_belanja||0) >= 1000000 ? 'Gold member' : 'Silver member'; document.getElementById('saldoMember').innerText=fmt(m.saldo); document.getElementById('bisaDitarik').innerText=fmt(maksBisaDitarik(m.saldo)); document.getElementById('poinMember').innerText=m.poin||0; document.getElementById('belanjaMember').innerText=fmt(m.total_belanja); tampilFotoProfil(); let cart=getCart(), total=0; document.getElementById('cartList').innerHTML = cart.length ? cart.map((c,i)=>{ total+=Number(c.harga); return `<div class="cart-item"><img src="${c.foto||''}"><div style="flex:1"><b>${c.nama||'Tanpa Nama'}</b><br><small>Ukuran: ${c.size}</small><br><span style="color:#FFD700">${fmt(c.harga)}</span></div><button onclick="hapusCart(${i})" style="background:none;border:none;color:#fff">✕</button></div>`; }).join('') : '<p style="color:#aaa;margin-top:10px">Keranjang kosong, ayo belanja di Home!</p>'; document.getElementById('cartTotal').innerText = cart.length ? 'Total: '+fmt(total) : ''; try{ let riw = await sb("GET","casa_topup","", "?select=*&member_id=eq."+m.id+"&order=created_at.desc&limit=5"); document.getElementById('riwayatTopup').innerHTML = riw.length ? riw.map(x=>`<div class="member-item">${fmt(x.nominal)} • ${x.metode} • ${x.status}<br><small>${new Date(x.at||x.created_at).toLocaleString('id-ID')}</small></div>`).join('') : '<p style="color:#aaa;margin-top:8px">Belum ada Top Up</p>'; }catch(e){ document.getElementById('riwayatTopup').innerHTML='<p style="color:#aaa">Belum ada Top Up</p>'; } try{ let riwW = await sb("GET","casa_withdraw","", "?select=*&member_id=eq."+m.id+"&order=created_at.desc&limit=5"); document.getElementById('riwayatWithdraw').innerHTML = riwW.length ? riwW.map(x=>`<div class="member-item">-${fmt(x.nominal)} • ${x.metode} ke ${x.nomor} (${x.nama_rek}) • ${x.status}<br><small>${new Date(x.at||x.created_at).toLocaleString('id-ID')}</small></div>`).join('') : '<p style="color:#aaa;margin-top:8px">Belum ada penarikan</p>'; }catch(e){ document.getElementById('riwayatWithdraw').innerHTML='<p style="color:#aaa">Belum ada penarikan</p>'; } loadList(); renderAdminNotif(false); }
 function hapusCart(i){ let c=getCart(); c.splice(i,1); localStorage.setItem('casa_cart', JSON.stringify(c)); tampilMember(); showToast('Barang dihapus'); }
 async function kosongkanCart(){ let ok=await casaConfirm('Kosongkan semua keranjang?', 'Kosongkan Keranjang?', '🗑️', 'Ya, Kosongkan!', 'Batal'); if(!ok) return; localStorage.setItem('casa_cart','[]'); tampilMember(); showToast('Keranjang dikosongkan'); }
-async function checkoutMember(){
-  let cart=getCart(); if(!cart.length){ showToast('Keranjang kosong!'); return; }
-  let m=getMember(); if(m.id){ let r=await sb("GET","member","", "?select=*&id=eq."+m.id); if(r[0]) m=r[0]; }
-  let total=cart.reduce((s,c)=>s+Number(c.harga||0),0), saldo=Number(m.saldo||0);
-  if(saldo<total){ let mau=await casaConfirm('Total '+fmt(total)+'\nSaldo lu '+fmt(saldo)+'\n\nSaldo KURANG! Mau Top Up?', 'Saldo Kurang! 😭', '💰', 'Ya, Top Up!', 'Nanti'); if(mau) openTopUp(); return; }
-  let ok=await casaConfirm('Checkout '+cart.length+' barang?\nTotal: '+fmt(total)+'\nSisa saldo: '+fmt(saldo-total), 'Checkout? 💰', '💰', 'Ya, Bayar!', 'Batal'); if(!ok) return;
-  let saldoBaru=saldo-total, poinBaru=Number(m.poin||0)+Math.floor(total/10000), belanjaBaru=Number(m.total_belanja||0)+total;
-  await sb("PATCH","member",{saldo:saldoBaru,poin:poinBaru,total_belanja:belanjaBaru,keranjang:[]}, "?id=eq."+m.id);
-  m.saldo=saldoBaru; m.poin=poinBaru; m.total_belanja=belanjaBaru; localStorage.setItem('casa_member', JSON.stringify(m));
-  localStorage.setItem('casa_cart','[]');
-  await casaAlert('CHECKOUT BERHASIL! 🎉\nTotal: '+fmt(total)+'\nSisa saldo: '+fmt(saldoBaru), 'Berhasil! 🎉', '🎉');
-  tampilMember();
-}
-async function logout(){
-  let ok=await casaConfirm('Keluar dari akun ini?', 'Keluar?', '👋', 'Ya, Keluar', 'Batal');
-  if(!ok) return;
-  localStorage.removeItem('casa_member');
-  document.getElementById('mWa').value = '';
-  document.getElementById('mPass').value = '';
-  document.getElementById('dNama').value = '';
-  document.getElementById('dWa').value = '';
-  document.getElementById('dPass').value = '';
-  gantiTab('masuk');
-  tampilMember();
-  showToast('Berhasil keluar');
-}
+async function checkoutMember(){ let cart=getCart(); if(!cart.length){ showToast('Keranjang kosong!'); return; } let m=getMember(); if(m.id){ let r=await sb("GET","member","", "?select=*&id=eq."+m.id); if(r[0]) m=r[0]; } let total=cart.reduce((s,c)=>s+Number(c.harga||0),0), saldo=Number(m.saldo||0); if(saldo<total){ let mau=await casaConfirm('Total '+fmt(total)+'\nSaldo lu '+fmt(saldo)+'\n\nSaldo KURANG! Mau Top Up?', 'Saldo Kurang! 😭', '💰', 'Ya, Top Up!', 'Nanti'); if(mau) openTopUp(); return; } let ok=await casaConfirm('Checkout '+cart.length+' barang?\nTotal: '+fmt(total)+'\nSisa saldo: '+fmt(saldo-total), 'Checkout? 💰', '💰', 'Ya, Bayar!', 'Batal'); if(!ok) return; let saldoBaru=saldo-total, poinBaru=Number(m.poin||0)+Math.floor(total/10000), belanjaBaru=Number(m.total_belanja||0)+total; await sb("PATCH","member",{saldo:saldoBaru,poin:poinBaru,total_belanja:belanjaBaru,keranjang:[]}, "?id=eq."+m.id); m.saldo=saldoBaru; m.poin=poinBaru; m.total_belanja=belanjaBaru; localStorage.setItem('casa_member', JSON.stringify(m)); localStorage.setItem('casa_cart','[]'); await casaAlert('CHECKOUT BERHASIL! 🎉\nTotal: '+fmt(total)+'\nSisa saldo: '+fmt(saldoBaru), 'Berhasil! 🎉', '🎉'); tampilMember(); }
+async function logout(){ let ok=await casaConfirm('Keluar dari akun ini?', 'Keluar?', '👋', 'Ya, Keluar', 'Batal'); if(!ok) return; localStorage.removeItem('casa_member'); document.getElementById('mWa').value = ''; document.getElementById('mPass').value = ''; document.getElementById('dNama').value = ''; document.getElementById('dWa').value = ''; document.getElementById('dPass').value = ''; gantiTab('masuk'); tampilMember(); showToast('Berhasil keluar'); }
 async function loadList(){ try{ let r=await sb("GET","member","", "?select=*&order=id.desc&limit=10"); document.getElementById('listMember').innerHTML=r.map(x=>`<div class="member-item"><b>${x.nama}</b> - ${Number(x.total_belanja||0)>=1000000?'Gold':'Silver'}<br>WA: ${x.wa} | Poin: ${x.poin||0} | Belanja: ${fmt(x.total_belanja)}<br>Keranjang: ${getCart().length} item</div>`).join('') || 'Belum ada member'; }catch(e){} }
 function logoPay(n){ let s={'QRIS':'<div style="background:#fff;color:#000;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">QRIS<span style="color:#E4002B">•</span><span style="color:#0057A8">•</span></div>','GOPAY':'<div style="background:#00AED6;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">GOPAY</div>','DANA':'<div style="background:#118EEA;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">DANA</div>','OVO':'<div style="background:#4C2A85;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">OVO</div>','MANDIRI':'<div style="background:#003A8C;color:#FFD700;border-radius:8px;padding:6px 10px;font-weight:900;font-size:12px">mandiri</div>','BRI':'<div style="background:#00529C;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">BRI</div>','BCA':'<div style="background:#0060AF;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">BCA</div>'}; return s[n]||n; }
 const PAY_INFO={'QRIS':{title:'QRIS - Scan di Semua Aplikasi',desc:'Buka GOPAY / DANA / OVO / M-Banking lu, scan QR di bawah.',qris:true},'GOPAY':{title:'GOPAY',desc:'Transfer ke GOPAY:',nomor:'0858-9061-1111',nama:'KO CHENG - CASA MODA'},'DANA':{title:'DANA',desc:'Transfer ke DANA:',nomor:'0858-9061-1111',nama:'KO CHENG - CASA MODA'},'OVO':{title:'OVO',desc:'Transfer ke OVO:',nomor:'0858-9061-1111',nama:'KO CHENG - CASA MODA'},'MANDIRI':{title:'Bank Mandiri',desc:'Transfer ke Mandiri:',nomor:'137-00-1234567-8',nama:'KO CHENG'},'BRI':{title:'Bank BRI',desc:'Transfer ke BRI:',nomor:'1234-01-012345-67-8',nama:'KO CHENG'},'BCA':{title:'Bank BCA',desc:'Transfer ke BCA:',nomor:'123-456-7890',nama:'KO CHENG'}};
@@ -332,8 +228,8 @@ function renderPayList(){ let ms=['QRIS','GOPAY','DANA','OVO','MANDIRI','BRI','B
 function pilihPay(m){ topupMetode=m; renderPayList(); renderPayDetail(); }
 function renderPayDetail(){ let custom=angkaDariRupiah(document.getElementById('topupNominalCustom').value); let nominal=custom>0?custom:topupNominal; let info=PAY_INFO[topupMetode]; let el=document.getElementById('payDetail'); let html=`<div style="background:#222;padding:14px;border-radius:12px"><b>${info.title}</b><br><span style="font-size:13px;color:#ccc">${info.desc}</span><br><b style="font-size:18px;color:#FFD700">Transfer: ${fmt(nominal)}</b><br>`; if(info.qris){ html+=`<div style="text-align:center;margin:12px 0"><img src="${getQrisFoto()}" onerror="this.style.display='none';document.getElementById('qrisKosong').style.display='block'" style="width:230px;height:230px;object-fit:contain;background:#fff;border-radius:12px;padding:10px"><div id="qrisKosong" style="display:none;background:#fff;color:#000;border-radius:12px;padding:20px">Belum ada foto QRIS!<br><small>Klik tombol di bawah buat upload</small></div><br><b>CASA MODA</b><br><small>Scan pake GOPAY / DANA / OVO / M-Banking</small><br><label style="display:inline-block;margin-top:10px;background:#222;border:1px dashed #FFD700;padding:8px 12px;border-radius:10px;font-size:12px;cursor:pointer">📸 Ganti Foto QRIS<input type="file" accept="image/*" onchange="gantiQris(event)" style="display:none"></label></div>`; } else { html+=`<div style="background:#000;padding:10px;border-radius:10px;margin:10px 0;display:flex;justify-content:space-between;align-items:center"><span><b style="font-size:18px">${info.nomor}</b><br><small>a.n ${info.nama}</small></span><button onclick="salinNomor('${info.nomor}')" style="background:#FFD700;border:none;padding:8px 12px;border-radius:8px;font-weight:bold">Salin</button></div>`; } html+=`</div>`; el.innerHTML=html; document.getElementById('btnKonfirmTopup').style.display='block'; }
 function salinNomor(n){ if(navigator.clipboard) navigator.clipboard.writeText(n); showToast('Disalin: '+n); }
-async function konfirmTopUp(){ let custom=angkaDariRupiah(document.getElementById('topupNominalCustom').value); let nominal=custom>0?custom:topupNominal; if(!nominal||nominal<10000){ await casaAlert('Minimal Top Up Rp. 10.000,-','Nominal Kurang!','💰'); return; } let m=getMember(); let riw=JSON.parse(localStorage.getItem('casa_topup')||'[]'); riw.push({member:m.nama,member_id:m.id,nominal,metode:topupMetode,at:new Date().toISOString(),status:'Menunggu Verifikasi'}); localStorage.setItem('casa_topup', JSON.stringify(riw)); closeTopUp(); await casaAlert('Request Top Up Terkirim! 🎉\nNominal: '+fmt(nominal)+'\nVia: '+topupMetode+'\n\nAdmin akan cek max 1x24 jam.','Top Up Terkirim! 🎉','🎉'); tampilMember(); }
-// ===== TARIK SALDO / WITHDRAW + SALDO MENGENDAP 10.000 =====
+async function konfirmTopUp(){ let custom=angkaDariRupiah(document.getElementById('topupNominalCustom').value); let nominal=custom>0?custom:topupNominal; if(!nominal||nominal<10000){ await casaAlert('Minimal Top Up Rp. 10.000,-','Nominal Kurang!','💰'); return; } let m=getMember(); try{ await sb("POST","casa_topup", {member:m.nama,member_id:m.id,nominal,metode:topupMetode,status:'Menunggu Verifikasi'}, "?select=*"); }catch(e){ await casaAlert('Gagal kirim ke database: '+e.message,'Gagal!','⚠️'); return; } closeTopUp(); await casaAlert('Request Top Up Terkirim! 🎉\nNominal: '+fmt(nominal)+'\nVia: '+topupMetode+'\n\nAdmin akan cek max 1x24 jam. Admin udah dikasih notif! 🔔','Top Up Terkirim! 🎉','🎉'); tampilMember(); }
+// ===== TARIK SALDO - KE DATABASE =====
 let withdrawNominal=100000, withdrawMetode='DANA';
 function openWithdraw(){ let m=getMember(); if(!m){ casaAlert('Login dulu!','Login Dulu!','👤'); return; } document.getElementById('withdrawPopup').classList.add('open'); document.getElementById('withdrawSaldo').innerText=fmt(m.saldo); document.getElementById('withdrawMaks').innerText=fmt(maksBisaDitarik(m.saldo)); document.getElementById('withdrawNama').value=m.nama||''; renderWithdrawNominal(); renderWithdrawPayList(); renderWithdrawInfo(); }
 function closeWithdraw(){ document.getElementById('withdrawPopup').classList.remove('open'); }
@@ -343,26 +239,8 @@ function tarikSemua(){ let m=getMember(); let maks=maksBisaDitarik(m.saldo); if(
 function renderWithdrawPayList(){ let ms=['DANA','GOPAY','OVO','BCA','BRI','MANDIRI']; document.getElementById('withdrawPayList').innerHTML=ms.map(m=>`<div onclick="pilihWithdrawPay('${m}')" style="display:flex;align-items:center;gap:10px;background:${withdrawMetode===m?'#FFD700':'#222'};color:${withdrawMetode===m?'#000':'#fff'};padding:10px;border-radius:12px;margin-top:8px;cursor:pointer">${logoPay(m)} <b>${m}</b> <span style="margin-left:auto">${withdrawMetode===m?'✅':''}</span></div>`).join(''); }
 function pilihWithdrawPay(m){ withdrawMetode=m; renderWithdrawPayList(); renderWithdrawInfo(); }
 function renderWithdrawInfo(){ let custom=angkaDariRupiah(document.getElementById('withdrawNominalCustom').value); let nominal=custom>0?custom:withdrawNominal; let m=getMember(); let maks=maksBisaDitarik(m.saldo); let sisa=Number(m.saldo||0)-nominal; let warna = nominal>maks ? '#FF2D2D' : '#22C55E'; let ket = nominal>maks ? '⚠️ MELEBIHI LIMIT! Bakal ditolak!' : '✅ Aman, sisa mengendap terjaga!'; document.getElementById('withdrawInfo').innerHTML=`Tarik <b style="color:#FFD700">${fmt(nominal)}</b> ke <b>${withdrawMetode}</b><br>Maks bisa ditarik: <b>${fmt(maks)}</b><br>Sisa saldo setelah tarik: <b style="color:${warna}">${fmt(sisa)}</b> (wajib sisa min ${fmt(SALDO_MENGENDAP)})<br><span style="color:${warna}">${ket}</span><br><span style="font-size:12px">Saldo gak langsung kepotong! Nunggu admin TF dulu, baru saldo dipotong.</span>`; }
-async function konfirmWithdraw(){
-  let custom=angkaDariRupiah(document.getElementById('withdrawNominalCustom').value); let nominal=custom>0?custom:withdrawNominal;
-  let m=getMember(); if(!m) return;
-  let saldo=Number(m.saldo||0); let maks=maksBisaDitarik(saldo);
-  let nomor=document.getElementById('withdrawNomor').value.trim();
-  let namaRek=document.getElementById('withdrawNama').value.trim();
-  if(!nominal||nominal<MIN_TARIK){ await casaAlert('Minimal Tarik '+fmt(MIN_TARIK),'Nominal Kurang!','💸'); return; }
-  if(maks<MIN_TARIK){ await casaAlert('SALDO TIDAK MENCUKUPI! 😭\n\nSaldo lu: '+fmt(saldo)+'\nSaldo mengendap wajib: '+fmt(SALDO_MENGENDAP)+'\nMaksimal bisa ditarik: '+fmt(maks)+'\n\nTop Up dulu biar bisa tarik!','Saldo Tidak Mencukupi! 😭','⚠️'); return; }
-  if(nominal>maks){ await casaAlert('SALDO TIDAK MENCUKUPI! 😭\n\nLu mau tarik: '+fmt(nominal)+'\nSaldo lu: '+fmt(saldo)+'\nSaldo mengendap wajib: '+fmt(SALDO_MENGENDAP)+'\nMaksimal yang bisa ditarik: '+fmt(maks)+'\n\nContoh: Saldo '+fmt(saldo)+' -> yang bisa ditarik cuma '+fmt(maks)+'!\nSisanya '+fmt(SALDO_MENGENDAP)+' harus ngendap di akun!','Saldo Tidak Mencukupi! 😭','⚠️'); return; }
-  if(!nomor){ await casaAlert('Isi nomor rekening / DANA tujuan dulu!','Belum Lengkap!','⚠️'); return; }
-  if(!namaRek){ await casaAlert('Isi nama pemilik rekening dulu!','Belum Lengkap!','⚠️'); return; }
-  let ok=await casaConfirm('Tarik '+fmt(nominal)+' ke '+withdrawMetode+'\nNomor: '+nomor+'\nA.n: '+namaRek+'\nSisa saldo setelah tarik: '+fmt(saldo-nominal)+' (mengendap '+fmt(SALDO_MENGENDAP)+')\n\nAdmin akan TF max 1x24 jam.','Tarik Saldo? 💸','💸','Ya, Tarik!','Batal'); if(!ok) return;
-  let riw=JSON.parse(localStorage.getItem('casa_withdraw')||'[]');
-  riw.push({member:m.nama,member_id:m.id,nominal,metode:withdrawMetode,nomor,nama_rek:namaRek,at:new Date().toISOString(),status:'Menunggu Verifikasi'});
-  localStorage.setItem('casa_withdraw', JSON.stringify(riw));
-  closeWithdraw();
-  await casaAlert('Request Tarik Saldo Terkirim! 🎉\nNominal: '+fmt(nominal)+'\nKe: '+withdrawMetode+' - '+nomor+'\nA.n: '+namaRek+'\nSisa saldo: '+fmt(saldo-nominal)+' (mengendap '+fmt(SALDO_MENGENDAP)+')\n\nAdmin akan TF max 1x24 jam.','Tarik Saldo Terkirim! 🎉','🎉');
-  tampilMember();
-}
+async function konfirmWithdraw(){ let custom=angkaDariRupiah(document.getElementById('withdrawNominalCustom').value); let nominal=custom>0?custom:withdrawNominal; let m=getMember(); if(!m) return; let saldo=Number(m.saldo||0); let maks=maksBisaDitarik(saldo); let nomor=document.getElementById('withdrawNomor').value.trim(); let namaRek=document.getElementById('withdrawNama').value.trim(); if(!nominal||nominal<MIN_TARIK){ await casaAlert('Minimal Tarik '+fmt(MIN_TARIK),'Nominal Kurang!','💸'); return; } if(maks<MIN_TARIK){ await casaAlert('SALDO TIDAK MENCUKUPI! 😭\n\nSaldo lu: '+fmt(saldo)+'\nSaldo mengendap wajib: '+fmt(SALDO_MENGENDAP)+'\nMaksimal bisa ditarik: '+fmt(maks)+'\n\nTop Up dulu biar bisa tarik!','Saldo Tidak Mencukupi! 😭','⚠️'); return; } if(nominal>maks){ await casaAlert('SALDO TIDAK MENCUKUPI! 😭\n\nLu mau tarik: '+fmt(nominal)+'\nSaldo lu: '+fmt(saldo)+'\nSaldo mengendap wajib: '+fmt(SALDO_MENGENDAP)+'\nMaksimal yang bisa ditarik: '+fmt(maks)+'\n\nContoh: Saldo '+fmt(saldo)+' -> yang bisa ditarik cuma '+fmt(maks)+'!\nSisanya '+fmt(SALDO_MENGENDAP)+' harus ngendap di akun!','Saldo Tidak Mencukupi! 😭','⚠️'); return; } if(!nomor){ await casaAlert('Isi nomor rekening / DANA tujuan dulu!','Belum Lengkap!','⚠️'); return; } if(!namaRek){ await casaAlert('Isi nama pemilik rekening dulu!','Belum Lengkap!','⚠️'); return; } let ok=await casaConfirm('Tarik '+fmt(nominal)+' ke '+withdrawMetode+'\nNomor: '+nomor+'\nA.n: '+namaRek+'\nSisa saldo setelah tarik: '+fmt(saldo-nominal)+' (mengendap '+fmt(SALDO_MENGENDAP)+')\n\nAdmin akan TF max 1x24 jam.','Tarik Saldo? 💸','💸','Ya, Tarik!','Batal'); if(!ok) return; try{ await sb("POST","casa_withdraw", {member:m.nama,member_id:m.id,nominal,metode:withdrawMetode,nomor,nama_rek:namaRek,status:'Menunggu Verifikasi'}, "?select=*"); }catch(e){ await casaAlert('Gagal kirim ke database: '+e.message,'Gagal!','⚠️'); return; } closeWithdraw(); await casaAlert('Request Tarik Saldo Terkirim! 🎉\nNominal: '+fmt(nominal)+'\nKe: '+withdrawMetode+' - '+nomor+'\nA.n: '+namaRek+'\nSisa saldo: '+fmt(saldo-nominal)+' (mengendap '+fmt(SALDO_MENGENDAP)+')\n\nAdmin akan TF max 1x24 jam. Admin udah dikasih notif! 🔔','Tarik Saldo Terkirim! 🎉','🎉'); tampilMember(); }
 tampilMember();
 </script>
 </body>
-</html>
+  </html>
