@@ -70,7 +70,7 @@ input{width:100%;padding:12px;border-radius:10px;border:1px solid #444;backgroun
 <a onclick="showPage('produk')">🛍️ Collection</a>
 <a onclick="showPage('about')">✨ About Us</a>
 <a onclick="openCart()">🛒 Cart • <span id="cartCount">0</span></a>
-<a onclick="showPage('member')">👤 Login Member</a>
+<a href="member.html">👤 Member</a>
 <a href="https://wa.me/6285890611111">💬 Chat Admin</a>
 </div>
 <h1>Wear<br><em style="color:#FFD700">Your Power.</em></h1>
@@ -84,14 +84,6 @@ input{width:100%;padding:12px;border-radius:10px;border:1px solid #444;backgroun
 <div class="section" id="page-about" style="display:none">
 <h2>About <i>CASA MODA</i></h2><p style="text-align:left;max-width:none;margin-top:10px">CASA MODA adalah brand luxury dari Bandung. Premium material, handcrafted, limited stock. Dibuat oleh Ko Cheng, Bandung, 2026.</p>
 <p style="text-align:left;max-width:none;margin-top:10px">📍 Bandung, West Java<br>💬 WA: 0858-9061-1111<br>📦 Pengiriman seluruh Indonesia</p>
-</div>
-<div class="section" id="page-member" style="display:none">
-<h2>Login <i>Member</i></h2><p style="text-align:left;margin:0">Masuk pake akun lu, biar bisa checkout.</p>
-<input id="memberAkun" placeholder="Akun Member, contoh: andi123">
-<input id="memberPass" type="password" placeholder="Password">
-<button class="buy-btn" onclick="loginMember()">Login Member</button>
-<button class="btn-add" onclick="daftarMember()">Daftar Baru</button>
-<div id="memberMsg" style="margin-top:10px;color:#FFD700"></div>
 </div>
 <div class="footer">© 2026 CASA MODA • Made with luxury in Bandung • Data dari Supabase Baru</div>
 <button class="chat-float" onclick="toggleBot()">💬</button>
@@ -133,7 +125,12 @@ function isHabis(p){ return Number(p.stok||0) <= 0 || String(p.status||'').toLow
 function isReady(p){ return !isHabis(p); }
 function produkReady(){ return products.filter(p=> isReady(p)); }
 function toggleMenu(){ const m=document.getElementById('menuBox'); m.style.display=m.style.display==='block'?'none':'block'; }
-function showPage(p){ document.getElementById('page-home').style.display = p==='home'||p==='produk' ? 'block':'none'; document.getElementById('page-about').style.display = p==='about'?'block':'none'; document.getElementById('page-member').style.display = p==='member'?'block':'none'; document.getElementById('menuBox').style.display='none'; window.scrollTo(0,0); }
+function showPage(p){
+  if(p==='member'){ window.location.href='member.html'; return; }
+  document.getElementById('page-home').style.display = p==='home'||p==='produk' ? 'block':'none';
+  document.getElementById('page-about').style.display = p==='about'?'block':'none';
+  document.getElementById('menuBox').style.display='none'; window.scrollTo(0,0);
+}
 async function loadProduk(){
   try{
     let prods = await sb("GET","produk","", "?select=*&order=id.asc");
@@ -199,28 +196,9 @@ function addToCart(){ cart.push({...current, size:selectedSize}); document.getEl
 function openCart(){ document.getElementById('menuBox').style.display='none'; let html = cart.length===0 ? '<p>Keranjang masih kosong Bro, ayo belanja!</p>' : ''; let total=0; cart.forEach((c,idx)=>{ total+=Number(c.harga); html+=`<div class="cart-item"><img src="${c.foto||''}"><div style="flex:1"><b>${getNama(c)}</b><br><small>Ukuran: ${c.size}</small><br><span style="color:#FFD700">${fmt(c.harga)}</span></div><button onclick="removeItem(${idx})" style="background:none;border:none;color:#fff">✕</button></div>`; }); document.getElementById('cartItems').innerHTML=html; document.getElementById('cartTotal').innerText = cart.length ? 'Total: '+fmt(total) : ''; document.getElementById('cartDrawer').classList.add('open'); }
 function closeCart(){ document.getElementById('cartDrawer').classList.remove('open'); }
 function removeItem(i){ cart.splice(i,1); document.getElementById('cartCount').innerText=cart.length; openCart(); }
-async function loginMember(){
-  const akun=document.getElementById('memberAkun').value.trim(); const pass=document.getElementById('memberPass').value.trim();
-  if(!akun||!pass) return alert('Isi akun & password dulu');
-  try{
-    let found = await sb("GET","member","", "?select=*&nama=eq."+encodeURIComponent(akun)+"&password=eq."+encodeURIComponent(pass));
-    if(!found || found.length===0){ document.getElementById('memberMsg').innerText="Akun / Password salah!"; return; }
-    currentUser=akun; document.getElementById('memberMsg').innerText="Login berhasil! Halo "+akun; showPage('home');
-  }catch(e){ document.getElementById('memberMsg').innerText="Gagal login: "+e.message; }
-}
-async function daftarMember(){
-  const akun=document.getElementById('memberAkun').value.trim(); const pass=document.getElementById('memberPass').value.trim();
-  if(!akun||!pass) return alert('Isi akun & password dulu');
-  try{
-    let cek = await sb("GET","member","", "?select=*&nama=eq."+encodeURIComponent(akun));
-    if(cek && cek.length>0){ document.getElementById('memberMsg').innerText="Akun udah ada, tinggal login."; return; }
-    await sb("POST","member", { nama:akun, password:pass, WA:"", tingkat:"Silver", alamat:"", saldo:0 }, "");
-    document.getElementById('memberMsg').innerText="Daftar berhasil! Sekarang login."; await loadProduk(); loginMember();
-  }catch(e){ document.getElementById('memberMsg').innerText="Gagal daftar: "+e.message; }
-}
 function checkout(){
   if(cart.length===0) return alert('Keranjang kosong!');
-  if(!currentUser) return alert('Login Member dulu!'), showPage('member');
+  if(!currentUser){ alert('Login Member dulu!'); window.location.href='member.html'; return; }
   let msg="Halo CASA MODA, saya mau order:\nMember: "+currentUser+"\n"; cart.forEach(c=>{ msg+="- "+getNama(c)+" Ukuran "+c.size+" "+fmt(c.harga)+"\n"; });
   alert('Lanjut ke WA ya!'); cart=[]; document.getElementById('cartCount').innerText=0; closeCart();
   window.open("https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent(msg), "_blank");
@@ -254,7 +232,6 @@ function tekanPin(angka){
   pinInput += angka; updateDots();
   if(pinInput.length === total){ setTimeout(cekPin, 250); }
 }
-// === FIX FINAL: admin -> ass.html (KAMUFLASE, JANGAN DIHAPUS!) ===
 function cekPin(){
   if(!pendingAdmin){ closeLock(); return; }
   if(pinInput === String(pendingAdmin.pin).trim()){
