@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PEGAWAI - CASA MODA</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Georgia',serif}
+body{background:#000;color:#fff;overflow-x:hidden}
+.hero{background:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.65)),url('background-emas.jpg');background-size:cover;background-position:center top;padding:20px;text-align:center}
+.top{display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:22px;letter-spacing:3px;font-weight:bold;text-align:left}.logo span{color:#FFD700;font-size:11px;display:block;letter-spacing:5px}
+.logout{background:#FFD700;color:#000;padding:8px 16px;border-radius:20px;font-weight:bold;border:none;cursor:pointer}
+.info{margin-top:15px;background:rgba(0,0,0,0.55);border:1px solid rgba(255,215,0,0.6);border-radius:18px;padding:14px;text-align:left}
+.section{padding:15px 20px 100px;background:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.65)),url('background-emas.jpg');background-size:cover;background-position:center;min-height:100vh}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.stat{background:rgba(0,0,0,0.55);border:1px solid rgba(255,215,0,0.6);border-radius:18px;padding:14px;text-align:left}
+.stat small{color:#FFD700}.stat b{font-size:22px;display:block;margin-top:4px}
+.menu-top{display:flex;gap:8px;overflow-x:auto;padding-bottom:5px;margin-bottom:14px;scrollbar-width:none}
+.menu-top::-webkit-scrollbar{display:none}
+.menu-top button{background:rgba(0,0,0,0.55);color:#fff;border:1px solid rgba(255,215,0,0.6);padding:10px 16px;border-radius:20px;white-space:nowrap;cursor:pointer;font-weight:bold}
+.menu-top button.active{background:#FFD700;color:#000}
+.card{background:rgba(0,0,0,0.55);border:1px solid rgba(255,215,0,0.6);border-radius:18px;padding:14px;margin-bottom:12px;text-align:left}
+.card.low{border:2px solid #FF2D2D}
+.card.habis{border:2px dashed #888;opacity:0.75}
+.card-flex{display:flex;gap:12px}
+.card-flex img{width:90px;height:90px;object-fit:cover;border-radius:12px}
+.price{color:#FFD700;font-weight:bold}
+.badge-low{background:#FF2D2D;color:#fff;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:bold}
+.badge-aman{background:#22C55E;color:#000;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:bold}
+.badge-habis{background:#888;color:#000;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:bold}
+.btn-lihat{width:100%;background:#FFD700;border:none;padding:12px;border-radius:12px;font-weight:bold;cursor:pointer;margin-top:10px}
+.btn-dark{width:100%;background:#222;color:#fff;border:1px solid #FFD700;padding:14px;border-radius:14px;font-weight:bold;cursor:pointer;margin-bottom:12px}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid #444;background:#222;color:#fff;margin-top:8px}
+.popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;align-items:flex-end;justify-content:center}.popup.open{display:flex}
+.popup-box{background:#111;width:100%;max-width:420px;border-radius:25px 25px 0 0;max-height:92vh;overflow-y:auto;border-top:2px solid #FFD700;padding:18px}
+.close{float:right;font-size:24px;cursor:pointer;background:none;border:none;color:#fff}
+.detail-row{display:flex;justify-content:space-between;font-size:13px;color:#ccc;padding:4px 0;border-bottom:1px dashed #333}
+.detail-row b{color:#fff;text-align:right;max-width:60%}
+</style>
+</head>
+<body>
+<div class="hero">
+<div class="top"><div class="logo">CASA MODA<span>PEGAWAI - CEK BARANG</span></div><button class="logout" onclick="logout()">Logout</button></div>
+<div class="info"><b id="pegNama">Pegawai CASA MODA</b><br><small style="color:#FFD700" id="pegCode">Code: -</small><br><small id="pegWA">WA: -</small><br><small style="color:#ccc">Mode: LIHAT SAJA - Tidak bisa tambah / edit / hapus. Kalau ada yang salah, lapor ke Admin.</small></div>
+</div>
+<div class="section">
+<h2>Cek <i>Stok Barang</i></h2>
+<div class="stats">
+<div class="stat"><small>📦 Total Produk</small><b id="statTotal">0</b></div>
+<div class="stat"><small>⚠️ Stok Tipis</small><b id="statTipis">0</b></div>
+<div class="stat"><small>🚫 Habis</small><b id="statHabis">0</b></div>
+<div class="stat"><small>✅ Ready</small><b id="statReady">0</b></div>
+</div>
+<input id="cariBarang" placeholder="🔍 Cari barang... contoh: Sepatu / Dompet" oninput="renderPegawai()">
+<div class="menu-top" id="menuTop" style="margin-top:12px"></div>
+<button class="btn-dark" onclick="window.location.href='index.html'">👀 Lihat Halaman Depan (Kayak Pembeli)</button>
+<div id="listProduk"></div>
+<p style="font-size:12px;color:#ccc;text-align:center;margin-top:10px">Pegawai hanya cek. Tambah / Edit / Hapus hanya di Admin (ass.html).</p>
+</div>
+<div class="popup" id="popupDetail"><div class="popup-box"><button class="close" onclick="closeDetail()">✕</button><img id="dImg" style="width:100%;height:280px;object-fit:cover;border-radius:14px"><h3 id="dNama" style="margin-top:12px"></h3><div id="dHarga" style="color:#FFD700;font-weight:bold;font-size:18px"></div><div id="dDetail" style="margin-top:12px"></div><button class="btn-lihat" onclick="closeDetail()">Tutup</button></div></div>
+<script>
+const SUPABASE_URL = "https://tnpkepfjrltfryhuqnvo.supabase.co";
+const SUPABASE_KEY = "sb_publishable_D_RB0mj9X66SOlj9-4jgug_s7fvHEYO";
+const HEADERS = { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=representation" };
+async function sb(method, table, body, query){
+  let url = SUPABASE_URL + "/rest/v1/" + table + (query || "");
+  let res = await fetch(url, { method, headers: HEADERS, body: body ? JSON.stringify(body) : undefined });
+  if(!res.ok) throw new Error(await res.text());
+  let txt = await res.text(); return txt ? JSON.parse(txt) : [];
+}
+async function rpcEnsure(){
+  try{ let r=await fetch(SUPABASE_URL+"/rest/v1/rpc/ensure_casa",{method:"POST",headers:HEADERS,body:"{}"}); return r.ok; }catch(e){ return false; }
+}
+let products=[]; let filterAktif='semua';
+function fmt(n){ return "Rp " + Number(n||0).toLocaleString('id-ID'); }
+function isHabis(p){ return Number(p.stok||0) <= 0 || String(p.status||'').toLowerCase() === 'habis'; }
+function logout(){ sessionStorage.removeItem('casa_login'); window.location.href='index.html'; }
+async function loadPegawai(){
+  try{
+    await rpcEnsure();
+    products = await sb("GET","produk","", "?select=*&order=id.asc");
+    let pegs = await sb("GET","pegawai","", "?select=*");
+    let params = new URLSearchParams(window.location.search);
+    let code = params.get('code') || '';
+    document.getElementById('pegCode').innerText = "Code: "+code;
+    let p = (pegs||[]).find(x=>String(x.code||'').toLowerCase()===String(code).toLowerCase());
+    if(p){ document.getElementById('pegNama').innerText = p.nama; document.getElementById('pegWA').innerText = "WA: "+(p.WA||'-')+" • "+(p.alamat||'Bandung'); }
+  }catch(e){ products=[]; }
+  buildMenu(); renderPegawai();
+}
+function buildMenu(){
+  let seen=[];
+  products.forEach(p=>{ let j=(p.jenis||'').trim(); if(j && !seen.includes(j)) seen.push(j); });
+  let html=`<button class="${filterAktif==='semua'?'active':''}" onclick="setFilter('semua')">Semua</button>`;
+  seen.forEach(k=>{ html+=`<button class="${filterAktif===k?'active':''}" onclick="setFilter('${k}')">${k}</button>`; });
+  html+=`<button class="${filterAktif==='tipis'?'active':''}" onclick="setFilter('tipis')">⚠️ Tipis</button><button class="${filterAktif==='habis'?'active':''}" onclick="setFilter('habis')">🚫 Habis</button>`;
+  document.getElementById('menuTop').innerHTML=html;
+}
+function setFilter(f){ filterAktif=f; buildMenu(); renderPegawai(); }
+function renderPegawai(){
+  let cari=(document.getElementById('cariBarang').value||'').toLowerCase().trim();
+  let list=products.filter(p=>{
+    if(filterAktif==='tipis' && (isHabis(p) || Number(p.stok)>=5)) return false;
+    if(filterAktif==='habis' && !isHabis(p)) return false;
+    if(filterAktif!=='semua' && filterAktif!=='tipis' && filterAktif!=='habis' && String(p.jenis||'').toLowerCase()!==filterAktif.toLowerCase()) return false;
+    if(cari && !(String(p.nama||'').toLowerCase().includes(cari) || String(p.jenis||'').toLowerCase().includes(cari))) return false;
+    return true;
+  });
+  document.getElementById('statTotal').innerText=products.length;
+  document.getElementById('statTipis').innerText=products.filter(p=>!isHabis(p) && Number(p.stok)<5).length;
+  document.getElementById('statHabis').innerText=products.filter(p=>isHabis(p)).length;
+  document.getElementById('statReady').innerText=products.filter(p=>!isHabis(p)).length;
+  document.getElementById('listProduk').innerHTML = list.length===0 ? '<div class="card">Gak ketemu barangnya.</div>' : list.map(p=>{
+    let habis=isHabis(p); let low=!habis && Number(p.stok)<5;
+    return `<div class="card ${habis?'habis':''} ${low?'low':''}"><div class="card-flex"><img src="${p.foto||''}"><div style="flex:1"><small style="color:#FFD700">${p.jenis} • ${p.status}</small><br><b>${p.nama||''}</b> ${habis?'<span class="badge-habis">🚫 HABIS</span>':low?'<span class="badge-low">⚠️ TIPIS</span>':'<span class="badge-aman">Ready</span>'}<br><small>Ukuran: ${p.ukuran} • Stok: <b>${p.stok} pcs</b></small><div class="price">${fmt(p.harga)}</div><small style="color:#ccc">${(p.ket||'').slice(0,60)}</small></div></div><button class="btn-lihat" onclick="openDetail(${p.id})">👀 Lihat Detail (Cek Saja)</button></div>`;
+  }).join('');
+}
+function openDetail(id){
+  let p=products.find(x=>x.id===id); if(!p) return;
+  document.getElementById('dImg').src=p.foto||'';
+  document.getElementById('dNama').innerText=p.nama||'';
+  document.getElementById('dHarga').innerText=fmt(p.harga);
+  document.getElementById('dDetail').innerHTML=
+    `<div class="detail-row"><span>Jenis</span><b>${p.jenis}</b></div>`+
+    `<div class="detail-row"><span>Status</span><b>${p.status}</b></div>`+
+    `<div class="detail-row"><span>SKU</span><b>${p.nomor||'-'}</b></div>`+
+    `<div class="detail-row"><span>Ukuran</span><b>${p.ukuran}</b></div>`+
+    `<div class="detail-row"><span>Warna</span><b>${p.warna||'-'}</b></div>`+
+    `<div class="detail-row"><span>Bahan</span><b>${p.bahan||'-'}</b></div>`+
+    `<div class="detail-row"><span>Stok</span><b>${p.stok} pcs</b></div>`+
+    `<div class="detail-row"><span>Harga</span><b>${fmt(p.harga)}</b></div>`+
+    `<p style="margin-top:12px;font-size:14px;line-height:1.6">${p.ket||''}</p>`;
+  document.getElementById('popupDetail').classList.add('open');
+}
+function closeDetail(){ document.getElementById('popupDetail').classList.remove('open'); }
+(function cekTiket(){
+  try{
+    let t=sessionStorage.getItem('casa_login');
+    let params=new URLSearchParams(window.location.search);
+    if(!t && !params.get('code')){ window.location.href='index.html'; return; }
+    if(t){ let j=JSON.parse(t); if(j.role!=='pegawai'){ window.location.href='index.html'; return; } }
+  }catch(e){ window.location.href='index.html'; }
+})();
+loadPegawai();
+</script>
+</body>
+</html>
