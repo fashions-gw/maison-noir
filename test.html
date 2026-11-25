@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Member - CASA MODA</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Georgia',serif}
 body{background:#000;color:#fff}
-.hero{background:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.65)),url('background-emas.jpg');background-size:cover;padding:20px;text-align:center}
-.logo{font-size:22px;letter-spacing:3px;font-weight:bold;text-align:left}.logo span{color:#FFD700;font-size:11px;display:block;letter-spacing:5px}
+.hero{background:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.65)),url('background-emas.jpg');background-size:cover;padding:20px}
+.logo{font-size:22px;letter-spacing:3px;font-weight:bold}.logo span{color:#FFD700;font-size:11px;display:block;letter-spacing:5px}
 .section{padding:15px 20px 110px;background:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.65)),url('background-emas.jpg');background-size:cover;min-height:100vh}
 .card{background:rgba(0,0,0,0.55);border:1px solid rgba(255,215,0,0.6);border-radius:18px;padding:20px;max-width:480px;margin:auto;text-align:center}
 h2{font-size:22px} h2 i{color:#FFD700}
@@ -18,7 +17,7 @@ button.abu{background:#222;color:#fff;border:1px solid #FFD700}
 .info{background:rgba(0,0,0,0.55);border:1px solid rgba(255,215,0,0.4);border-radius:12px;padding:14px;margin-top:10px;font-size:14px;line-height:1.9;text-align:left}
 .badge{display:inline-block;background:#FFD700;color:#000;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:bold}
 .hidden{display:none}
-#status{text-align:center;font-size:13px;color:#FFD700;min-height:18px;word-break:break-word}
+#status{text-align:center;font-size:13px;color:#FFD700;min-height:18px}
 a{color:#FFD700}
 </style>
 </head>
@@ -26,57 +25,44 @@ a{color:#FFD700}
 <div class="hero"><div class="logo">CASA MODA<span>MEMBER LUXURY</span></div></div>
 <div class="section">
 <div class="card" id="loginCard">
-  <h2>Login <i>Member</i><br>CASA MODA</h2>
-  <input id="loginWa" placeholder="No WA (contoh: 085890611111)">
-  <input id="loginPass" type="password" placeholder="Password">
-  <button onclick="login()">MASUK</button>
-  <p id="status"></p>
-  <p style="font-size:13px;color:#ccc"><a href="index.html">← Kembali ke Katalog</a></p>
+<h2>Login <i>Member</i><br>CASA MODA</h2>
+<input id="loginWa" placeholder="No WA persis kayak di tabel">
+<input id="loginPass" type="password" placeholder="Password">
+<button onclick="login()">MASUK</button>
+<p id="status"></p>
+<p style="font-size:13px;color:#ccc">Coba dulu pake:<br><b>WA: 08111111111 / Pass: 12345</b><br>atau<br><b>WA: 092123332321 / Pass: lupa12</b><br><a href="index.html">← Kembali ke Katalog</a></p>
 </div>
 <div class="card hidden" id="profilCard">
-  <h2>Profil <i>Member</i></h2>
-  <div class="info" id="infoMember"></div>
-  <button onclick="logout()" class="abu">KELUAR</button>
-  <a href="index.html"><button class="abu" style="margin-top:4px">🛍️ Belanja Lagi</button></a>
+<h2>Profil <i>Member</i></h2>
+<div class="info" id="infoMember"></div>
+<button onclick="logout()" class="abu">KELUAR</button>
+<a href="index.html"><button class="abu" style="margin-top:4px">🛍️ Belanja Lagi</button></a>
 </div>
 </div>
 <script>
-// SAMA PERSIS KAYAK ADMIN YANG AMAN ITU - PAKE FETCH, GAK PAKE supabase-js!
+// PAKE FETCH KAYAK ADMIN - GAK PAKE supabase-js YANG RUSAK ITU!
 const SUPABASE_URL = "https://tnpkepfjrltfryhuqnvo.supabase.co";
 const SUPABASE_KEY = "sb_publishable_D_RB0mj9X66SOlj9-4jgug_s7fvHEYO";
-const HEADERS = { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=representation" };
+const HEADERS = { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json" };
 let userSaatIni = null;
-
-function variasiWA(wa){
-  let w = wa.replace(/[^0-9]/g,'');
-  if(w.startsWith('62')) w = '0' + w.slice(2);
-  if(!w.startsWith('0')) w = '0' + w;
-  return [...new Set([wa, w, '62'+w.slice(1)])];
-}
-
 async function login(){
-  let waRaw = document.getElementById('loginWa').value.trim();
+  let wa = document.getElementById('loginWa').value.trim();
   let pass = document.getElementById('loginPass').value.trim();
-  if(!waRaw || !pass) return alert('Isi WA & Password dulu');
+  if(!wa || !pass) return alert('Isi WA & Password dulu');
   document.getElementById('status').innerText = 'Mengecek...';
-  let ketemu = null;
-  // Cara admin: fetch langsung ke rest/v1/member
-  for(let wa of variasiWA(waRaw)){
-    try{
-      let res = await fetch(SUPABASE_URL + "/rest/v1/member?select=*&wa=eq." + encodeURIComponent(wa) + "&password=eq." + encodeURIComponent(pass), { headers: HEADERS });
-      let data = await res.json();
-      if(data && data.length > 0){ ketemu = data[0]; break; }
-    }catch(e){ document.getElementById('status').innerText = 'Gagal fetch: '+e.message; return; }
-  }
-  if(!ketemu){
-    document.getElementById('status').innerText = 'WA / Password salah! Cek di admin, WA-nya yang mana? Copy persis dari admin!';
-    return;
-  }
-  userSaatIni = ketemu;
-  localStorage.setItem('casa_member_v2', JSON.stringify(ketemu));
-  tampilProfil();
+  try{
+    let url = SUPABASE_URL + "/rest/v1/member?select=*&wa=eq." + encodeURIComponent(wa) + "&password=eq." + encodeURIComponent(pass);
+    let res = await fetch(url, { headers: HEADERS });
+    let data = await res.json();
+    if(!data || data.length === 0){
+      document.getElementById('status').innerText = 'WA / Password salah! Cek lagi di tabel, WA-nya 092123332321 bukan 0858...!';
+      return;
+    }
+    userSaatIni = data[0];
+    localStorage.setItem('casa_member_v2', JSON.stringify(userSaatIni));
+    tampilProfil();
+  }catch(e){ document.getElementById('status').innerText = 'Gagal fetch: ' + e.message; }
 }
-
 function tampilProfil(){
   if(!userSaatIni) return;
   document.getElementById('loginCard').classList.add('hidden');
