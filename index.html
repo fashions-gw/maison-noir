@@ -60,6 +60,19 @@ input{width:100%;padding:12px;border-radius:10px;border:1px solid #444;backgroun
 .shake{animation:shake 0.4s}
 .db-error{background:#FF2D2D;color:#fff;padding:10px;border-radius:10px;margin:10px 0;font-size:13px;text-align:left;display:none}
 .empty-box{grid-column:1/3;text-align:center;padding:25px 10px;background:rgba(0,0,0,0.5);border-radius:16px;border:1px dashed rgba(255,215,0,0.6)}
+/* POPUP CANTIK CASA MODA - GANTIIN ALERT BAWAAN YANG JELEK */
+.casa-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.casa-modal.open{display:flex}
+.casa-modal-box{background:#111;border:2px solid #FFD700;border-radius:22px;width:100%;max-width:360px;padding:22px;text-align:center;box-shadow:0 20px 60px rgba(255,215,0,0.25);animation:popIn .25s ease}
+@keyframes popIn{from{transform:scale(.85) translateY(10px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.casa-modal-icon{font-size:42px;margin-bottom:8px}
+.casa-modal-title{font-size:18px;font-weight:bold;margin-bottom:8px}
+.casa-modal-msg{font-size:14px;line-height:1.6;color:#ddd;white-space:pre-line}
+.casa-modal-btns{display:flex;gap:10px;margin-top:18px}
+.casa-btn-yes{flex:1;background:#FFD700;border:none;padding:13px;border-radius:12px;font-weight:bold;font-size:14px;cursor:pointer}
+.casa-btn-no{flex:1;background:#222;color:#fff;border:1px solid #555;padding:13px;border-radius:12px;font-weight:bold;font-size:14px;cursor:pointer}
+.casa-toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);background:#FFD700;color:#000;padding:12px 18px;border-radius:20px;font-weight:bold;font-size:13px;z-index:1100;opacity:0;pointer-events:none;transition:.3s;max-width:90%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.casa-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
@@ -116,6 +129,9 @@ input{width:100%;padding:12px;border-radius:10px;border:1px solid #444;backgroun
 <button class="buy-btn" id="btnKonfirmTopup" onclick="konfirmTopUp()" style="display:none">Saya Sudah Bayar / Transfer ✅</button>
 <div style="font-size:11px;color:#999;margin-top:10px;text-align:center">Pembayaran diverifikasi admin max 1x24 jam. Simpan bukti transfer lu ya!</div>
 </div></div>
+<!-- POPUP CANTIK PENGGANTI ALERT / CONFIRM BAWAAN -->
+<div class="casa-modal" id="casaModal"><div class="casa-modal-box"><div class="casa-modal-icon" id="casaModalIcon">✨</div><div class="casa-modal-title" id="casaModalTitle">CASA MODA</div><div class="casa-modal-msg" id="casaModalMsg"></div><div class="casa-modal-btns" id="casaModalBtns"></div></div></div>
+<div class="casa-toast" id="casaToast"></div>
 <script>
 const SUPABASE_URL = "https://tnpkepfjrltfryhuqnvo.supabase.co";
 const SUPABASE_KEY = "sb_publishable_D_RB0mj9X66SOlj9-4jgug_s7fvHEYO";
@@ -127,6 +143,12 @@ async function sb(method, table, body, query){
   let txt = await res.text(); return txt ? JSON.parse(txt) : [];
 }
 const WA_NUMBER = "6285890611111";
+// ===== POPUP CANTIK - GANTIIN ALERT / CONFIRM JELEK =====
+let _casaResolve = null;
+function showToast(msg){ let t=document.getElementById('casaToast'); t.innerText=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+function casaAlert(msg, title, icon){ return new Promise(res=>{ document.getElementById('casaModalIcon').innerText=icon||'✨'; document.getElementById('casaModalTitle').innerText=title||'CASA MODA'; document.getElementById('casaModalMsg').innerText=msg; document.getElementById('casaModalBtns').innerHTML=`<button class="casa-btn-yes" onclick="tutupCasaModal(true)">OK, Siap! ✨</button>`; _casaResolve=res; document.getElementById('casaModal').classList.add('open'); }); }
+function casaConfirm(msg, title, icon, yesText, noText){ return new Promise(res=>{ document.getElementById('casaModalIcon').innerText=icon||'💰'; document.getElementById('casaModalTitle').innerText=title||'Yakin?'; document.getElementById('casaModalMsg').innerText=msg; document.getElementById('casaModalBtns').innerHTML=`<button class="casa-btn-no" onclick="tutupCasaModal(false)">${noText||'Batal'}</button><button class="casa-btn-yes" onclick="tutupCasaModal(true)">${yesText||'Ya, Lanjut!'}</button>`; _casaResolve=res; document.getElementById('casaModal').classList.add('open'); }); }
+function tutupCasaModal(val){ document.getElementById('casaModal').classList.remove('open'); if(_casaResolve){ let r=_casaResolve; _casaResolve=null; r(val); } }
 function loadCartFromStorage(){ try{ return JSON.parse(localStorage.getItem('casa_cart')||'[]'); }catch(e){ return []; } }
 function saveCartToStorage(){ localStorage.setItem('casa_cart', JSON.stringify(cart)); }
 function loadMemberFromStorage(){ try{ let m = JSON.parse(localStorage.getItem('casa_member')||'null'); if(m && typeof m === 'string') return { nama: m }; return m; }catch(e){ return null; } }
@@ -210,16 +232,16 @@ function renderProdukFiltered(){
   if(list.length===0){ grid.innerHTML = '<div class="empty-box"><b>Belum ada produk Ready di ' + kategoriAktif + '</b><br><span style="font-size:13px;color:#ccc">Produknya mungkin lagi Habis, jadi disembunyiin dari depan.</span><br><button onclick="pilihKategori(\'populer\')" style="background:#FFD700;border:none;padding:10px 18px;border-radius:12px;font-weight:bold;margin-top:12px;cursor:pointer">Lihat Populer</button></div>'; return; }
   grid.innerHTML = list.map(p=>kartuProduk(p, isPopuler)).join('');
 }
-function openDetail(i){ current=products[i]; if(isHabis(current)) return alert('Produk ini lagi Habis!'); selectedSize=String(current.ukuran||'').split(',')[0]||"42"; document.getElementById('pImg').src=current.foto||''; document.getElementById('pCat').innerText=(current.jenis||'')+" • "+(current.status||''); document.getElementById('pName').innerText=getNama(current); document.getElementById('pPrice').innerText=fmt(current.harga); document.getElementById('pPrice2').innerText=fmt(current.harga); document.getElementById('pDesc').innerText=(current.ket||'')+" Stok: "+current.stok+" • Premium material, handcrafted in Bandung. Limited stock!"; let sizes = String(current.ukuran||'42').split(',').map(s=>s.trim()).filter(Boolean); document.getElementById('sizeBox').innerHTML=sizes.map(s=>`<button class="size-btn ${s==selectedSize?'active':''}" onclick="pickSize(this)">${s}</button>`).join(''); document.getElementById('popup').classList.add('open'); updateCartUI(); }
+function openDetail(i){ current=products[i]; if(isHabis(current)){ showToast('Produk ini lagi Habis! 😭'); return; } selectedSize=String(current.ukuran||'').split(',')[0]||"42"; document.getElementById('pImg').src=current.foto||''; document.getElementById('pCat').innerText=(current.jenis||'')+" • "+(current.status||''); document.getElementById('pName').innerText=getNama(current); document.getElementById('pPrice').innerText=fmt(current.harga); document.getElementById('pPrice2').innerText=fmt(current.harga); document.getElementById('pDesc').innerText=(current.ket||'')+" Stok: "+current.stok+" • Premium material, handcrafted in Bandung. Limited stock!"; let sizes = String(current.ukuran||'42').split(',').map(s=>s.trim()).filter(Boolean); document.getElementById('sizeBox').innerHTML=sizes.map(s=>`<button class="size-btn ${s==selectedSize?'active':''}" onclick="pickSize(this)">${s}</button>`).join(''); document.getElementById('popup').classList.add('open'); updateCartUI(); }
 function closePopup(){ document.getElementById('popup').classList.remove('open'); }
 function pickSize(el){ document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); selectedSize=el.innerText; }
-function addToCart(){
+async function addToCart(){
   cart.push({...current, size:selectedSize}); saveCartToStorage(); updateCartUI(); closePopup();
   if(!currentUser || !currentUser.id){
-    let mau = confirm('Masuk keranjang! 🔥 '+getNama(current)+' Ukuran '+selectedSize+'\n\nKeranjang lu kesimpen di HP ini, cek di Menu > Cart.\n\nMau langsung Login Member biar keranjang lu keliatan di halaman Member?');
+    let mau = await casaConfirm('Masuk keranjang! 🔥\n'+getNama(current)+' Ukuran '+selectedSize+'\n\nKeranjang lu kesimpen di HP ini, cek di Menu > Cart.\n\nMau langsung Login Member?', 'Masuk Keranjang! 🛒', '🛒', 'Ya, Login Member!', 'Nanti Aja');
     if(mau) window.location.href='member.html';
   } else {
-    alert('Masuk keranjang! 🔥 '+getNama(current)+' Ukuran '+selectedSize+'\nCek di Menu > Cart atau di halaman Member ya!');
+    showToast('Masuk keranjang! 🔥 '+getNama(current));
   }
 }
 async function getMemberFresh(){
@@ -229,16 +251,16 @@ async function getMemberFresh(){
   return currentUser;
 }
 async function beliSekarang(){
-  if(!currentUser || !currentUser.id){ alert('Login Member dulu biar bisa Beli!'); cart.push({...current, size:selectedSize}); saveCartToStorage(); updateCartUI(); window.location.href='member.html'; return; }
+  if(!currentUser || !currentUser.id){ await casaAlert('Login Member dulu biar bisa Beli!', 'Login Dulu Yuk! 👤', '👤'); cart.push({...current, size:selectedSize}); saveCartToStorage(); updateCartUI(); window.location.href='member.html'; return; }
   let harga = Number(current.harga||0);
   let m = await getMemberFresh();
   let saldo = Number(m.saldo||0);
   if(saldo < harga){
-    let mau = confirm('Saldo lu '+fmt(saldo)+'\nHarga barang '+fmt(harga)+'\n\nSaldo KURANG! Mau Top Up sekarang via QRIS / GOPAY / DANA / OVO / Bank?');
+    let mau = await casaConfirm('Saldo lu '+fmt(saldo)+'\nHarga barang '+fmt(harga)+'\n\nSaldo KURANG! Mau Top Up sekarang via QRIS / GOPAY / DANA / OVO / Bank?', 'Saldo Kurang! 😭', '💰', 'Ya, Top Up Sekarang!', 'Nanti Aja');
     if(mau){ closePopup(); openTopUp(); }
     return;
   }
-  let konfirm = confirm('Beli '+getNama(current)+' Ukuran '+selectedSize+'\nHarga: '+fmt(harga)+'\nSaldo lu: '+fmt(saldo)+'\nSisa saldo jadi: '+fmt(saldo-harga)+'\n\nLanjut potong saldo?');
+  let konfirm = await casaConfirm('Beli '+getNama(current)+' Ukuran '+selectedSize+'\nHarga: '+fmt(harga)+'\nSaldo lu: '+fmt(saldo)+'\nSisa saldo jadi: '+fmt(saldo-harga), 'Beli Sekarang? ⚡', '⚡', 'Ya, Potong Saldo!', 'Batal');
   if(!konfirm) return;
   let saldoBaru = saldo - harga;
   let poinBaru = Number(m.poin||0) + Math.floor(harga / 10000);
@@ -246,23 +268,23 @@ async function beliSekarang(){
   await sb("PATCH","member", { saldo: saldoBaru, poin: poinBaru, total_belanja: belanjaBaru }, "?id=eq."+m.id);
   m.saldo = saldoBaru; m.poin = poinBaru; m.total_belanja = belanjaBaru;
   localStorage.setItem('casa_member', JSON.stringify(m)); currentUser = m; updateCartUI(); closePopup();
-  alert('BERHASIL BELI! 🎉\n'+getNama(current)+' Ukuran '+selectedSize+'\nSaldo terpotong: '+fmt(harga)+'\nSisa saldo: '+fmt(saldoBaru)+'\nPoin lu sekarang: '+poinBaru);
+  await casaAlert('BERHASIL BELI! 🎉\n'+getNama(current)+' Ukuran '+selectedSize+'\nSaldo terpotong: '+fmt(harga)+'\nSisa saldo: '+fmt(saldoBaru)+'\nPoin lu sekarang: '+poinBaru, 'Berhasil Beli! 🎉', '🎉');
 }
 function openCart(){ document.getElementById('menuBox').style.display='none'; let html = cart.length===0 ? '<p>Keranjang masih kosong Bro, ayo belanja!</p>' : ''; let total=0; cart.forEach((c,idx)=>{ total+=Number(c.harga); html+=`<div class="cart-item"><img src="${c.foto||''}"><div style="flex:1"><b>${getNama(c)}</b><br><small>Ukuran: ${c.size}</small><br><span style="color:#FFD700">${fmt(c.harga)}</span></div><button onclick="removeItem(${idx})" style="background:none;border:none;color:#fff">✕</button></div>`; }); document.getElementById('cartItems').innerHTML=html; document.getElementById('cartTotal').innerText = cart.length ? 'Total: '+fmt(total) : ''; document.getElementById('cartSaldo').innerText = currentUser ? 'Saldo lu: '+fmt(currentUser.saldo||0) : 'Login dulu buat liat saldo'; document.getElementById('cartDrawer').classList.add('open'); }
 function closeCart(){ document.getElementById('cartDrawer').classList.remove('open'); }
-function removeItem(i){ cart.splice(i,1); saveCartToStorage(); updateCartUI(); openCart(); }
+function removeItem(i){ cart.splice(i,1); saveCartToStorage(); updateCartUI(); openCart(); showToast('Barang dihapus dari keranjang'); }
 async function checkout(){
-  if(cart.length===0) return alert('Keranjang kosong!');
-  if(!currentUser || !currentUser.id){ alert('Login Member dulu!'); window.location.href='member.html'; return; }
+  if(cart.length===0){ showToast('Keranjang kosong!'); return; }
+  if(!currentUser || !currentUser.id){ await casaAlert('Login Member dulu!', 'Login Dulu Yuk! 👤', '👤'); window.location.href='member.html'; return; }
   let total = cart.reduce((s,c)=> s + Number(c.harga||0), 0);
   let m = await getMemberFresh();
   let saldo = Number(m.saldo||0);
   if(saldo < total){
-    let mau = confirm('Total keranjang '+fmt(total)+'\nSaldo lu '+fmt(saldo)+'\n\nSaldo KURANG! Mau Top Up sekarang via QRIS / GOPAY / DANA / OVO / Bank?');
+    let mau = await casaConfirm('Total keranjang '+fmt(total)+'\nSaldo lu '+fmt(saldo)+'\n\nSaldo KURANG! Mau Top Up sekarang?', 'Saldo Kurang! 😭', '💰', 'Ya, Top Up!', 'Nanti Aja');
     if(mau){ closeCart(); openTopUp(); }
     return;
   }
-  let konfirm = confirm('Checkout '+cart.length+' barang?\nTotal: '+fmt(total)+'\nSaldo lu: '+fmt(saldo)+'\nSisa: '+fmt(saldo-total)+'\n\nLanjut potong saldo?');
+  let konfirm = await casaConfirm('Checkout '+cart.length+' barang?\nTotal: '+fmt(total)+'\nSaldo lu: '+fmt(saldo)+'\nSisa: '+fmt(saldo-total), 'Checkout? 💰', '💰', 'Ya, Bayar!', 'Batal');
   if(!konfirm) return;
   let saldoBaru = saldo - total;
   let poinBaru = Number(m.poin||0) + Math.floor(total / 10000);
@@ -270,7 +292,7 @@ async function checkout(){
   await sb("PATCH","member", { saldo: saldoBaru, poin: poinBaru, total_belanja: belanjaBaru, keranjang: [] }, "?id=eq."+m.id);
   m.saldo = saldoBaru; m.poin = poinBaru; m.total_belanja = belanjaBaru;
   localStorage.setItem('casa_member', JSON.stringify(m)); currentUser = m;
-  alert('CHECKOUT BERHASIL! 🎉\nTotal dipotong: '+fmt(total)+'\nSisa saldo: '+fmt(saldoBaru)+'\nPoin: '+poinBaru);
+  await casaAlert('CHECKOUT BERHASIL! 🎉\nTotal dipotong: '+fmt(total)+'\nSisa saldo: '+fmt(saldoBaru)+'\nPoin: '+poinBaru, 'Berhasil! 🎉', '🎉');
   cart=[]; saveCartToStorage(); updateCartUI(); closeCart();
 }
 function toggleBot(){ document.getElementById('botBox').classList.toggle('open'); }
@@ -343,7 +365,6 @@ function kirimBot(){
   if(ketemu.length>0){ botBalas("Ketemu nih 🔥 Klik buat liat detailnya:",false); ketemu.forEach(p=>{ botBalasHTML(botKartuProduk(p)); }); return; }
   botBalas("Halo! Mau liat koleksi CASA MODA? Ketik 'populer' ya! 🔥",false);
 }
-// ===== TOP UP - LOGO PAKE SCRIPT, QRIS PAKE FOTO ASLI LU =====
 function logoPay(nama){
   let s = {
     'QRIS': '<div style="background:#fff;color:#000;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">QRIS<span style="color:#E4002B">•</span><span style="color:#0057A8">•</span></div>',
@@ -367,7 +388,6 @@ const PAY_INFO = {
 };
 let topupNominal = 50000;
 let topupMetode = 'QRIS';
-// QRIS pake FOTO ASLI lu - bukan gambar script lagi!
 function getQrisFoto(){
   let upload = localStorage.getItem('casa_qris_foto');
   if(upload) return upload;
@@ -379,13 +399,13 @@ function gantiQris(event){
   let reader = new FileReader();
   reader.onload = function(e){
     localStorage.setItem('casa_qris_foto', e.target.result);
-    alert('Foto QRIS berhasil diganti! ✅');
+    showToast('Foto QRIS berhasil diganti! ✅');
     renderPayDetail();
   };
   reader.readAsDataURL(file);
 }
 async function openTopUp(){
-  if(!currentUser || !currentUser.id){ alert('Login Member dulu!'); window.location.href='member.html'; return; }
+  if(!currentUser || !currentUser.id){ await casaAlert('Login Member dulu!', 'Login Dulu Yuk! 👤', '👤'); window.location.href='member.html'; return; }
   document.getElementById('menuBox').style.display='none';
   document.getElementById('topupPopup').classList.add('open');
   let m = await getMemberFresh();
@@ -428,16 +448,16 @@ function renderPayDetail(){
   el.innerHTML = html;
   document.getElementById('btnKonfirmTopup').style.display='block';
 }
-function salinNomor(n){ if(navigator.clipboard) navigator.clipboard.writeText(n); alert('Disalin: '+n); }
+function salinNomor(n){ if(navigator.clipboard) navigator.clipboard.writeText(n); showToast('Disalin: '+n); }
 async function konfirmTopUp(){
   let custom = Number(document.getElementById('topupNominalCustom').value||0);
   let nominal = custom>0 ? custom : topupNominal;
-  if(!nominal || nominal < 10000) return alert('Minimal Top Up Rp 10.000');
+  if(!nominal || nominal < 10000){ await casaAlert('Minimal Top Up Rp 10.000', 'Nominal Kurang!', '💰'); return; }
   let riwayat = JSON.parse(localStorage.getItem('casa_topup')||'[]');
   riwayat.push({ member: currentUser.nama, member_id: currentUser.id, nominal, metode: topupMetode, at: new Date().toISOString(), status:'Menunggu Verifikasi' });
   localStorage.setItem('casa_topup', JSON.stringify(riwayat));
-  alert('Request Top Up Terkirim! 🎉\nNominal: '+fmt(nominal)+'\nVia: '+topupMetode+'\n\nAdmin akan cek & masukin saldo lu max 1x24 jam. Simpan bukti transfer lu ya!');
   closeTopUp();
+  await casaAlert('Request Top Up Terkirim! 🎉\nNominal: '+fmt(nominal)+'\nVia: '+topupMetode+'\n\nAdmin akan cek & masukin saldo lu max 1x24 jam. Simpan bukti transfer lu ya!', 'Top Up Terkirim! 🎉', '🎉');
 }
 document.getElementById('topupNominalCustom').addEventListener('input', renderPayDetail);
 buildKeypad();
