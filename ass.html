@@ -85,6 +85,8 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 </div>
 <div class="menu-top" id="menuTop"></div>
 <button class="btn-add" onclick="openForm()">+ TAMBAH BARANG BARU</button>
+<button class="btn-add dark" onclick="perbaikiDB()">🛠️ PERBAIKI DATABASE - Klik Kalau Gagal Simpan</button>
+<p id="dbStatus" style="font-size:12px;color:#FFD700;text-align:center;margin-top:-8px;margin-bottom:12px"></p>
 <button class="btn-add red" id="btnBersihin" onclick="hapusSemuaHabis()">🗑️ BERSIHIN SAMPAH - Hapus Semua yang Habis (0)</button>
 <button class="btn-add dark" onclick="lihatDepan()">👀 Lihat Halaman Depan (Kayak Pembeli)</button>
 <div id="listProduk"></div>
@@ -196,17 +198,29 @@ async function rpcEnsure(){
     return true;
   }catch(e){ return false; }
 }
+async function perbaikiDB(){
+  let el = document.getElementById('dbStatus');
+  if(el) el.innerText = 'Lagi dibenerin... tunggu bentar...';
+  let ok = await rpcEnsure();
+  if(ok){
+    if(el) el.innerText = '✅ BERES! Tabel + kolom udah dibikinin. Sekarang pencet Simpan lagi.';
+    await loadAdmin();
+  } else {
+    if(el) el.innerText = '❌ Gagal. Jalankan DROP + SQL ensure_casa di Supabase dulu, baru pencet lagi.';
+    alert('Gagal perbaiki. Pastikan di Supabase udah jalanin: DROP FUNCTION IF EXISTS ensure_casa(); lalu SQL ensure_casa yang baru.');
+  }
+}
 async function sbAuto(method, table, body, query){
   try{ return await sb(method, table, body, query); }
   catch(e){
     let msg = String(e.message||'');
-    if(msg.includes('Could not find') || msg.includes('PGRST204') || msg.includes('does not exist') || msg.includes('relation') && msg.includes('does not exist')){
+    if(msg.includes('Could not find') || msg.includes('PGRST204') || msg.includes('does not exist') || (msg.includes('relation') && msg.includes('does not exist'))){
       let ok = await rpcEnsure();
       if(ok){
         await new Promise(r=>setTimeout(r,800));
         return await sb(method, table, body, query);
       }
-      throw new Error('Kolom / tabel belum ada. Jalankan SQL ensure_casa 1x di Supabase, lalu pencet Simpan lagi. Pesan asli: '+msg);
+      throw new Error('Kolom / tabel belum ada. Pencet tombol PERBAIKI DATABASE dulu, lalu pencet Simpan lagi. Pesan asli: '+msg);
     }
     throw e;
   }
