@@ -48,16 +48,16 @@ input.locked{background:#333;border-color:#222;color:#888}
 
 <div id="formBox">
 <div id="boxDaftar" style="display:none">
-<input id="dNama" placeholder="Nama Lengkap">
-<input id="dWa" type="tel" inputmode="numeric" placeholder="No WA, ex: 085890611111">
+<input id="dNama" placeholder="Nama Lengkap" autocomplete="off">
+<input id="dWa" type="tel" inputmode="numeric" placeholder="No WA, ex: 085890611111" autocomplete="off">
 <div class="hint">Minimal 10 digit, cuma angka, harus diawali 08</div>
-<input id="dPass" type="password" placeholder="Password (min 6 karakter)">
+<input id="dPass" type="password" placeholder="Password (min 6 karakter)" autocomplete="new-password">
 <div class="hint">Minimal 6 karakter, jangan cuma 1 huruf 😂</div>
 <button class="buy-btn" onclick="daftar()">Daftar Member ✨</button>
 </div>
 <div id="boxMasuk">
-<input id="mWa" type="tel" inputmode="numeric" placeholder="No WA, ex: 085890611111">
-<input id="mPass" type="password" placeholder="Password">
+<input id="mWa" type="tel" inputmode="numeric" placeholder="No WA, ex: 085890611111" autocomplete="off">
+<input id="mPass" type="password" placeholder="Password" autocomplete="new-password">
 <button class="buy-btn" onclick="masuk()">MASUK</button>
 </div>
 </div>
@@ -86,7 +86,6 @@ input.locked{background:#333;border-color:#222;color:#888}
 <div class="card"><h3>📜 Riwayat Top Up</h3><div id="riwayatTopup"></div></div>
 </div>
 
-<!-- LIST MEMBER - HILANG KALAU UDAH KELUAR -->
 <div class="card" id="listMemberBox" style="display:none"><h3>LIST MEMBER</h3><div id="listMember"></div></div>
 
 <div id="bawahBox" style="display:none;gap:12px;margin-top:14px">
@@ -95,11 +94,11 @@ input.locked{background:#333;border-color:#222;color:#888}
 </div>
 
 <div class="popup" id="editPopup"><div class="popup-box"><button class="close" onclick="closeEditProfil()">✕</button><h3>✏️ Edit Profil</h3><p style="font-size:12px;color:#aaa;margin-top:4px">Bisa ganti semua, kecuali saldo! Saldo dikunci 😂</p>
-<label class="small">Nama Lengkap</label><input id="eNama" placeholder="Nama Lengkap">
-<label class="small">No WA (min 10 digit)</label><input id="eWa" type="tel" inputmode="numeric" placeholder="085890611111">
-<label class="small">Alamat Lengkap</label><textarea id="eAlamat" placeholder="Jl. ... , Bandung, Jawa Barat"></textarea>
-<label class="small">Kota / Kecamatan</label><input id="eKota" placeholder="Ex: Bandung - Dago">
-<label class="small">Password Baru (kosongkan kalau gak mau ganti, kalau diisi min 6 karakter)</label><input id="ePass" type="password" placeholder="Password baru">
+<label class="small">Nama Lengkap</label><input id="eNama" placeholder="Nama Lengkap" autocomplete="off">
+<label class="small">No WA (min 10 digit)</label><input id="eWa" type="tel" inputmode="numeric" placeholder="085890611111" autocomplete="off">
+<label class="small">Alamat Lengkap</label><textarea id="eAlamat" placeholder="Jl. ... , Bandung, Jawa Barat" autocomplete="off"></textarea>
+<label class="small">Kota / Kecamatan</label><input id="eKota" placeholder="Ex: Bandung - Dago" autocomplete="off">
+<label class="small">Password Baru (kosongkan kalau gak mau ganti, kalau diisi min 6 karakter)</label><input id="ePass" type="password" placeholder="Password baru" autocomplete="new-password">
 <label class="small">🔒 Saldo - TIDAK BISA DIEDIT 😂</label><input id="eSaldo" class="locked" readonly disabled value="Rp 0">
 <label class="small">⭐ Poin - TIDAK BISA DIEDIT</label><input id="ePoin" class="locked" readonly disabled value="0">
 <button class="buy-btn" onclick="simpanEditProfil()">Simpan Perubahan ✅</button>
@@ -116,7 +115,6 @@ const SUPABASE_KEY = "sb_publishable_D_RB0mj9X66SOlj9-4jgug_s7fvHEYO";
 const HEADERS = { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=representation" };
 async function sb(method, table, body, query){ let url = SUPABASE_URL + "/rest/v1/" + table + (query || ""); let res = await fetch(url, { method, headers: HEADERS, body: body ? JSON.stringify(body) : undefined }); if(!res.ok) throw new Error(await res.text()); let txt = await res.text(); return txt ? JSON.parse(txt) : []; }
 function fmt(n){ return "Rp " + Number(n||0).toLocaleString('id-ID'); }
-// VALIDASI BARU - JANGAN SAMPE LOLOS LAGI!
 function bersihWA(wa){ return String(wa||'').replace(/[^0-9]/g,''); }
 function validasiWA(wa){
   let w = bersihWA(wa);
@@ -234,7 +232,19 @@ async function checkoutMember(){
   await casaAlert('CHECKOUT BERHASIL! 🎉\nTotal: '+fmt(total)+'\nSisa saldo: '+fmt(saldoBaru), 'Berhasil! 🎉', '🎉');
   tampilMember();
 }
-async function logout(){ let ok=await casaConfirm('Keluar dari akun ini?', 'Keluar?', '👋', 'Ya, Keluar', 'Batal'); if(!ok) return; localStorage.removeItem('casa_member'); tampilMember(); showToast('Berhasil keluar'); }
+async function logout(){
+  let ok=await casaConfirm('Keluar dari akun ini?', 'Keluar?', '👋', 'Ya, Keluar', 'Batal');
+  if(!ok) return;
+  localStorage.removeItem('casa_member');
+  document.getElementById('mWa').value = '';
+  document.getElementById('mPass').value = '';
+  document.getElementById('dNama').value = '';
+  document.getElementById('dWa').value = '';
+  document.getElementById('dPass').value = '';
+  gantiTab('masuk');
+  tampilMember();
+  showToast('Berhasil keluar');
+}
 async function loadList(){ try{ let r=await sb("GET","member","", "?select=*&order=id.desc&limit=10"); document.getElementById('listMember').innerHTML=r.map(x=>`<div class="member-item"><b>${x.nama}</b> - ${Number(x.total_belanja||0)>=1000000?'Gold':'Silver'}<br>WA: ${x.wa} | Poin: ${x.poin||0} | Belanja: ${fmt(x.total_belanja)}<br>Keranjang: ${getCart().length} item</div>`).join('') || 'Belum ada member'; }catch(e){} }
 function logoPay(n){ let s={'QRIS':'<div style="background:#fff;color:#000;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">QRIS<span style="color:#E4002B">•</span><span style="color:#0057A8">•</span></div>','GOPAY':'<div style="background:#00AED6;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">GOPAY</div>','DANA':'<div style="background:#118EEA;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">DANA</div>','OVO':'<div style="background:#4C2A85;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">OVO</div>','MANDIRI':'<div style="background:#003A8C;color:#FFD700;border-radius:8px;padding:6px 10px;font-weight:900;font-size:12px">mandiri</div>','BRI':'<div style="background:#00529C;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">BRI</div>','BCA':'<div style="background:#0060AF;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">BCA</div>'}; return s[n]||n; }
 const PAY_INFO={'QRIS':{title:'QRIS - Scan di Semua Aplikasi',desc:'Buka GOPAY / DANA / OVO / M-Banking lu, scan QR di bawah.',qris:true},'GOPAY':{title:'GOPAY',desc:'Transfer ke GOPAY:',nomor:'0858-9061-1111',nama:'KO CHENG - CASA MODA'},'DANA':{title:'DANA',desc:'Transfer ke DANA:',nomor:'0858-9061-1111',nama:'KO CHENG - CASA MODA'},'OVO':{title:'OVO',desc:'Transfer ke OVO:',nomor:'0858-9061-1111',nama:'KO CHENG - CASA MODA'},'MANDIRI':{title:'Bank Mandiri',desc:'Transfer ke Mandiri:',nomor:'137-00-1234567-8',nama:'KO CHENG'},'BRI':{title:'Bank BRI',desc:'Transfer ke BRI:',nomor:'1234-01-012345-67-8',nama:'KO CHENG'},'BCA':{title:'Bank BCA',desc:'Transfer ke BCA:',nomor:'123-456-7890',nama:'KO CHENG'}};
