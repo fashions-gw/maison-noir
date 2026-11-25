@@ -16,8 +16,6 @@ body{background:#000;color:#fff;overflow-x:hidden}
 .section{padding:15px 20px 100px;background:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.65)),url('background-emas.jpg');background-size:cover;background-position:center;background-attachment:fixed;min-height:100vh}
 .section h2{font-size:22px;margin-bottom:12px}.section h2 i{color:#FFD700}
 .sub{font-size:12px;color:#ccc;text-align:left;margin-bottom:12px}
-.save-bar{background:#FFD700;color:#000;border-radius:14px;padding:12px;margin-bottom:14px;text-align:left;display:none}
-.save-bar b{font-size:14px}.save-bar p{font-size:12px;margin-top:4px;line-height:1.5}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
 .stat{background:rgba(0,0,0,0.55);border:1px solid rgba(255,215,0,0.6);border-radius:18px;padding:14px;text-align:left;cursor:pointer}
 .stat small{color:#FFD700}.stat b{font-size:24px;display:block;margin-top:4px}
@@ -55,7 +53,6 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 .chip{display:inline-block;background:#222;border:1px solid #FFD700;color:#FFD700;padding:6px 12px;border-radius:20px;font-size:12px;margin:4px 4px 0 0;cursor:pointer}
 .chip.active{background:#FFD700;color:#000}
 .foto-box{margin-top:10px;background:#222;border:2px dashed rgba(255,215,0,0.6);border-radius:16px;padding:14px;text-align:center;cursor:pointer}
-.foto-box:active{background:#333}
 .foto-btn{width:70px;height:70px;border-radius:50%;background:#FFD700;border:none;font-size:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:0 auto}
 .foto-preview{width:100%;height:220px;object-fit:cover;border-radius:14px;border:1px solid rgba(255,215,0,0.5);margin-top:10px;display:none}
 .foto-hint{font-size:12px;color:#ccc;margin-top:8px}
@@ -63,10 +60,6 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 .pilih-foto.open{display:flex}
 .pilih-box{background:#111;width:100%;max-width:420px;border-radius:25px 25px 0 0;border-top:2px solid #FFD700;padding:20px}
 .pilih-opt{background:#222;border:1px solid rgba(255,215,0,0.5);border-radius:14px;padding:16px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:14px;text-align:left}
-.pilih-opt:active{background:#333}
-.pilih-opt b{font-size:16px;display:block}
-.pilih-opt small{color:#ccc}
-/* KAMERA BENERAN */
 .cam-screen{position:fixed;inset:0;background:#000;z-index:600;display:none;flex-direction:column}
 .cam-screen.open{display:flex}
 .cam-screen video{width:100%;flex:1;object-fit:cover;background:#000}
@@ -84,8 +77,7 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 
 <div class="section" id="page-admin">
 <h2>Dashboard <i>Admin</i></h2>
-<p class="sub">Sumber data: <b style="color:#FFD700">db.json</b> • Jenis baru auto kebikin, yang Habis bisa dihapus biar gak jadi sampah.</p>
-<div class="save-bar" id="saveBar"><b>⚠️ Ada perubahan belum ke-save ke db.json!</b><p>Pencet DOWNLOAD di bawah, timpa file db.json lama lu. Kalau gak download, barang baru GAK AKAN NONGOL di depan!</p></div>
+<p class="sub">Sumber data: <b style="color:#FFD700">Supabase Baru</b> • Simpan langsung nongol di depan, gak perlu download lagi!</p>
 <div class="stats">
 <div class="stat" onclick="filterTab(null,'semua')"><small>📦 Total Produk</small><b id="statProduk">0</b><span>Semua, termasuk Habis</span></div>
 <div class="stat" onclick="filterTab(null,'stok-tipis')"><small>⚠️ Stok Menipis</small><b id="statStok">0</b><span>Stok &lt; 5</span></div>
@@ -94,7 +86,6 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 </div>
 <div class="menu-top" id="menuTop"></div>
 <button class="btn-add" onclick="openForm()">+ TAMBAH BARANG BARU</button>
-<button class="btn-add green" onclick="downloadDB()">⬇️ DOWNLOAD db.json BARU (Simpan Permanen)</button>
 <button class="btn-add red" id="btnBersihin" onclick="hapusSemuaHabis()">🗑️ BERSIHIN SAMPAH - Hapus Semua yang Habis (0)</button>
 <button class="btn-add dark" onclick="lihatDepan()">👀 Lihat Halaman Depan (Kayak Pembeli)</button>
 <div id="listProduk"></div>
@@ -103,7 +94,7 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 <div class="section" id="page-laporan" style="display:none">
 <h2>Laporan <i>Omset</i></h2>
 <div class="card"><small style="color:#FFD700">Total Nilai Stok (Semua Produk)</small><div class="price" style="font-size:26px" id="lapOmset">Rp 0</div><p style="margin-top:8px;font-size:13px" id="lapDetail"></p></div>
-<div class="card"><b>Per Kategori (dari db.json)</b><div id="lapKategori" style="margin-top:10px"></div></div>
+<div class="card"><b>Per Kategori</b><div id="lapKategori" style="margin-top:10px"></div></div>
 <div class="card"><b>Produk Stok Terbanyak (Terlaris)</b><div id="lapTop" style="margin-top:10px"></div></div>
 <button class="btn-add" onclick="showPageAdmin('admin')">← Kembali ke Dashboard</button>
 </div>
@@ -128,7 +119,7 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 <label>2. Jenis / Kategori *</label>
 <div id="fJenisChips"><span class="chip" onclick="pilihJenis(this)">Sepatu</span><span class="chip" onclick="pilihJenis(this)">Kemeja</span><span class="chip" onclick="pilihJenis(this)">Hoodie</span><span class="chip" onclick="pilihJenis(this)">Dress</span><span class="chip" onclick="pilihJenis(this)">Jaket</span></div>
 <input id="fJenisBaru" placeholder="Atau ketik jenis BARU di sini, contoh: Dompet, Tas, Topi...">
-<p style="font-size:12px;color:#ccc">Kalau isi kotak ini, jenis baru OTOMATIS kebikin. Gak perlu bikin di database dulu!</p>
+<p style="font-size:12px;color:#ccc">Kalau isi kotak ini, jenis baru OTOMATIS kebikin.</p>
 <label>3. Status</label><select id="fStatus"><option>Ready</option><option>Pre-Order</option><option>Habis</option></select>
 <label>4. Ukuran *</label><input id="fUkuran" placeholder="All Size / 39,40,41,42 atau S,M,L,XL">
 <label>5. Warna</label><input id="fWarna" placeholder="Hitam / Coklat / Gold">
@@ -144,11 +135,10 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 <div class="foto-hint" id="fotoHint">Klik kamera buat foto barang</div>
 </div>
 <img id="fotoPreview" class="foto-preview">
-<!-- CUMA GALERI DI SINI, KAMERA PAKE KAMERA BENERAN DI BAWAH -->
 <input type="file" id="inputGaleri" accept="image/*" style="display:none" onchange="bacaFoto(this)">
 <label>13. Detail / Deskripsi Lengkap</label><textarea id="fKet" rows="4" placeholder="Contoh: Dompet kulit asli, handcrafted di Bandung."></textarea>
 <button class="btn-add" style="margin-top:14px" onclick="simpanProduk()">💾 Simpan Barang</button>
-<p style="font-size:12px;color:#ccc;text-align:center">Abis simpan, WAJIB DOWNLOAD db.json BARU + timpa file lama, baru nongol di depan!</p>
+<p style="font-size:12px;color:#ccc;text-align:center">Abis simpan, LANGSUNG nongol di depan! Gak perlu download lagi.</p>
 </div></div>
 
 <div class="pilih-foto" id="pilihFoto">
@@ -160,7 +150,6 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 </div>
 </div>
 
-<!-- LAYAR KAMERA BENERAN -->
 <div class="cam-screen" id="camScreen">
 <div style="padding:14px;display:flex;justify-content:space-between;align-items:center"><b>📷 Kamera - Arahkan ke Barang</b><button onclick="tutupKamera()" style="background:none;border:none;color:#fff;font-size:22px">✕</button></div>
 <video id="camVideo" autoplay playsinline muted></video>
@@ -169,17 +158,25 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 </div>
 
 <script>
+const SUPABASE_URL = "https://tnpkepfjrltfryhuqnvo.supabase.co";
+const SUPABASE_KEY = "sb_publishable_D_RB0mj9X66SOlj9-4jgug_s7fvHEYO";
+const HEADERS = { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=representation" };
+async function sb(method, table, body, query){
+  let url = SUPABASE_URL + "/rest/v1/" + table + (query || "");
+  let res = await fetch(url, { method, headers: HEADERS, body: body ? JSON.stringify(body) : undefined });
+  if(!res.ok) throw new Error(await res.text());
+  let txt = await res.text(); return txt ? JSON.parse(txt) : [];
+}
 let DB = { produk:[], member:[], bot:[], admin:[], pegawai:[] };
 let products = [];
 let editId = null;
 let filterAktif = 'semua';
-let adaPerubahan = false;
 let jenisTerpilih = 'Sepatu';
 let fotoBaru = '';
 let KATEGORI_LIST = [];
 let KAT_EMOJI = { Sepatu:'👟', Kemeja:'👔', Hoodie:'🧥', Dress:'👗', Jaket:'🧥', Tas:'👜', Topi:'🧢', Celana:'👖', Kaos:'👕', Kacamata:'🕶️', Jam:'⌚', Dompet:'👛' };
 function emojiKat(kat){ return KAT_EMOJI[kat] || '✨'; }
-function getNama(p){ return p.nama || p.nama_produk || 'Tanpa Nama'; }
+function getNama(p){ return p.nama || 'Tanpa Nama'; }
 function fmt(n){ return "Rp " + Number(n||0).toLocaleString('id-ID'); }
 function isHabis(p){ return Number(p.stok||0) <= 0 || String(p.status||'').toLowerCase() === 'habis'; }
 function showPageAdmin(p){
@@ -192,29 +189,17 @@ function showPageAdmin(p){
 function navAdmin(el, p){ document.querySelectorAll('.bottom-nav a').forEach(a=>a.classList.remove('active')); el.classList.add('active'); showPageAdmin(p); }
 function logout(){ window.location.href='index.html'; }
 function lihatDepan(){ window.location.href='index.html'; }
-function tandaiPerubahan(){ adaPerubahan = true; document.getElementById('saveBar').style.display='block'; }
-function downloadDB(){
-  let isi = JSON.stringify(DB, null, 2);
-  let blob = new Blob([isi], {type:'application/json'});
-  let a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'db.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
-  alert('db.json baru ke-download! Sekarang TIMPA file db.json lama lu, terus REFRESH index.html. Baru Dompet nongol! 🔥');
-  adaPerubahan = false; document.getElementById('saveBar').style.display='none';
-}
 async function loadAdmin(){
   try{
-    let res = await fetch('db.json?v=' + Date.now());
-    if(!res.ok) throw new Error('db.json tidak ketemu');
-    let data = await res.json();
-    DB = { produk: data.produk||[], member: data.member||[], bot: data.bot||[], admin: data.admin||[], pegawai: data.pegawai||[] };
-  }catch(e){ DB = { produk:[], member:[], bot:[], admin:[], pegawai:[] }; alert('Gagal load db.json: '+e.message); }
-  products = DB.produk || [];
+    products = await sb("GET","produk","", "?select=*&order=id.asc");
+    DB.produk = products;
+    DB.admin = await sb("GET","admin","", "?select=*");
+    DB.member = await sb("GET","member","", "?select=*");
+    DB.bot = await sb("GET","bot","", "?select=*");
+  }catch(e){ alert('Gagal load Supabase: '+e.message); products=[]; }
   let params = new URLSearchParams(window.location.search);
   let codeAdmin = params.get('code') || 'kodok';
-  document.getElementById('adminCode').innerText = "Code: "+codeAdmin+" • Login Admin (dari db.json)";
+  document.getElementById('adminCode').innerText = "Code: "+codeAdmin+" • Supabase Baru";
   let adm = (DB.admin||[]).find(a=>a.code===codeAdmin);
   if(adm){ document.getElementById('adminNama').innerText = adm.nama; document.getElementById('adminWA').innerText = "WA: "+(adm.WA||'-')+" • "+(adm.alamat||'Bandung'); }
   buildKategoriAdmin();
@@ -252,17 +237,17 @@ function renderAdmin(){
   document.getElementById('btnBersihin').innerText = '🗑️ BERSIHIN SAMPAH - Hapus Semua yang Habis (' + getHabis().length + ')';
   let terlaris = getPopuler()[0];
   document.getElementById('statTerlaris').innerText = terlaris ? getNama(terlaris) : '-';
-  document.getElementById('listProduk').innerHTML = list.length===0 ? '<div class="card">Belum ada produk di filter ini.<br><span style="font-size:13px;color:#ccc">Coba klik Semua atau tambahin produk baru.</span></div>' : list.map(p=>{
+  document.getElementById('listProduk').innerHTML = list.length===0 ? '<div class="card">Belum ada produk.<br><span style="font-size:13px;color:#ccc">Pencet + TAMBAH BARANG BARU di atas, langsung nongol di depan!</span></div>' : list.map(p=>{
     let habis = isHabis(p);
     let low = !habis && Number(p.stok) < 5;
     let isPop = getPopuler().some(x=>x.id===p.id);
-    return `<div class="card ${habis?'habis':''} ${low?'low':''}"><div class="card-flex"><img src="${p.foto||''}" onclick="openDetail(${p.id})"><div style="flex:1"><small style="color:#FFD700">${p.jenis} • ${p.status}</small><br><b>${getNama(p)}</b> ${habis?'<span class="badge-habis">🚫 HABIS - SAMPAH?</span>':low?'<span class="badge-low">⚠️ STOK TIPIS!</span>':'<span class="badge-aman">Aman</span>'} ${isPop?'<span class="badge-aman" style="background:#FFD700">🔥 POPULER</span>':''}<br><small>SKU: ${p.nomor||'-'} • Ukuran: ${p.ukuran} • Stok: <b>${p.stok} pcs</b></small><div class="price">${fmt(p.harga)} ${p.discount?'<small style="color:#fff">Disc '+p.discount+'%</small>':''}</div><small style="color:#ccc">${(p.ket||'').slice(0,60)}${(p.ket||'').length>60?'...':''}</small></div></div><div class="btn-row"><button class="btn-edit" onclick="editProduk(${p.id})">✏️ Edit / Restock</button><button class="btn-hapus" onclick="hapusProduk(${p.id})">🗑️ Hapus</button></div></div>`;
+    return `<div class="card ${habis?'habis':''} ${low?'low':''}"><div class="card-flex"><img src="${p.foto||''}" onclick="openDetail(${p.id})"><div style="flex:1"><small style="color:#FFD700">${p.jenis} • ${p.status}</small><br><b>${getNama(p)}</b> ${habis?'<span class="badge-habis">🚫 HABIS</span>':low?'<span class="badge-low">⚠️ STOK TIPIS!</span>':'<span class="badge-aman">Aman</span>'} ${isPop?'<span class="badge-aman" style="background:#FFD700">🔥 POPULER</span>':''}<br><small>SKU: ${p.nomor||'-'} • Ukuran: ${p.ukuran} • Stok: <b>${p.stok} pcs</b></small><div class="price">${fmt(p.harga)} ${p.discount?'<small style="color:#fff">Disc '+p.discount+'%</small>':''}</div><small style="color:#ccc">${(p.ket||'').slice(0,60)}</small></div></div><div class="btn-row"><button class="btn-edit" onclick="editProduk(${p.id})">✏️ Edit / Restock</button><button class="btn-hapus" onclick="hapusProduk(${p.id})">🗑️ Hapus</button></div></div>`;
   }).join('');
 }
 function renderLaporan(){
   let omset = products.reduce((a,p)=> a + (Number(p.harga)*Number(p.stok)),0);
   document.getElementById('lapOmset').innerText = fmt(omset);
-  document.getElementById('lapDetail').innerText = products.length+" produk • Total nilai stok "+fmt(omset)+" • Stok tipis: "+getStokTipis().length+" produk • Habis: "+getHabis().length+" produk";
+  document.getElementById('lapDetail').innerText = products.length+" produk • Total nilai stok "+fmt(omset)+" • Stok tipis: "+getStokTipis().length+" • Habis: "+getHabis().length;
   document.getElementById('lapKategori').innerHTML = KATEGORI_LIST.map(kat=>{
     let list = products.filter(p=> String(p.jenis||'').toLowerCase()===kat.toLowerCase());
     let nilai = list.reduce((a,p)=> a + (Number(p.harga)*Number(p.stok)),0);
@@ -271,7 +256,7 @@ function renderLaporan(){
   let top = getPopuler();
   document.getElementById('lapTop').innerHTML = top.map(p=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #333"><span>${getNama(p)}</span><b style="color:#FFD700">${fmt(p.harga)} • Stok ${p.stok}</b></div>`).join('') || 'Belum ada produk';
 }
-function filterTab(el, f){ filterAktif = f; renderAdmin(); if(el) document.getElementById('listProduk').scrollIntoView({behavior:'smooth'}); }
+function filterTab(el, f){ filterAktif = f; renderAdmin(); }
 function openDetail(id){
   let p = products.find(x=>x.id===id); if(!p) return;
   document.getElementById('dImg').src = p.foto||'';
@@ -293,64 +278,40 @@ function openDetail(id){
 function closeDetail(){ document.getElementById('popupDetail').classList.remove('open'); }
 function bukaPilihFoto(){ document.getElementById('pilihFoto').classList.add('open'); }
 function tutupPilihFoto(){ document.getElementById('pilihFoto').classList.remove('open'); }
-// KAMERA BENERAN - PAKE getUserMedia, BUKAN capture LAGI
-let camStream = null;
-let camBelakang = true;
+let camStream = null; let camBelakang = true;
 async function pilihKamera(){
   tutupPilihFoto();
-  // HARUS HTTPS / LOCALHOST, KALAU BUKA DARI file:// KADANG DITOLAK HP
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    alert('Kamera gak bisa dibuka di browser ini. Coba buka lewat Chrome, bukan dari WhatsApp. Atau pake Galeri aja dulu.');
-    return;
-  }
-  try{
-    await bukaKamera();
-  }catch(e){
-    alert('Kamera gak bisa dibuka: '+e.message+'\nCoba pencet IZINKAN pas muncul popup, atau buka lewat Chrome, atau pake Galeri aja.');
-  }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ alert('Kamera gak bisa, buka lewat Chrome / pake Galeri.'); return; }
+  try{ await bukaKamera(); }catch(e){ alert('Kamera gak bisa: '+e.message); }
 }
 async function bukaKamera(){
-  tutupKameraStream();
-  document.getElementById('camScreen').classList.add('open');
+  tutupKameraStream(); document.getElementById('camScreen').classList.add('open');
   let video = document.getElementById('camVideo');
   camStream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode: camBelakang ? 'environment' : 'user' }, audio:false });
-  video.srcObject = camStream;
-  await video.play();
+  video.srcObject = camStream; await video.play();
 }
 function tutupKameraStream(){ if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null; } }
 function tutupKamera(){ tutupKameraStream(); document.getElementById('camScreen').classList.remove('open'); }
 async function gantiKamera(){ camBelakang = !camBelakang; try{ await bukaKamera(); }catch(e){ alert('Gagal ganti kamera: '+e.message); } }
 function jepretFoto(){
   let video = document.getElementById('camVideo');
-  if(!video.videoWidth) return alert('Kamera belum siap, tunggu sebentar...');
+  if(!video.videoWidth) return alert('Kamera belum siap...');
   let canvas = document.createElement('canvas');
   canvas.width = video.videoWidth; canvas.height = video.videoHeight;
   canvas.getContext('2d').drawImage(video, 0, 0);
   fotoBaru = canvas.toDataURL('image/jpeg', 0.85);
-  let img = document.getElementById('fotoPreview');
-  img.src = fotoBaru; img.style.display='block';
+  let img = document.getElementById('fotoPreview'); img.src = fotoBaru; img.style.display='block';
   document.getElementById('fotoHint').innerText = '✅ Foto dari kamera udah kepilih!';
   tutupKamera();
 }
 function pilihGaleri(){ tutupPilihFoto(); document.getElementById('inputGaleri').click(); }
 function bacaFoto(input){
-  let file = input.files && input.files[0];
-  if(!file) return;
+  let file = input.files && input.files[0]; if(!file) return;
   let reader = new FileReader();
-  reader.onload = function(e){
-    fotoBaru = e.target.result;
-    let img = document.getElementById('fotoPreview');
-    img.src = fotoBaru; img.style.display='block';
-    document.getElementById('fotoHint').innerText = '✅ Foto dari galeri udah kepilih!';
-  };
-  reader.readAsDataURL(file);
-  input.value = '';
+  reader.onload = function(e){ fotoBaru = e.target.result; let img = document.getElementById('fotoPreview'); img.src = fotoBaru; img.style.display='block'; document.getElementById('fotoHint').innerText = '✅ Foto dari galeri udah kepilih!'; };
+  reader.readAsDataURL(file); input.value = '';
 }
-function pilihJenis(el){
-  document.querySelectorAll('#fJenisChips .chip').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active'); jenisTerpilih = el.innerText;
-  document.getElementById('fJenisBaru').value = '';
-}
+function pilihJenis(el){ document.querySelectorAll('#fJenisChips .chip').forEach(c=>c.classList.remove('active')); el.classList.add('active'); jenisTerpilih = el.innerText; document.getElementById('fJenisBaru').value = ''; }
 function openForm(){
   editId=null; jenisTerpilih='Sepatu'; fotoBaru='';
   document.getElementById('formTitle').innerText='Tambah Barang Baru';
@@ -364,8 +325,7 @@ function openForm(){
 function closeForm(){ document.getElementById('popupForm').classList.remove('open'); }
 function editProduk(id){
   let p=products.find(x=>x.id===id); if(!p) return;
-  editId=id; jenisTerpilih = p.jenis||'Sepatu';
-  fotoBaru = p.foto||'';
+  editId=id; jenisTerpilih = p.jenis||'Sepatu'; fotoBaru = p.foto||'';
   document.getElementById('formTitle').innerText='Edit Barang - '+getNama(p);
   document.getElementById('fNama').value=getNama(p);
   document.querySelectorAll('#fJenisChips .chip').forEach(c=>c.classList.toggle('active', c.innerText===jenisTerpilih));
@@ -385,31 +345,28 @@ function editProduk(id){
   else { img.style.display='none'; document.getElementById('fotoHint').innerText='Klik kamera buat foto barang'; }
   document.getElementById('popupForm').classList.add('open');
 }
-function simpanProduk(){
+async function simpanProduk(){
   let jenisFinal = document.getElementById('fJenisBaru').value.trim() || jenisTerpilih;
   let data = { nama:document.getElementById('fNama').value.trim(), jenis:jenisFinal, status:document.getElementById('fStatus').value, ukuran:document.getElementById('fUkuran').value.trim(), warna:document.getElementById('fWarna').value.trim(), bahan:document.getElementById('fBahan').value.trim(), nomor:document.getElementById('fNomor').value.trim(), stok:Number(document.getElementById('fStok').value||0), harga:Number(document.getElementById('fHarga').value||0), harga_modal:Number(document.getElementById('fHargaModal').value||0), discount:Number(document.getElementById('fDiscount').value||0), foto:fotoBaru, ket:document.getElementById('fKet').value.trim() };
   if(!data.nama) return alert('Isi nama barang dulu!');
   if(!data.ukuran) return alert('Isi ukuran dulu!');
   if(!data.foto) return alert('Klik 📷 dulu buat foto barang!');
-  if(!KATEGORI_LIST.includes(data.jenis)){ KATEGORI_LIST.push(data.jenis); }
-  if(editId){ let idx=products.findIndex(x=>x.id===editId); if(idx>=0) products[idx]={...products[idx], ...data}; alert('Barang berhasil di-EDIT! 🔥'); }
-  else { data.id=Date.now(); products.push(data); alert('Barang baru berhasil DITAMBAH! Jenis '+data.jenis+' otomatis kebikin! 🔥'); }
-  DB.produk=products; tandaiPerubahan();
-  closeForm(); renderAdmin();
-  alert('WAJIB: DOWNLOAD db.json BARU -> Timpa file lama -> Refresh depan. Kalau gak, Dompet GAK AKAN NONGOL!');
+  try{
+    if(editId){ await sb("PATCH","produk", data, "?id=eq."+editId); alert('Berhasil di-EDIT, langsung nongol di depan! 🔥'); }
+    else { await sb("POST","produk", data, ""); alert('Barang baru berhasil DITAMBAH! Langsung nongol di depan! 🔥'); }
+    closeForm(); await loadAdmin();
+  }catch(e){ alert('Gagal simpan ke Supabase: '+e.message); }
 }
-function hapusProduk(id){
+async function hapusProduk(id){
   let p = products.find(x=>x.id===id);
   if(!confirm('Hapus "'+(p?getNama(p):'')+'" ?')) return;
-  products = products.filter(p=>p.id!==id); DB.produk=products; tandaiPerubahan(); renderAdmin();
+  try{ await sb("DELETE","produk","", "?id=eq."+id); await loadAdmin(); }catch(e){ alert('Gagal hapus: '+e.message); }
 }
-function hapusSemuaHabis(){
+async function hapusSemuaHabis(){
   let habis = getHabis();
   if(habis.length===0) return alert('Udah bersih! Gak ada yang Habis. 🔥');
   if(!confirm('Hapus semua '+habis.length+' produk yang Habis?')) return;
-  products = products.filter(p=>!isHabis(p));
-  DB.produk=products; tandaiPerubahan(); renderAdmin();
-  alert(habis.length+' produk sampah udah kehapus! 🔥 Jangan lupa DOWNLOAD db.json BARU!');
+  try{ for(let p of habis) await sb("DELETE","produk","", "?id=eq."+p.id); await loadAdmin(); alert(habis.length+' produk sampah udah kehapus! 🔥'); }catch(e){ alert('Gagal: '+e.message); }
 }
 loadAdmin();
 </script>
