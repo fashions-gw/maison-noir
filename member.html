@@ -14,13 +14,13 @@ a{color:#FFD700;text-decoration:none}
 .tabs{display:flex;gap:8px;margin:18px 0}
 .tab{flex:1;padding:12px;border-radius:12px;border:1px solid #555;background:#222;color:#fff;font-weight:bold;cursor:pointer}
 .tab.active{background:#FFD700;color:#000;border-color:#FFD700}
-input{width:100%;padding:13px;border-radius:12px;border:1px solid #444;background:#222;color:#fff;margin-top:10px}
+input,textarea{width:100%;padding:13px;border-radius:12px;border:1px solid #444;background:#222;color:#fff;margin-top:10px}
+textarea{min-height:70px;resize:vertical}
 .buy-btn{width:100%;background:#FFD700;border:none;padding:14px;border-radius:14px;font-weight:bold;margin-top:14px;font-size:15px;cursor:pointer}
 .btn-add{width:100%;background:#222;color:#fff;border:1px solid #FFD700;padding:13px;border-radius:14px;font-weight:bold;margin-top:10px;font-size:14px;cursor:pointer}
 .card{background:#111;border:1px solid rgba(255,215,0,.5);border-radius:18px;padding:16px;margin-top:14px}
 .member-item{background:#1a1a1a;padding:12px;border-radius:12px;margin-top:10px;border:1px solid #333}
 .cart-item{display:flex;gap:10px;background:#222;padding:10px;border-radius:12px;margin-top:10px;align-items:center}.cart-item img{width:60px;height:60px;object-fit:cover;border-radius:8px}
-/* POPUP CANTIK */
 .casa-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;align-items:center;justify-content:center;padding:20px}
 .casa-modal.open{display:flex}
 .casa-modal-box{background:#111;border:2px solid #FFD700;border-radius:22px;width:100%;max-width:360px;padding:22px;text-align:center;box-shadow:0 20px 60px rgba(255,215,0,.25);animation:popIn .25s ease}
@@ -36,14 +36,15 @@ input{width:100%;padding:13px;border-radius:12px;border:1px solid #444;backgroun
 .popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:flex-end;justify-content:center}.popup.open{display:flex}
 .popup-box{background:#111;width:100%;max-width:420px;border-radius:25px 25px 0 0;max-height:90vh;overflow-y:auto;border-top:2px solid #FFD700;padding:18px}
 .close{float:right;font-size:24px;cursor:pointer;background:none;border:none;color:#fff}
+label.small{font-size:12px;color:#aaa;margin-top:12px;display:block}
+input.locked{background:#333;border-color:#222;color:#888}
 </style>
 </head>
 <body>
 <div class="top"><div class="logo">CASA MODA<span>LUXURY BANDUNG</span></div><a href="index.html" class="btn-back">← Home</a></div>
 
-<div class="tabs"><button class="tab" id="tabDaftar" onclick="gantiTab('daftar')">DAFTAR</button><button class="tab active" id="tabMasuk" onclick="gantiTab('masuk')">MASUK</button></div>
+<div class="tabs" id="tabsBox"><button class="tab" id="tabDaftar" onclick="gantiTab('daftar')">DAFTAR</button><button class="tab active" id="tabMasuk" onclick="gantiTab('masuk')">MASUK</button></div>
 
-<!-- FORM LOGIN / DAFTAR -->
 <div id="formBox">
 <div id="boxDaftar" style="display:none">
 <input id="dNama" placeholder="Nama Lengkap">
@@ -58,10 +59,7 @@ input{width:100%;padding:13px;border-radius:12px;border:1px solid #444;backgroun
 </div>
 </div>
 
-<!-- KALAU UDAH LOGIN -->
 <div id="memberBox" style="display:none">
-
-<!-- KARTU SALDO EMAS + FOTO KECIL DI DALAM - FINAL -->
 <div style="background:linear-gradient(135deg,#FFD700,#FFE99A,#FFD700);border-radius:20px;padding:18px;margin-top:14px;color:#000;box-shadow:0 10px 25px rgba(255,215,0,.25)">
   <div style="display:flex;gap:12px;align-items:flex-start">
     <div style="flex:1;min-width:0">
@@ -83,12 +81,28 @@ input{width:100%;padding:13px;border-radius:12px;border:1px solid #444;backgroun
 <button onclick="openTopUp()" style="width:100%;background:linear-gradient(135deg,#FFD700,#FFAA00);border:none;padding:14px;border-radius:14px;font-weight:900;font-size:15px;margin-top:12px;cursor:pointer">TOP UP SALDO</button>
 
 <div class="card"><h3>🛒 Keranjang Lu</h3><div id="cartList"></div><div id="cartTotal" style="font-weight:bold;margin-top:10px"></div><button class="buy-btn" onclick="checkoutMember()">💰 Bayar Pake Saldo</button><button class="btn-add" onclick="kosongkanCart()">Kosongkan Keranjang</button></div>
-
 <div class="card"><h3>📜 Riwayat Top Up</h3><div id="riwayatTopup"></div></div>
-<button class="btn-add" onclick="logout()">Keluar / Ganti Akun</button>
 </div>
 
 <div class="card"><h3>LIST MEMBER</h3><div id="listMember"></div></div>
+
+<!-- TOMBOL BAGI 2 - EDIT PROFIL + KELUAR - PALING BAWAH -->
+<div id="bawahBox" style="display:none;gap:12px;margin-top:14px">
+  <button onclick="openEditProfil()" style="flex:1;background:#FFD700;border:none;padding:14px;border-radius:14px;font-weight:900;font-size:15px;cursor:pointer">✏️ Edit Profil</button>
+  <button onclick="logout()" style="flex:1;background:#400;color:#fff;border:1px solid #ff4444;padding:14px;border-radius:14px;font-weight:bold;font-size:15px;cursor:pointer">🚪 Keluar</button>
+</div>
+
+<!-- POPUP EDIT PROFIL -->
+<div class="popup" id="editPopup"><div class="popup-box"><button class="close" onclick="closeEditProfil()">✕</button><h3>✏️ Edit Profil</h3><p style="font-size:12px;color:#aaa;margin-top:4px">Bisa ganti semua, kecuali saldo! Saldo dikunci 😂</p>
+<label class="small">Nama Lengkap</label><input id="eNama" placeholder="Nama Lengkap">
+<label class="small">No WA</label><input id="eWa" placeholder="085890611111">
+<label class="small">Alamat Lengkap</label><textarea id="eAlamat" placeholder="Jl. ... , Bandung, Jawa Barat"></textarea>
+<label class="small">Kota / Kecamatan</label><input id="eKota" placeholder="Ex: Bandung - Dago">
+<label class="small">Password Baru (kosongkan kalau gak mau ganti)</label><input id="ePass" type="password" placeholder="Password baru">
+<label class="small">🔒 Saldo - TIDAK BISA DIEDIT 😂</label><input id="eSaldo" class="locked" readonly disabled value="Rp 0">
+<label class="small">⭐ Poin - TIDAK BISA DIEDIT</label><input id="ePoin" class="locked" readonly disabled value="0">
+<button class="buy-btn" onclick="simpanEditProfil()">Simpan Perubahan ✅</button>
+</div></div>
 
 <!-- POPUP TOP UP -->
 <div class="popup" id="topupPopup"><div class="popup-box"><button class="close" onclick="closeTopUp()">✕</button><h3>💰 TOP UP SALDO</h3><p style="font-size:13px;color:#ccc">Saldo lu: <b id="topupSaldo" style="color:#FFD700">Rp 0</b></p><label>Pilih Nominal:</label><div id="nominalBox" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0"></div><input id="topupNominalCustom" type="number" placeholder="Nominal lain, ex: 75000"><label style="margin-top:12px;display:block">Pilih Pembayaran:</label><div id="payList"></div><div id="payDetail" style="margin-top:12px"></div><button class="buy-btn" id="btnKonfirmTopup" onclick="konfirmTopUp()" style="display:none">Saya Sudah Bayar ✅</button></div></div>
@@ -103,35 +117,53 @@ const SUPABASE_KEY = "sb_publishable_D_RB0mj9X66SOlj9-4jgug_s7fvHEYO";
 const HEADERS = { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=representation" };
 async function sb(method, table, body, query){ let url = SUPABASE_URL + "/rest/v1/" + table + (query || ""); let res = await fetch(url, { method, headers: HEADERS, body: body ? JSON.stringify(body) : undefined }); if(!res.ok) throw new Error(await res.text()); let txt = await res.text(); return txt ? JSON.parse(txt) : []; }
 function fmt(n){ return "Rp " + Number(n||0).toLocaleString('id-ID'); }
-// POPUP CANTIK
 let _res=null;
 function showToast(m){ let t=document.getElementById('casaToast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
 function casaAlert(msg,title,icon){ return new Promise(r=>{ document.getElementById('casaModalIcon').innerText=icon||'✨'; document.getElementById('casaModalTitle').innerText=title||'CASA MODA'; document.getElementById('casaModalMsg').innerText=msg; document.getElementById('casaModalBtns').innerHTML=`<button class="casa-btn-yes" onclick="tutupCasa(true)">OK, Siap! ✨</button>`; _res=r; document.getElementById('casaModal').classList.add('open'); }); }
 function casaConfirm(msg,title,icon,yes,no){ return new Promise(r=>{ document.getElementById('casaModalIcon').innerText=icon||'💰'; document.getElementById('casaModalTitle').innerText=title||'Yakin?'; document.getElementById('casaModalMsg').innerText=msg; document.getElementById('casaModalBtns').innerHTML=`<button class="casa-btn-no" onclick="tutupCasa(false)">${no||'Batal'}</button><button class="casa-btn-yes" onclick="tutupCasa(true)">${yes||'Ya, Lanjut!'}</button>`; _res=r; document.getElementById('casaModal').classList.add('open'); }); }
 function tutupCasa(v){ document.getElementById('casaModal').classList.remove('open'); if(_res){ let r=_res; _res=null; r(v); } }
-
 function gantiTab(t){ document.getElementById('tabDaftar').classList.toggle('active',t==='daftar'); document.getElementById('tabMasuk').classList.toggle('active',t==='masuk'); document.getElementById('boxDaftar').style.display=t==='daftar'?'block':'none'; document.getElementById('boxMasuk').style.display=t==='masuk'?'block':'none'; }
 function getCart(){ try{ return JSON.parse(localStorage.getItem('casa_cart')||'[]'); }catch(e){ return []; } }
 function getMember(){ try{ return JSON.parse(localStorage.getItem('casa_member')||'null'); }catch(e){ return null; } }
+function gantiFotoProfil(e){ let f = e.target.files[0]; if(!f) return; let r = new FileReader(); r.onload = function(ev){ localStorage.setItem('casa_foto_profil', ev.target.result); tampilFotoProfil(); showToast('Foto profil diganti! ✅'); }; r.readAsDataURL(f); }
+function tampilFotoProfil(){ let foto = localStorage.getItem('casa_foto_profil'); let img = document.getElementById('fotoProfil'); let kosong = document.getElementById('fotoKosong'); if(!img) return; if(foto){ img.src = foto; img.style.display='block'; kosong.style.display='none'; } else { img.style.display='none'; kosong.style.display='flex'; } }
 
-// FOTO PROFIL
-function gantiFotoProfil(e){
-  let f = e.target.files[0]; if(!f) return;
-  let r = new FileReader();
-  r.onload = function(ev){
-    localStorage.setItem('casa_foto_profil', ev.target.result);
-    tampilFotoProfil();
-    showToast('Foto profil diganti! ✅');
-  };
-  r.readAsDataURL(f);
+// EDIT PROFIL
+function openEditProfil(){
+  let m = getMember(); if(!m) return;
+  document.getElementById('eNama').value = m.nama || '';
+  document.getElementById('eWa').value = m.wa || '';
+  document.getElementById('eAlamat').value = m.alamat || localStorage.getItem('casa_alamat_'+m.id) || '';
+  document.getElementById('eKota').value = m.kota || localStorage.getItem('casa_kota_'+m.id) || '';
+  document.getElementById('ePass').value = '';
+  document.getElementById('eSaldo').value = fmt(m.saldo) + ' 🔒 Terkunci!';
+  document.getElementById('ePoin').value = (m.poin||0) + ' 🔒 Terkunci!';
+  document.getElementById('editPopup').classList.add('open');
 }
-function tampilFotoProfil(){
-  let foto = localStorage.getItem('casa_foto_profil');
-  let img = document.getElementById('fotoProfil');
-  let kosong = document.getElementById('fotoKosong');
-  if(!img) return;
-  if(foto){ img.src = foto; img.style.display='block'; kosong.style.display='none'; }
-  else { img.style.display='none'; kosong.style.display='flex'; }
+function closeEditProfil(){ document.getElementById('editPopup').classList.remove('open'); }
+async function simpanEditProfil(){
+  let m = getMember(); if(!m) return;
+  let nama = document.getElementById('eNama').value.trim();
+  let wa = document.getElementById('eWa').value.trim();
+  let alamat = document.getElementById('eAlamat').value.trim();
+  let kota = document.getElementById('eKota').value.trim();
+  let pass = document.getElementById('ePass').value.trim();
+  if(!nama || !wa){ await casaAlert('Nama + WA wajib diisi!', 'Belum Lengkap!', '⚠️'); return; }
+  let data = { nama, wa, alamat, kota };
+  if(pass) data.password = pass;
+  // Simpan ke Supabase - saldo TIDAK ikut, jadi aman!
+  try{ let r = await sb("PATCH","member", data, "?id=eq."+m.id); if(r[0]) m = r[0]; }catch(e){ 
+    // Kalau kolom alamat/kota belum ada di Supabase, simpan tanpa alamat/kota dulu, alamat simpan lokal
+    try{ let r2 = await sb("PATCH","member", { nama, wa, ...(pass?{password:pass}:{}) }, "?id=eq."+m.id); if(r2[0]) m = r2[0]; }catch(e2){}
+  }
+  m.nama = nama; m.wa = wa; m.alamat = alamat; m.kota = kota; if(pass) m.password = pass;
+  // Saldo & Poin TIDAK diubah sama sekali!
+  localStorage.setItem('casa_member', JSON.stringify(m));
+  localStorage.setItem('casa_alamat_'+m.id, alamat);
+  localStorage.setItem('casa_kota_'+m.id, kota);
+  closeEditProfil();
+  await casaAlert('Profil berhasil diupdate! ✅\n\nNama: '+nama+'\nWA: '+wa+'\nAlamat: '+(alamat||'-')+'\n\nSaldo lu aman, gak berubah! 😂', 'Profil Diupdate! ✅', '✅');
+  tampilMember();
 }
 
 async function daftar(){
@@ -156,16 +188,10 @@ async function masuk(){
 }
 async function tampilMember(){
   let m = getMember();
-  if(!m){ document.getElementById('memberBox').style.display='none'; document.getElementById('formBox').style.display='block'; loadList(); return; }
-  if(m.id){ try{ let r=await sb("GET","member","", "?select=*&id=eq."+m.id); if(r[0]){ m=r[0]; localStorage.setItem('casa_member', JSON.stringify(m)); } }catch(e){} }
-  document.getElementById('formBox').style.display='none';
-  document.getElementById('memberBox').style.display='block';
-  document.getElementById('namaMember').innerText=m.nama;
-  document.getElementById('levelMember').innerText = Number(m.total_belanja||0) >= 1000000 ? 'Gold member' : 'Silver member';
-  document.getElementById('saldoMember').innerText=fmt(m.saldo);
-  document.getElementById('poinMember').innerText=m.poin||0;
-  document.getElementById('belanjaMember').innerText=fmt(m.total_belanja);
-  tampilFotoProfil();
+  if(!m){ document.getElementById('memberBox').style.display='none'; document.getElementById('formBox').style.display='block'; document.getElementById('tabsBox').style.display='flex'; document.getElementById('bawahBox').style.display='none'; loadList(); return; }
+  if(m.id){ try{ let r=await sb("GET","member","", "?select=*&id=eq."+m.id); if(r[0]){ m=r[0]; m.alamat = m.alamat || localStorage.getItem('casa_alamat_'+m.id) || ''; m.kota = m.kota || localStorage.getItem('casa_kota_'+m.id) || ''; localStorage.setItem('casa_member', JSON.stringify(m)); } }catch(e){} }
+  document.getElementById('formBox').style.display='none'; document.getElementById('tabsBox').style.display='none'; document.getElementById('memberBox').style.display='block'; document.getElementById('bawahBox').style.display='flex';
+  document.getElementById('namaMember').innerText=m.nama; document.getElementById('levelMember').innerText = Number(m.total_belanja||0) >= 1000000 ? 'Gold member' : 'Silver member'; document.getElementById('saldoMember').innerText=fmt(m.saldo); document.getElementById('poinMember').innerText=m.poin||0; document.getElementById('belanjaMember').innerText=fmt(m.total_belanja); tampilFotoProfil();
   let cart=getCart(), total=0;
   document.getElementById('cartList').innerHTML = cart.length ? cart.map((c,i)=>{ total+=Number(c.harga); return `<div class="cart-item"><img src="${c.foto||''}"><div style="flex:1"><b>${c.nama||'Tanpa Nama'}</b><br><small>Ukuran: ${c.size}</small><br><span style="color:#FFD700">${fmt(c.harga)}</span></div><button onclick="hapusCart(${i})" style="background:none;border:none;color:#fff">✕</button></div>`; }).join('') : '<p style="color:#aaa;margin-top:10px">Keranjang kosong, ayo belanja di Home!</p>';
   document.getElementById('cartTotal').innerText = cart.length ? 'Total: '+fmt(total) : '';
@@ -190,8 +216,6 @@ async function checkoutMember(){
 }
 async function logout(){ let ok=await casaConfirm('Keluar dari akun ini?', 'Keluar?', '👋', 'Ya, Keluar', 'Batal'); if(!ok) return; localStorage.removeItem('casa_member'); tampilMember(); showToast('Berhasil keluar'); }
 async function loadList(){ try{ let r=await sb("GET","member","", "?select=*&order=id.desc&limit=10"); document.getElementById('listMember').innerHTML=r.map(x=>`<div class="member-item"><b>${x.nama}</b> - ${Number(x.total_belanja||0)>=1000000?'Gold':'Silver'}<br>WA: ${x.wa} | Poin: ${x.poin||0} | Belanja: ${fmt(x.total_belanja)}<br>Keranjang: ${getCart().length} item</div>`).join('') || 'Belum ada member'; }catch(e){} }
-
-// TOP UP
 function logoPay(n){ let s={'QRIS':'<div style="background:#fff;color:#000;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">QRIS<span style="color:#E4002B">•</span><span style="color:#0057A8">•</span></div>','GOPAY':'<div style="background:#00AED6;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">GOPAY</div>','DANA':'<div style="background:#118EEA;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">DANA</div>','OVO':'<div style="background:#4C2A85;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">OVO</div>','MANDIRI':'<div style="background:#003A8C;color:#FFD700;border-radius:8px;padding:6px 10px;font-weight:900;font-size:12px">mandiri</div>','BRI':'<div style="background:#00529C;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">BRI</div>','BCA':'<div style="background:#0060AF;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">BCA</div>'}; return s[n]||n; }
 const PAY_INFO={'QRIS':{title:'QRIS - Scan di Semua Aplikasi',desc:'Buka GOPAY / DANA / OVO / M-Banking lu, scan QR di bawah.',qris:true},'GOPAY':{title:'GOPAY',desc:'Transfer ke GOPAY:',nomor:'0858-9061-1111',nama:'KO CHENG - CASA MODA'},'DANA':{title:'DANA',desc:'Transfer ke DANA:',nomor:'0858-9061-1111',nama:'KO CHENG - CASA MODA'},'OVO':{title:'OVO',desc:'Transfer ke OVO:',nomor:'0858-9061-1111',nama:'KO CHENG - CASA MODA'},'MANDIRI':{title:'Bank Mandiri',desc:'Transfer ke Mandiri:',nomor:'137-00-1234567-8',nama:'KO CHENG'},'BRI':{title:'Bank BRI',desc:'Transfer ke BRI:',nomor:'1234-01-012345-67-8',nama:'KO CHENG'},'BCA':{title:'Bank BCA',desc:'Transfer ke BCA:',nomor:'123-456-7890',nama:'KO CHENG'}};
 let topupNominal=50000, topupMetode='QRIS';
