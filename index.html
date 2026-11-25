@@ -44,6 +44,13 @@
   .bot-input{display:flex;gap:8px;padding:10px;background:#000}
   .bot-input input{margin:0}
   .bot-input button{background:#FFD700;border:none;padding:12px 16px;border-radius:10px;font-weight:bold}
+  /* BARU: Kartu produk di dalam chat */
+  .bot-card{background:#000;border:1px solid rgba(255,215,0,0.6);border-radius:14px;overflow:hidden;margin-top:8px;text-align:left}
+  .bot-card img{width:100%;height:140px;object-fit:cover;display:block;cursor:pointer}
+  .bot-card-body{padding:10px}
+  .bot-card-body b{font-size:14px;display:block}
+  .bot-card-body span{color:#FFD700;font-weight:bold;font-size:14px}
+  .bot-card-btn{width:100%;background:#FFD700;border:none;padding:10px;border-radius:10px;font-weight:bold;margin-top:8px;cursor:pointer}
   .pin-overlay{display:none;position:fixed;inset:0;background:radial-gradient(circle at 50% 20%, #2a2100 0%, #000 55%, #000 100%);z-index:500;align-items:center;justify-content:center;flex-direction:column;padding:24px}
   .pin-overlay.open{display:flex}
   .pin-card{width:100%;max-width:340px;background:linear-gradient(180deg, rgba(255,215,0,0.12), rgba(255,255,255,0.02));border:1px solid rgba(255,215,0,0.45);border-radius:28px;padding:28px 20px 22px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,215,0,0.15) inset}
@@ -152,7 +159,7 @@ async function loadProduk(){
 function renderProduk(list){
   document.getElementById('grid').innerHTML = list.map((p)=>{
     let idx = products.indexOf(p);
-    return `<div class="card" onclick="openDetail(${idx})"><img src="${p.foto || 'https://via.placeholder.com/400'}"><div class="card-body"><small>${p.jenis} • ${p.status}</small><h3>${p.nama_produk}</h3><div>Ukuran: ${p.ukuran} • Stok: ${p.stok}</div><div class="price">${fmt(p.harga)}</div><button class="add" onclick="event.stopPropagation();openDetail(${idx})">Lihat Detail →</button></div></div>`;
+    return `<div class="card" id="produk-${idx}" onclick="openDetail(${idx})"><img src="${p.foto || 'https://via.placeholder.com/400'}"><div class="card-body"><small>${p.jenis} • ${p.status}</small><h3>${p.nama_produk}</h3><div>Ukuran: ${p.ukuran} • Stok: ${p.stok}</div><div class="price">${fmt(p.harga)}</div><button class="add" onclick="event.stopPropagation();openDetail(${idx})">Lihat Detail →</button></div></div>`;
   }).join('');
 }
 function openDetail(i){ current=products[i]; selectedSize=current.ukuran; document.getElementById('pImg').src=current.foto||''; document.getElementById('pCat').innerText=current.jenis+" • "+current.status; document.getElementById('pName').innerText=current.nama_produk; document.getElementById('pPrice').innerText=fmt(current.harga); document.getElementById('pPrice2').innerText=fmt(current.harga); document.getElementById('pDesc').innerText="Stok: "+current.stok+" • Premium material, handcrafted in Bandung. Limited stock!"; document.getElementById('sizeBox').innerHTML=['39','40','41','42','43','44'].map(s=>`<button class="size-btn ${s==selectedSize?'active':''}" onclick="pickSize(this)">${s}</button>`).join(''); document.getElementById('popup').classList.add('open'); }
@@ -193,6 +200,36 @@ function botBalas(teks, isUser){
   document.getElementById('botMsgs').appendChild(div);
   document.getElementById('botMsgs').scrollTop = 99999;
 }
+function botBalasHTML(html){
+  let div = document.createElement('div');
+  div.className = 'msg-bot';
+  div.innerHTML = html;
+  document.getElementById('botMsgs').appendChild(div);
+  document.getElementById('botMsgs').scrollTop = 99999;
+}
+function botKartuProduk(p){
+  let idx = products.indexOf(p);
+  return `<div class="bot-card">
+    <img src="${p.foto || 'https://via.placeholder.com/400'}" onclick="botLihatProduk(${idx})">
+    <div class="bot-card-body">
+      <small style="color:#FFD700">${p.jenis} • ${p.status}</small>
+      <b>${p.nama_produk}</b>
+      <div>Ukuran: ${p.ukuran} • Stok: ${p.stok}</div>
+      <span>${fmt(p.harga)}</span>
+      <button class="bot-card-btn" onclick="botLihatProduk(${idx})">👉 Lihat Produk Ini</button>
+    </div>
+  </div>`;
+}
+function botLihatProduk(idx){
+  document.getElementById('botBox').classList.remove('open');
+  showPage('home');
+  renderProduk(products);
+  setTimeout(()=>{
+    openDetail(idx);
+    let el = document.getElementById('produk-'+idx);
+    if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
+  }, 100);
+}
 async function kirimBot(){
   let input = document.getElementById('botInput');
   let pesan = input.value.trim();
@@ -217,13 +254,14 @@ async function kirimBot(){
   let kata = pesan.toLowerCase();
   if(kata.includes('koleksi') || kata.includes('produk') || kata.includes('cari') || kata.includes('lihat')){
     if(products.length===0){ botBalas("Produk masih loading, coba lagi bentar ya!", false); return; }
-    botBalas("Ini koleksi kita! Ada "+products.length+" produk! 🔥 Scroll ke atas ya!", false);
+    botBalas("Ini koleksi kita! Ada "+products.length+" produk! 🔥 Klik gambar / tombol buat liat detailnya:", false);
+    products.slice(0,5).forEach(p=>{ botBalasHTML(botKartuProduk(p)); });
     renderProduk(products); showPage('home'); return;
   }
   let ketemuProduk = products.filter(p => (p.nama_produk||'').toLowerCase().includes(kata) || (p.jenis||'').toLowerCase().includes(kata));
   if(ketemuProduk.length > 0){
-    let teks = "Ketemu nih 🔥\n" + ketemuProduk.map(p => "- " + p.nama_produk + " - " + fmt(p.harga) + " (Stok: " + p.stok + ")").join("\n");
-    botBalas(teks, false);
+    botBalas("Ketemu nih 🔥 Klik buat liat detailnya:", false);
+    ketemuProduk.forEach(p=>{ botBalasHTML(botKartuProduk(p)); });
     renderProduk(ketemuProduk); showPage('home'); return;
   }
   let { data: jawab } = await supabaseClient.from('bot').select('*').ilike('kata_kunci', '%'+pesan+'%').maybeSingle();
