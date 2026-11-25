@@ -13,7 +13,7 @@ body{background:#000;color:#fff;overflow-x:hidden}
 .logout{background:#FFD700;color:#000;padding:8px 16px;border-radius:20px;font-weight:bold;border:none;cursor:pointer}
 .admin-info{margin-top:15px;background:rgba(0,0,0,0.55);border:1px solid rgba(255,215,0,0.6);border-radius:18px;padding:14px;display:flex;gap:12px;align-items:center;text-align:left}
 .admin-info img{width:55px;height:55px;border-radius:50%;object-fit:cover;border:2px solid #FFD700}
-.section{padding:15px 20px 100px;background:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.65)),url('background-emas.jpg');background-size:cover;background-position:center;background-attachment:fixed;min-height:100vh}
+.section{padding:15px 20px 100px;background:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.65)),url('background-emas.jpg');background-size:cover;background-position:center;min-height:100vh}
 .section h2{font-size:22px;margin-bottom:12px}.section h2 i{color:#FFD700}
 .sub{font-size:12px;color:#ccc;text-align:left;margin-bottom:12px}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
@@ -45,7 +45,7 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 .detail-row{display:flex;justify-content:space-between;font-size:13px;color:#ccc;padding:4px 0;border-bottom:1px dashed #333}
 .detail-row b{color:#fff;text-align:right;max-width:60%}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.92);border-top:1px solid #FFD700;display:flex;justify-content:space-around;padding:12px 0;z-index:99}
-.bottom-nav a{color:#fff;text-decoration:none;font-size:12px;text-align:center;cursor:pointer}
+.bottom-nav a{color:#fff;text-decoration:none;font-size:11px;text-align:center;cursor:pointer}
 .bottom-nav a.active{color:#FFD700}
 .popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;align-items:flex-end;justify-content:center}.popup.open{display:flex}
 .popup-box{background:#111;width:100%;max-width:420px;border-radius:25px 25px 0 0;max-height:92vh;overflow-y:auto;border-top:2px solid #FFD700;padding:18px}
@@ -74,10 +74,9 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 <div class="top"><div class="logo">CASA MODA<span>ADMIN LUXURY</span></div><button class="logout" onclick="logout()">Logout</button></div>
 <div class="admin-info"><img src="https://via.placeholder.com/100" id="adminFoto"><div><b id="adminNama">Admin CASA MODA</b><br><small style="color:#FFD700" id="adminCode">Code: -</small><br><small id="adminWA">WA: -</small></div></div>
 </div>
-
 <div class="section" id="page-admin">
 <h2>Dashboard <i>Admin</i></h2>
-<p class="sub">Sumber data: <b style="color:#FFD700">Supabase Baru</b> • Simpan langsung nongol di depan, gak perlu download lagi!</p>
+<p class="sub">Sumber data: <b style="color:#FFD700">Supabase Baru</b> • Simpan langsung nongol di depan!</p>
 <div class="stats">
 <div class="stat" onclick="filterTab(null,'semua')"><small>📦 Total Produk</small><b id="statProduk">0</b><span>Semua, termasuk Habis</span></div>
 <div class="stat" onclick="filterTab(null,'stok-tipis')"><small>⚠️ Stok Menipis</small><b id="statStok">0</b><span>Stok &lt; 5</span></div>
@@ -90,7 +89,6 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 <button class="btn-add dark" onclick="lihatDepan()">👀 Lihat Halaman Depan (Kayak Pembeli)</button>
 <div id="listProduk"></div>
 </div>
-
 <div class="section" id="page-laporan" style="display:none">
 <h2>Laporan <i>Omset</i></h2>
 <div class="card"><small style="color:#FFD700">Total Nilai Stok (Semua Produk)</small><div class="price" style="font-size:26px" id="lapOmset">Rp 0</div><p style="margin-top:8px;font-size:13px" id="lapDetail"></p></div>
@@ -98,22 +96,34 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 <div class="card"><b>Produk Stok Terbanyak (Terlaris)</b><div id="lapTop" style="margin-top:10px"></div></div>
 <button class="btn-add" onclick="showPageAdmin('admin')">← Kembali ke Dashboard</button>
 </div>
-
+<div class="section" id="page-adminlist" style="display:none">
+<h2>Kelola <i>Admin</i></h2>
+<p class="sub">Admin bisa login lewat bot: <b style="color:#FFD700">@code + PIN</b> • Contoh: @kodok</p>
+<button class="btn-add green" onclick="openAdminForm()">+ TAMBAH ADMIN BARU</button>
+<div id="listAdmin"></div>
+<button class="btn-add dark" onclick="showPageAdmin('admin')">← Kembali ke Dashboard</button>
+</div>
+<div class="section" id="page-pegawai" style="display:none">
+<h2>Kelola <i>Pegawai</i></h2>
+<p class="sub">Pegawai login lewat bot juga: <b style="color:#FFD700">@code + PIN</b> • Nanti dilempar ke pegawai.html</p>
+<button class="btn-add green" onclick="openPegawaiForm()">+ TAMBAH PEGAWAI BARU</button>
+<div id="listPegawai"></div>
+<button class="btn-add dark" onclick="showPageAdmin('admin')">← Kembali ke Dashboard</button>
+</div>
 <div class="section" id="page-pengaturan" style="display:none">
 <h2>Pengaturan <i>Toko</i></h2>
 <div class="card"><b>Info Toko</b><label>Nama Toko</label><input id="setNama" value="CASA MODA - Luxury Bandung"><label>Nomor WA</label><input id="setWA" value="6285890611111"><label>Alamat</label><input id="setAlamat" value="Bandung, West Java"><button class="btn-add" style="margin-top:12px" onclick="alert('Pengaturan dicatat di sesi ini.')">Simpan Pengaturan</button></div>
 <button class="btn-add dark" onclick="showPageAdmin('admin')">← Kembali ke Dashboard</button>
 </div>
-
 <div class="bottom-nav">
 <a class="active" id="nav-admin" onclick="navAdmin(this,'admin')">🏠<br>Dashboard</a>
 <a id="nav-laporan" onclick="navAdmin(this,'laporan')">📊<br>Laporan</a>
+<a id="nav-adminlist" onclick="navAdmin(this,'adminlist')">👥<br>Admin</a>
+<a id="nav-pegawai" onclick="navAdmin(this,'pegawai')">🧑‍💼<br>Pegawai</a>
 <a id="nav-pengaturan" onclick="navAdmin(this,'pengaturan')">⚙️<br>Pengaturan</a>
 <a onclick="logout()">🚪<br>Logout</a>
 </div>
-
 <div class="popup" id="popupDetail"><div class="popup-box"><button class="close" onclick="closeDetail()">✕</button><img id="dImg" style="width:100%;height:280px;object-fit:cover;border-radius:14px"><h3 id="dNama" style="margin-top:12px"></h3><div id="dHarga" style="color:#FFD700;font-weight:bold;font-size:18px"></div><div id="dDetail" style="margin-top:12px"></div><div class="btn-row"><button class="btn-edit" id="dEditBtn">✏️ Edit Produk Ini</button><button class="btn-hapus" onclick="closeDetail()">Tutup</button></div></div></div>
-
 <div class="popup" id="popupForm"><div class="popup-box"><button class="close" onclick="closeForm()">✕</button><h3 id="formTitle">Tambah Barang Baru</h3>
 <label>1. Nama Barang *</label><input id="fNama" placeholder="Contoh: Dompet CASA Kulit Asli">
 <label>2. Jenis / Kategori *</label>
@@ -130,17 +140,31 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 <label>10. Harga Modal</label><input id="fHargaModal" type="number" placeholder="250000">
 <label>11. Discount %</label><input id="fDiscount" type="number" placeholder="0">
 <label>12. Foto Barang *</label>
-<div class="foto-box" onclick="bukaPilihFoto()">
-<button class="foto-btn" type="button">📷</button>
-<div class="foto-hint" id="fotoHint">Klik kamera buat foto barang</div>
-</div>
+<div class="foto-box" onclick="bukaPilihFoto()"><button class="foto-btn" type="button">📷</button><div class="foto-hint" id="fotoHint">Klik kamera buat foto barang</div></div>
 <img id="fotoPreview" class="foto-preview">
 <input type="file" id="inputGaleri" accept="image/*" style="display:none" onchange="bacaFoto(this)">
 <label>13. Detail / Deskripsi Lengkap</label><textarea id="fKet" rows="4" placeholder="Contoh: Dompet kulit asli, handcrafted di Bandung."></textarea>
 <button class="btn-add" style="margin-top:14px" onclick="simpanProduk()">💾 Simpan Barang</button>
-<p style="font-size:12px;color:#ccc;text-align:center">Abis simpan, LANGSUNG nongol di depan! Gak perlu download lagi.</p>
+<p style="font-size:12px;color:#ccc;text-align:center">Abis simpan, LANGSUNG nongol di depan!</p>
 </div></div>
-
+<div class="popup" id="popupAdminForm"><div class="popup-box"><button class="close" onclick="closeAdminForm()">✕</button><h3 id="adminFormTitle">Tambah Admin Baru</h3>
+<label>Nama Admin *</label><input id="aNama" placeholder="Contoh: Ko Cheng">
+<label>Code Login * <span style="color:#ccc;font-size:11px">- tanpa @, contoh: kodok</span></label><input id="aCode" placeholder="kodok">
+<label>PIN * <span style="color:#ccc;font-size:11px">- bebas 4 / 6 digit, contoh: 1234</span></label><input id="aPin" placeholder="1234" inputmode="numeric">
+<label>Nomor WA</label><input id="aWA" placeholder="6285890611111">
+<label>Alamat</label><input id="aAlamat" placeholder="Bandung">
+<button class="btn-add green" style="margin-top:14px" onclick="simpanAdmin()">💾 Simpan Admin</button>
+<p style="font-size:12px;color:#ccc;text-align:center">Nanti loginnya: ketik @code di bot, masukin PIN ini.</p>
+</div></div>
+<div class="popup" id="popupPegawaiForm"><div class="popup-box"><button class="close" onclick="closePegawaiForm()">✕</button><h3 id="pegawaiFormTitle">Tambah Pegawai Baru</h3>
+<label>Nama Pegawai *</label><input id="pNama" placeholder="Contoh: Andi">
+<label>Code Login * <span style="color:#ccc;font-size:11px">- tanpa @, contoh: andi01</span></label><input id="pCode" placeholder="andi01">
+<label>PIN * <span style="color:#ccc;font-size:11px">- bebas 4 / 6 digit, contoh: 123456</span></label><input id="pPin" placeholder="123456" inputmode="numeric">
+<label>Nomor WA</label><input id="pWA" placeholder="62812xxxxxxx">
+<label>Alamat</label><input id="pAlamat" placeholder="Bandung">
+<button class="btn-add green" style="margin-top:14px" onclick="simpanPegawai()">💾 Simpan Pegawai</button>
+<p style="font-size:12px;color:#ccc;text-align:center">Nanti loginnya: ketik @code di bot, masukin PIN ini, dilempar ke pegawai.html</p>
+</div></div>
 <div class="pilih-foto" id="pilihFoto">
 <div class="pilih-box">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><b style="font-size:18px">Foto Barang</b><button onclick="tutupPilihFoto()" style="background:none;border:none;color:#fff;font-size:22px">✕</button></div>
@@ -149,14 +173,12 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 <div class="pilih-opt" onclick="tutupPilihFoto()" style="justify-content:center"><b style="color:#FFD700">Batal</b></div>
 </div>
 </div>
-
 <div class="cam-screen" id="camScreen">
 <div style="padding:14px;display:flex;justify-content:space-between;align-items:center"><b>📷 Kamera - Arahkan ke Barang</b><button onclick="tutupKamera()" style="background:none;border:none;color:#fff;font-size:22px">✕</button></div>
 <video id="camVideo" autoplay playsinline muted></video>
 <div class="cam-bar"><button class="cam-close" onclick="tutupKamera()">Batal</button><button class="cam-snap" onclick="jepretFoto()">📷</button><button class="cam-switch" onclick="gantiKamera()">🔄 Depan / Belakang</button></div>
 <p style="text-align:center;font-size:12px;color:#ccc;padding:0 14px 14px">Kalau minta izin kamera, pencet IZINKAN / ALLOW ya. Kalau dibuka dari WhatsApp & gak bisa, buka lewat Chrome.</p>
 </div>
-
 <script>
 const SUPABASE_URL = "https://tnpkepfjrltfryhuqnvo.supabase.co";
 const SUPABASE_KEY = "sb_publishable_D_RB0mj9X66SOlj9-4jgug_s7fvHEYO";
@@ -169,7 +191,7 @@ async function sb(method, table, body, query){
 }
 let DB = { produk:[], member:[], bot:[], admin:[], pegawai:[] };
 let products = [];
-let editId = null;
+let editId = null; let editAdminId = null; let editPegawaiId = null;
 let filterAktif = 'semua';
 let jenisTerpilih = 'Sepatu';
 let fotoBaru = '';
@@ -182,28 +204,32 @@ function isHabis(p){ return Number(p.stok||0) <= 0 || String(p.status||'').toLow
 function showPageAdmin(p){
   document.getElementById('page-admin').style.display = p==='admin' ? 'block':'none';
   document.getElementById('page-laporan').style.display = p==='laporan' ? 'block':'none';
+  document.getElementById('page-adminlist').style.display = p==='adminlist' ? 'block':'none';
+  document.getElementById('page-pegawai').style.display = p==='pegawai' ? 'block':'none';
   document.getElementById('page-pengaturan').style.display = p==='pengaturan' ? 'block':'none';
   window.scrollTo(0,0);
   if(p==='laporan') renderLaporan();
+  if(p==='adminlist') renderAdminList();
+  if(p==='pegawai') renderPegawaiList();
 }
 function navAdmin(el, p){ document.querySelectorAll('.bottom-nav a').forEach(a=>a.classList.remove('active')); el.classList.add('active'); showPageAdmin(p); }
-function logout(){ window.location.href='index.html'; }
+function logout(){ sessionStorage.removeItem('casa_login'); window.location.href='index.html'; }
 function lihatDepan(){ window.location.href='index.html'; }
 async function loadAdmin(){
   try{
     products = await sb("GET","produk","", "?select=*&order=id.asc");
     DB.produk = products;
-    DB.admin = await sb("GET","admin","", "?select=*");
+    DB.admin = await sb("GET","admin","", "?select=*&order=id.asc");
+    DB.pegawai = await sb("GET","pegawai","", "?select=*&order=id.asc");
     DB.member = await sb("GET","member","", "?select=*");
     DB.bot = await sb("GET","bot","", "?select=*");
   }catch(e){ alert('Gagal load Supabase: '+e.message); products=[]; }
   let params = new URLSearchParams(window.location.search);
   let codeAdmin = params.get('code') || 'kodok';
   document.getElementById('adminCode').innerText = "Code: "+codeAdmin+" • Supabase Baru";
-  let adm = (DB.admin||[]).find(a=>a.code===codeAdmin);
+  let adm = (DB.admin||[]).find(a=>String(a.code||'').toLowerCase()===String(codeAdmin).toLowerCase());
   if(adm){ document.getElementById('adminNama').innerText = adm.nama; document.getElementById('adminWA').innerText = "WA: "+(adm.WA||'-')+" • "+(adm.alamat||'Bandung'); }
-  buildKategoriAdmin();
-  renderAdmin();
+  buildKategoriAdmin(); renderAdmin(); renderAdminList(); renderPegawaiList();
 }
 function buildKategoriAdmin(){
   let seen = [];
@@ -242,6 +268,18 @@ function renderAdmin(){
     let low = !habis && Number(p.stok) < 5;
     let isPop = getPopuler().some(x=>x.id===p.id);
     return `<div class="card ${habis?'habis':''} ${low?'low':''}"><div class="card-flex"><img src="${p.foto||''}" onclick="openDetail(${p.id})"><div style="flex:1"><small style="color:#FFD700">${p.jenis} • ${p.status}</small><br><b>${getNama(p)}</b> ${habis?'<span class="badge-habis">🚫 HABIS</span>':low?'<span class="badge-low">⚠️ STOK TIPIS!</span>':'<span class="badge-aman">Aman</span>'} ${isPop?'<span class="badge-aman" style="background:#FFD700">🔥 POPULER</span>':''}<br><small>SKU: ${p.nomor||'-'} • Ukuran: ${p.ukuran} • Stok: <b>${p.stok} pcs</b></small><div class="price">${fmt(p.harga)} ${p.discount?'<small style="color:#fff">Disc '+p.discount+'%</small>':''}</div><small style="color:#ccc">${(p.ket||'').slice(0,60)}</small></div></div><div class="btn-row"><button class="btn-edit" onclick="editProduk(${p.id})">✏️ Edit / Restock</button><button class="btn-hapus" onclick="hapusProduk(${p.id})">🗑️ Hapus</button></div></div>`;
+  }).join('');
+}
+function renderAdminList(){
+  let list = DB.admin||[];
+  document.getElementById('listAdmin').innerHTML = list.length===0 ? '<div class="card">Belum ada admin.<br><span style="font-size:13px;color:#ccc">Pencet + TAMBAH ADMIN BARU di atas.</span></div>' : list.map(a=>{
+    return `<div class="card"><b>👥 ${a.nama||'-'}</b> <span class="badge-aman" style="background:#FFD700">ADMIN</span><br><small style="color:#FFD700">Login: @${a.code||'-'} • PIN: ${a.pin||'-'}</small><br><small style="color:#ccc">WA: ${a.WA||'-'} • ${a.alamat||'Bandung'}</small><div class="btn-row"><button class="btn-edit" onclick="editAdmin(${a.id})">✏️ Edit</button><button class="btn-hapus" onclick="hapusAdmin(${a.id})">🗑️ Hapus</button></div></div>`;
+  }).join('');
+}
+function renderPegawaiList(){
+  let list = DB.pegawai||[];
+  document.getElementById('listPegawai').innerHTML = list.length===0 ? '<div class="card">Belum ada pegawai.<br><span style="font-size:13px;color:#ccc">Pencet + TAMBAH PEGAWAI BARU di atas.</span></div>' : list.map(a=>{
+    return `<div class="card"><b>🧑‍💼 ${a.nama||'-'}</b> <span class="badge-aman">PEGAWAI</span><br><small style="color:#FFD700">Login: @${a.code||'-'} • PIN: ${a.pin||'-'}</small><br><small style="color:#ccc">WA: ${a.WA||'-'} • ${a.alamat||'Bandung'}</small><div class="btn-row"><button class="btn-edit" onclick="editPegawai(${a.id})">✏️ Edit</button><button class="btn-hapus" onclick="hapusPegawai(${a.id})">🗑️ Hapus</button></div></div>`;
   }).join('');
 }
 function renderLaporan(){
@@ -368,6 +406,90 @@ async function hapusSemuaHabis(){
   if(!confirm('Hapus semua '+habis.length+' produk yang Habis?')) return;
   try{ for(let p of habis) await sb("DELETE","produk","", "?id=eq."+p.id); await loadAdmin(); alert(habis.length+' produk sampah udah kehapus! 🔥'); }catch(e){ alert('Gagal: '+e.message); }
 }
+function openAdminForm(){
+  editAdminId=null;
+  document.getElementById('adminFormTitle').innerText='Tambah Admin Baru';
+  ['aNama','aCode','aPin','aWA','aAlamat'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('popupAdminForm').classList.add('open');
+}
+function closeAdminForm(){ document.getElementById('popupAdminForm').classList.remove('open'); }
+function editAdmin(id){
+  let a=(DB.admin||[]).find(x=>x.id===id); if(!a) return;
+  editAdminId=id;
+  document.getElementById('adminFormTitle').innerText='Edit Admin - '+(a.nama||'');
+  document.getElementById('aNama').value=a.nama||'';
+  document.getElementById('aCode').value=a.code||'';
+  document.getElementById('aPin').value=a.pin||'';
+  document.getElementById('aWA').value=a.WA||'';
+  document.getElementById('aAlamat').value=a.alamat||'';
+  document.getElementById('popupAdminForm').classList.add('open');
+}
+async function simpanAdmin(){
+  let data={ nama:document.getElementById('aNama').value.trim(), code:document.getElementById('aCode').value.trim().toLowerCase().replace('@',''), pin:document.getElementById('aPin').value.trim(), WA:document.getElementById('aWA').value.trim(), alamat:document.getElementById('aAlamat').value.trim()||'Bandung' };
+  if(!data.nama) return alert('Isi nama admin dulu!');
+  if(!data.code) return alert('Isi code dulu! Contoh: kodok');
+  if(!data.pin) return alert('Isi PIN dulu! Contoh: 1234');
+  try{
+    if(editAdminId){ await sb("PATCH","admin", data, "?id=eq."+editAdminId); alert('Admin berhasil di-EDIT! 🔥'); }
+    else {
+      let cek = await sb("GET","admin","", "?select=*&code=eq."+encodeURIComponent(data.code));
+      if(cek && cek.length>0) return alert('Code @'+data.code+' udah dipake admin lain! Ganti code lain.');
+      await sb("POST","admin", data, ""); alert('Admin baru berhasil DITAMBAH! Login: @'+data.code+' + PIN '+data.pin+' 🔥');
+    }
+    closeAdminForm(); await loadAdmin(); renderAdminList();
+  }catch(e){ alert('Gagal simpan admin: '+e.message); }
+}
+async function hapusAdmin(id){
+  let a=(DB.admin||[]).find(x=>x.id===id);
+  if(!confirm('Hapus admin "'+(a?a.nama:'')+'" ?')) return;
+  try{ await sb("DELETE","admin","", "?id=eq."+id); await loadAdmin(); renderAdminList(); }catch(e){ alert('Gagal hapus admin: '+e.message); }
+}
+function openPegawaiForm(){
+  editPegawaiId=null;
+  document.getElementById('pegawaiFormTitle').innerText='Tambah Pegawai Baru';
+  ['pNama','pCode','pPin','pWA','pAlamat'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('popupPegawaiForm').classList.add('open');
+}
+function closePegawaiForm(){ document.getElementById('popupPegawaiForm').classList.remove('open'); }
+function editPegawai(id){
+  let a=(DB.pegawai||[]).find(x=>x.id===id); if(!a) return;
+  editPegawaiId=id;
+  document.getElementById('pegawaiFormTitle').innerText='Edit Pegawai - '+(a.nama||'');
+  document.getElementById('pNama').value=a.nama||'';
+  document.getElementById('pCode').value=a.code||'';
+  document.getElementById('pPin').value=a.pin||'';
+  document.getElementById('pWA').value=a.WA||'';
+  document.getElementById('pAlamat').value=a.alamat||'';
+  document.getElementById('popupPegawaiForm').classList.add('open');
+}
+async function simpanPegawai(){
+  let data={ nama:document.getElementById('pNama').value.trim(), code:document.getElementById('pCode').value.trim().toLowerCase().replace('@',''), pin:document.getElementById('pPin').value.trim(), WA:document.getElementById('pWA').value.trim(), alamat:document.getElementById('pAlamat').value.trim()||'Bandung' };
+  if(!data.nama) return alert('Isi nama pegawai dulu!');
+  if(!data.code) return alert('Isi code dulu! Contoh: andi01');
+  if(!data.pin) return alert('Isi PIN dulu! Contoh: 123456');
+  try{
+    if(editPegawaiId){ await sb("PATCH","pegawai", data, "?id=eq."+editPegawaiId); alert('Pegawai berhasil di-EDIT! 🔥'); }
+    else {
+      let cek = await sb("GET","pegawai","", "?select=*&code=eq."+encodeURIComponent(data.code));
+      if(cek && cek.length>0) return alert('Code @'+data.code+' udah dipake pegawai lain! Ganti code lain.');
+      await sb("POST","pegawai", data, ""); alert('Pegawai baru berhasil DITAMBAH! Login: @'+data.code+' + PIN '+data.pin+' 🔥');
+    }
+    closePegawaiForm(); await loadAdmin(); renderPegawaiList();
+  }catch(e){ alert('Gagal simpan pegawai: '+e.message); }
+}
+async function hapusPegawai(id){
+  let a=(DB.pegawai||[]).find(x=>x.id===id);
+  if(!confirm('Hapus pegawai "'+(a?a.nama:'')+'" ?')) return;
+  try{ await sb("DELETE","pegawai","", "?id=eq."+id); await loadAdmin(); renderPegawaiList(); }catch(e){ alert('Gagal hapus pegawai: '+e.message); }
+}
+(function cekTiket(){
+  try{
+    let t = sessionStorage.getItem('casa_login');
+    let params = new URLSearchParams(window.location.search);
+    if(!t && !params.get('code')){ window.location.href='index.html'; return; }
+    if(t){ let j=JSON.parse(t); if(j.role!=='admin'){ window.location.href='index.html'; return; } }
+  }catch(e){ window.location.href='index.html'; }
+})();
 loadAdmin();
 </script>
 </body>
