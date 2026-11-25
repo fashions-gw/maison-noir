@@ -4,137 +4,173 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CASA MODA - Luxury Fashion</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;font-family:'Georgia',serif}
-  body{
-    background-image: linear-gradient(rgba(0,0,0,0.30), rgba(0,0,0,0.78)), url('background-emas.jpg');
-    background-size: cover; background-position: center top; background-repeat: no-repeat;
-    background-color:#000; color:#fff; overflow-x:hidden
-  }
-  .hero{ background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.55)); padding:20px 20px 10px 20px; text-align:center; position:relative}
-  .top{ display:flex; justify-content:space-between; align-items:center; padding:10px 0}
-  .logo{ font-size:24px; letter-spacing:3px; font-weight:bold; text-shadow:0 2px 10px #000; text-align:left}
-  .logo span{ color:#FFD700; font-size:11px; display:block; letter-spacing:5px}
-  .menu-btn{ background:#FFD700; color:#000; padding:8px 16px; border-radius:20px; font-weight:bold; font-size:14px; border:none; cursor:pointer}
-  .menu-box{ display:none; position:absolute; top:65px; right:20px; background:rgba(0,0,0,0.92); border:1px solid #FFD700; border-radius:15px; width:180px; text-align:left; z-index:99; overflow:hidden}
-  .menu-box a{ display:block; color:#fff; text-decoration:none; padding:13px 16px; border-bottom:1px solid #333; font-size:14px}
-  .menu-box a:hover{ background:#FFD700; color:#000}
-  h1{ font-size:34px; line-height:1.1; margin:15px 0 10px 0; text-shadow:0 2px 15px #000}
-  h1 em{ color:#FFD700; font-style:italic}
-  p{ color:#eee; font-size:14px; line-height:1.6; max-width:320px; margin:0 auto; text-shadow:0 1px 5px #000}
-  .section{ padding:15px 20px 20px 20px; background:linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.85))}
-  .section h2{ font-size:26px; margin-bottom:5px; text-shadow:0 2px 10px #000}
-  .section h2 i{ color:#FFD700}
-  .grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:15px}
-  .card{ background:rgba(0,0,0,0.55); backdrop-filter:blur(2px); border-radius:20px; overflow:hidden; border:1px solid rgba(255,215,0,0.5); cursor:pointer}
-  .card img{ width:100%; height:180px; object-fit:cover; display:block}
-  .card-body{ padding:12px; text-align:left}
-  .card-body small{ color:#FFD700; font-size:11px; letter-spacing:1px}
-  .card-body h3{ font-size:16px; margin:5px 0; text-shadow:0 1px 5px #000}
-  .price{ color:#FFD700; font-weight:bold}
-  .price s{ color:#ddd; font-size:12px; margin-left:5px}
-  .add{ width:100%; background:#FFD700; border:none; padding:10px; border-radius:12px; font-weight:bold; margin-top:8px; cursor:pointer}
-  .footer{ text-align:center; padding:30px 30px 90px 30px; color:#fff; font-size:13px; background:rgba(0,0,0,0.85)}
-  .chat-float{ position:fixed; bottom:20px; right:20px; background:#25D366; color:#fff; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px; box-shadow:0 5px 20px rgba(0,0,0,0.5); z-index:100; text-decoration:none; border:2px solid #fff}
-  .popup{ display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:200; align-items:flex-end; justify-content:center}
-  .popup.open{ display:flex}
-  .popup-box{ background:#111; width:100%; max-width:420px; border-radius:25px 25px 0 0; overflow:hidden; max-height:90vh; overflow-y:auto; border-top:2px solid #FFD700}
-  .popup-box img{ width:100%; height:300px; object-fit:cover}
-  .popup-body{ padding:18px}
-  .popup-body h3{ font-size:24px; margin:5px 0}
-  .close{ float:right; font-size:24px; cursor:pointer; background:none; border:none; color:#fff}
-  .size-btn{ background:#222; color:#fff; border:1px solid #555; padding:10px 16px; border-radius:10px; margin:5px 5px 0 0; cursor:pointer; font-weight:bold}
-  .size-btn.active{ background:#FFD700; color:#000; border-color:#FFD700}
-  .buy-btn{ width:100%; background:#FFD700; border:none; padding:14px; border-radius:14px; font-weight:bold; margin-top:15px; font-size:15px; cursor:pointer}
-  .cart-drawer{ display:none; position:fixed; top:0; right:0; width:85%; max-width:350px; height:100%; background:#111; z-index:300; padding:20px; border-left:2px solid #FFD700; overflow-y:auto}
-  .cart-drawer.open{ display:block}
-  .cart-item{ display:flex; gap:10px; background:#222; padding:10px; border-radius:12px; margin-bottom:10px; align-items:center}
-  .cart-item img{ width:60px; height:60px; object-fit:cover; border-radius:8px}
+  body{background:#000;color:#fff;overflow-x:hidden}
+  .hero{background:linear-gradient(rgba(0,0,0,0.25),rgba(0,0,0,0.55)),url('background-emas.jpg');background-size:cover;background-position:center top;padding:20px;text-align:center}
+  .top{display:flex;justify-content:space-between;align-items:center}
+  .logo{font-size:24px;letter-spacing:3px;font-weight:bold;text-align:left}.logo span{color:#FFD700;font-size:11px;display:block;letter-spacing:5px}
+  .menu-btn{background:#FFD700;color:#000;padding:8px 16px;border-radius:20px;font-weight:bold;border:none;cursor:pointer}
+  .menu-box{display:none;position:absolute;top:65px;right:20px;background:rgba(0,0,0,0.95);border:1px solid #FFD700;border-radius:15px;width:200px;text-align:left;z-index:99;overflow:hidden}
+  .menu-box a{display:block;color:#fff;text-decoration:none;padding:13px 16px;border-bottom:1px solid #333;font-size:14px;cursor:pointer}
+  .menu-box a:hover{background:#FFD700;color:#000}
+  h1{font-size:34px;line-height:1.1;margin:15px 0 10px}h1 em{color:#FFD700}
+  p{color:#eee;font-size:14px;line-height:1.6;max-width:320px;margin:0 auto}
+  .section{padding:15px 20px 20px;background:#111}
+  .section h2{font-size:26px;margin-bottom:5px}.section h2 i{color:#FFD700}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:15px}
+  .card{background:#222;border-radius:20px;overflow:hidden;border:1px solid rgba(255,215,0,0.5);cursor:pointer}
+  .card img{width:100%;height:180px;object-fit:cover;display:block}
+  .card-body{padding:12px;text-align:left}.card-body small{color:#FFD700;font-size:11px}.card-body h3{font-size:15px;margin:5px 0}.price{color:#FFD700;font-weight:bold}
+  .add{width:100%;background:#FFD700;border:none;padding:10px;border-radius:12px;font-weight:bold;margin-top:8px;cursor:pointer}
+  .footer{text-align:center;padding:30px 30px 90px;color:#fff;font-size:13px;background:#000}
+  .chat-float{position:fixed;bottom:20px;right:20px;background:#25D366;color:#fff;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;z-index:100;text-decoration:none;border:2px solid #fff}
+  .popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;align-items:flex-end;justify-content:center}.popup.open{display:flex}
+  .popup-box{background:#111;width:100%;max-width:420px;border-radius:25px 25px 0 0;max-height:90vh;overflow-y:auto;border-top:2px solid #FFD700}
+  .popup-box img{width:100%;height:300px;object-fit:cover}.popup-body{padding:18px}.close{float:right;font-size:24px;cursor:pointer;background:none;border:none;color:#fff}
+  .size-btn{background:#222;color:#fff;border:1px solid #555;padding:10px 16px;border-radius:10px;margin:5px 5px 0 0;cursor:pointer;font-weight:bold}.size-btn.active{background:#FFD700;color:#000}
+  .buy-btn{width:100%;background:#FFD700;border:none;padding:14px;border-radius:14px;font-weight:bold;margin-top:15px;font-size:15px;cursor:pointer}
+  .drawer{display:none;position:fixed;top:0;right:0;width:88%;max-width:360px;height:100%;background:#111;z-index:300;padding:20px;border-left:2px solid #FFD700;overflow-y:auto}.drawer.open{display:block}
+  .cart-item{display:flex;gap:10px;background:#222;padding:10px;border-radius:12px;margin-bottom:10px;align-items:center}.cart-item img{width:60px;height:60px;object-fit:cover;border-radius:8px}
+  input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #444;background:#222;color:#fff;margin-top:8px}
+  .admin-card{background:#222;padding:12px;border-radius:12px;margin-bottom:10px;border:1px solid #444}
 </style>
 </head>
 <body>
-
 <div class="hero">
-  <div class="top">
-    <div class="logo">CASA MODA<span>LUXURY BANDUNG</span></div>
-    <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
-  </div>
+  <div class="top"><div class="logo">CASA MODA<span>LUXURY BANDUNG</span></div><button class="menu-btn" onclick="toggleMenu()">☰ Menu</button></div>
   <div class="menu-box" id="menuBox">
-    <a href="#">🏠 Home</a>
-    <a href="#produk">🛍️ Collection</a>
-    <a href="#">✨ About Us</a>
-    <a href="#" onclick="openCart();return false">🛒 Cart • <span id="cartCount">0</span></a>
+    <a onclick="showPage('home')">🏠 Home</a>
+    <a onclick="showPage('produk')">🛍️ Collection</a>
+    <a onclick="showPage('about')">✨ About Us</a>
+    <a onclick="openCart()">🛒 Cart • <span id="cartCount">0</span></a>
+    <a onclick="showPage('member')">👤 Login Member</a>
+    <a onclick="showPage('admin')">🔐 Login Admin</a>
     <a href="https://wa.me/6285890611111">💬 Chat Admin</a>
   </div>
   <h1>Wear<br><em>Your Power.</em></h1>
   <p>Exclusive premium fashion for those who refuse to be ordinary. Limited edition. Handcrafted.</p>
+  <p style="margin-top:10px;color:#FFD700" id="userInfo">Belum login - Login Member biar bisa checkout</p>
 </div>
 
-<div class="section" id="produk">
-  <h2>Featured <i>Collection</i></h2>
-  <p style="text-align:left;margin:0;color:#eee;font-size:13px">Handpicked for you - Klik produk untuk liat dalemnya!</p>
+<div class="section" id="page-home">
+  <h2>Featured <i>Collection</i></h2><p style="text-align:left;margin:0;font-size:13px">Live dari Supabase - Klik produk untuk liat dalemnya!</p>
+  <div id="statusLoad" style="margin-top:10px;color:#FFD700">Loading produk dari Supabase...</div>
   <div class="grid" id="grid"></div>
 </div>
 
-<div class="footer">© 2026 CASA MODA • Made with luxury in Bandung</div>
-<a class="chat-float" href="https://wa.me/6285890611111?text=Halo%20CASA%20MODA,%20saya%20mau%20tanya%20produk">💬</a>
+<div class="section" id="page-about" style="display:none">
+  <h2>About <i>CASA MODA</i></h2><p style="text-align:left;max-width:none;margin-top:10px">CASA MODA adalah brand luxury dari Bandung. Premium material, handcrafted, limited stock. Dibuat oleh Ko Cheng, Bandung, 2026.</p>
+  <p style="text-align:left;max-width:none;margin-top:10px">📍 Bandung, West Java<br>💬 WA: 0858-9061-1111<br>📦 Pengiriman seluruh Indonesia</p>
+</div>
 
-<div class="popup" id="popup">
-  <div class="popup-box">
-    <div style="padding:10px"><button class="close" onclick="closePopup()">✕</button></div>
-    <img id="pImg" src="">
-    <div class="popup-body">
-      <small id="pCat" style="color:#FFD700"></small>
-      <h3 id="pName"></h3>
-      <div id="pPrice" style="color:#FFD700;font-weight:bold;font-size:18px"></div>
-      <p style="margin:10px 0;text-align:left;max-width:none">Premium material, handcrafted in Bandung. Limited stock. Dijamin bikin lu keliatan mahal pas dipake!</p>
-      <b>Pilih Ukuran:</b><br>
-      <button class="size-btn" onclick="pickSize(this)">39</button>
-      <button class="size-btn" onclick="pickSize(this)">40</button>
-      <button class="size-btn" onclick="pickSize(this)">41</button>
-      <button class="size-btn active" onclick="pickSize(this)">42</button>
-      <button class="size-btn" onclick="pickSize(this)">43</button>
-      <button class="size-btn" onclick="pickSize(this)">44</button>
-      <button class="buy-btn" onclick="addToCart()">+ Add to Cart - <span id="pPrice2"></span></button>
-    </div>
+<div class="section" id="page-member" style="display:none">
+  <h2>Login <i>Member</i></h2><p style="text-align:left;margin:0">Masuk pake akun lu, biar bisa checkout masuk ke database.</p>
+  <input id="memberAkun" placeholder="Akun Member, contoh: andi123">
+  <input id="memberPass" type="password" placeholder="Password">
+  <button class="buy-btn" onclick="loginMember()">Login Member</button>
+  <button class="buy-btn" style="background:#222;color:#fff;border:1px solid #FFD700" onclick="daftarMember()">Daftar Baru</button>
+  <div id="memberMsg" style="margin-top:10px;color:#FFD700"></div>
+</div>
+
+<div class="section" id="page-admin" style="display:none">
+  <h2>Admin <i>Panel</i></h2><p style="text-align:left;margin:0">Login pake PIN. PIN Admin lu: 1234</p>
+  <input id="adminPin" type="password" placeholder="Masukkan PIN Admin / Pegawai">
+  <button class="buy-btn" onclick="loginAdmin()">Login Admin</button>
+  <div id="adminMsg" style="margin-top:10px;color:#FFD700"></div>
+  <div id="adminPanel" style="display:none;margin-top:15px">
+    <h3 style="margin:10px 0">Pesanan Menunggu Admin:</h3><div id="adminOrders"></div>
+    <h3 style="margin:15px 0 5px">Tambah Produk Baru:</h3>
+    <input id="newNama" placeholder="Nama Produk"><input id="newUkuran" placeholder="Ukuran, contoh: 42"><input id="newJenis" placeholder="Jenis, contoh: Sepatu"><input id="newStok" type="number" placeholder="Stok"><input id="newModal" type="number" placeholder="Modal"><input id="newHarga" type="number" placeholder="Harga Jual"><input id="newFoto" placeholder="Link Foto">
+    <button class="buy-btn" onclick="tambahProduk()">+ Tambah Produk</button>
+    <h3 style="margin:15px 0 5px">Omset Hari Ini:</h3><div id="omsetHariIni"></div>
+    <button class="buy-btn" style="background:#222;color:#fff" onclick="loadOmset()">Refresh Omset</button>
   </div>
 </div>
 
-<div class="cart-drawer" id="cartDrawer">
-  <h2>🛒 Keranjang Lu <button onclick="closeCart()" style="float:right;background:none;border:none;color:#fff;font-size:22px">✕</button></h2>
-  <div id="cartItems" style="margin-top:15px"></div>
-  <div id="cartTotal" style="font-weight:bold;margin-top:10px;font-size:18px"></div>
-  <button class="buy-btn" onclick="checkout()">Checkout via WhatsApp 💬</button>
-</div>
+<div class="footer">© 2026 CASA MODA • Made with luxury in Bandung • Connected to Supabase</div>
+<a class="chat-float" href="https://wa.me/6285890611111?text=Halo%20CASA%20MODA">💬</a>
+
+<div class="popup" id="popup"><div class="popup-box"><div style="padding:10px"><button class="close" onclick="closePopup()">✕</button></div><img id="pImg"><div class="popup-body"><small id="pCat" style="color:#FFD700"></small><h3 id="pName"></h3><div id="pPrice" style="color:#FFD700;font-weight:bold;font-size:18px"></div><p style="margin:10px 0;text-align:left;max-width:none" id="pDesc"></p><b>Pilih Ukuran:</b><br><div id="sizeBox"></div><button class="buy-btn" onclick="addToCart()">+ Add to Cart - <span id="pPrice2"></span></button></div></div></div>
+
+<div class="drawer" id="cartDrawer"><h2>🛒 Keranjang Lu <button onclick="closeCart()" style="float:right;background:none;border:none;color:#fff;font-size:22px">✕</button></h2><div id="cartItems" style="margin-top:15px"></div><div id="cartTotal" style="font-weight:bold;margin-top:10px;font-size:18px"></div><button class="buy-btn" onclick="checkout()">Checkout ke Supabase + WhatsApp 💬</button></div>
 
 <script>
-const products = [
-  {name:"Prestige Loafers - Brown Leather", cat:"LEATHER • LUXURY", price:1299000, img:"https://wesleybenton.com/cdn/shop/files/ChatGPT_Image_Apr_23_2026_12_40_04_AM.png?v=1776922835"},
-  {name:"Royal Oxford - Brown Leather", cat:"LEATHER • PREMIUM OXFORD", price:1499000, img:"https://qutobd.com/wp-content/uploads/2026/09/WhatsApp-Image-2026-09-21-at-3.15.16-AM-2-1024x1024.webp"},
-  {name:"Casa Chelsea Boots - Black Leather", cat:"LEATHER • CHELSEA BOOTS", price:1399000, img:"https://assets.myntassets.com/assets/images/2026/SEPTEMBER/15/850eec89d28d4e908cf8a7dbcb939450.jpg"},
-  {name:"Elegant Loafers - Tan Leather", cat:"LEATHER • LOAFERS ELEGANT", price:1199000, img:"https://img-va.myshopline.com/image/store/1717642206153/11111-26_1445x.jpg?w=1000&h=1000&q=80"},
-  {name:"Classic Oxford - Brown Leather", cat:"LEATHER • HANDMADE", price:1349000, img:"https://cdn.shopify.com/s/files/1/0864/2786/1320/files/1_3_81304edf-d41e-4824-bf66-f17180628832.png_v_1773727664.png?v=1773729919"},
-  {name:"Gentleman Loafers - Dark Brown", cat:"LEATHER • BUSINESS CLASS", price:1249000, img:"https://cdn.shopify.com/s/files/1/0225/7063/1245/files/fashion-gentleman-social-footwear-251004002001.jpg?v=1759549905"},
-];
-let cart = []; let current = products[0]; let selectedSize = "42";
-function fmt(n){ return "Rp " + n.toLocaleString('id-ID'); }
-function render(){
+// ============ UDAH GUA ISI, JANGAN DIUBAH LAGI ============
+const SUPABASE_URL = "https://rwbrwcmtzlevjpxmhyqz.supabase.co";
+const SUPABASE_KEY = "sb_publishable_HN_7Kf9QCpepykVbPMrwfQ_07wM0Rh6";
+const WA_NUMBER = "6285890611111";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let products = []; let cart = []; let current = null; let selectedSize = "42"; let currentUser = null; let adminUser = null;
+function fmt(n){ return "Rp " + Number(n).toLocaleString('id-ID'); }
+function toggleMenu(){ const m=document.getElementById('menuBox'); m.style.display=m.style.display==='block'?'none':'block'; }
+function showPage(p){ document.getElementById('page-home').style.display = p==='home'||p==='produk' ? 'block':'none'; document.getElementById('page-about').style.display = p==='about'?'block':'none'; document.getElementById('page-member').style.display = p==='member'?'block':'none'; document.getElementById('page-admin').style.display = p==='admin'?'block':'none'; document.getElementById('menuBox').style.display='none'; window.scrollTo(0,0); }
+async function loadProduk(){
+  document.getElementById('statusLoad').innerText = "Loading...";
+  const { data, error } = await supabaseClient.rpc('bot_lihat_produk');
+  if(error){ document.getElementById('statusLoad').innerText = "Error: "+error.message; return; }
+  products = data || [];
+  document.getElementById('statusLoad').innerText = products.length+" produk live dari Supabase 🔥";
   document.getElementById('grid').innerHTML = products.map((p,i)=>`
     <div class="card" onclick="openDetail(${i})">
-      <img src="${p.img}">
-      <div class="card-body"><small>${p.cat}</small><h3>${p.name}</h3><div class="price">${fmt(p.price)}</div><button class="add" onclick="event.stopPropagation();openDetail(${i})">Lihat Detail →</button></div>
+      <img src="${p.foto || 'https://via.placeholder.com/400'}">
+      <div class="card-body"><small>${p.jenis} • ${p.status}</small><h3>${p.nama_produk}</h3><div>Ukuran: ${p.ukuran} • Stok: ${p.stok}</div><div class="price">${fmt(p.harga)}</div><button class="add" onclick="event.stopPropagation();openDetail(${i})">Lihat Detail →</button></div>
     </div>`).join('');
 }
-function toggleMenu(){ var m=document.getElementById('menuBox'); m.style.display = m.style.display==='block' ? 'none':'block'; }
-function openDetail(i){ current=products[i]; document.getElementById('pImg').src=current.img; document.getElementById('pCat').innerText=current.cat; document.getElementById('pName').innerText=current.name; document.getElementById('pPrice').innerText=fmt(current.price); document.getElementById('pPrice2').innerText=fmt(current.price); document.getElementById('popup').classList.add('open'); }
+function openDetail(i){ current=products[i]; selectedSize=current.ukuran; document.getElementById('pImg').src=current.foto||''; document.getElementById('pCat').innerText=current.jenis+" • "+current.status; document.getElementById('pName').innerText=current.nama_produk; document.getElementById('pPrice').innerText=fmt(current.harga); document.getElementById('pPrice2').innerText=fmt(current.harga); document.getElementById('pDesc').innerText="Stok: "+current.stok+" • Premium material, handcrafted in Bandung. Limited stock!"; document.getElementById('sizeBox').innerHTML=['39','40','41','42','43','44'].map(s=>`<button class="size-btn ${s==selectedSize?'active':''}" onclick="pickSize(this)">${s}</button>`).join(''); document.getElementById('popup').classList.add('open'); }
 function closePopup(){ document.getElementById('popup').classList.remove('open'); }
 function pickSize(el){ document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); selectedSize=el.innerText; }
-function addToCart(){ cart.push({...current, size:selectedSize}); document.getElementById('cartCount').innerText=cart.length; closePopup(); alert('Masuk keranjang! 🔥 ' + current.name + ' Ukuran ' + selectedSize); }
-function openCart(){ document.getElementById('menuBox').style.display='none'; let html = cart.length===0 ? '<p>Keranjang masih kosong Bro, ayo belanja!</p>' : ''; let total=0; cart.forEach((c,idx)=>{ total+=c.price; html+=`<div class="cart-item"><img src="${c.img}"><div style="flex:1"><b>${c.name}</b><br><small>Ukuran: ${c.size}</small><br><span style="color:#FFD700">${fmt(c.price)}</span></div><button onclick="removeItem(${idx})" style="background:none;border:none;color:#fff">✕</button></div>`; }); document.getElementById('cartItems').innerHTML=html; document.getElementById('cartTotal').innerText = cart.length ? 'Total: ' + fmt(total) : ''; document.getElementById('cartDrawer').classList.add('open'); }
+function addToCart(){ cart.push({...current, size:selectedSize}); document.getElementById('cartCount').innerText=cart.length; closePopup(); alert('Masuk keranjang! 🔥 '+current.nama_produk+' Ukuran '+selectedSize); }
+function openCart(){ document.getElementById('menuBox').style.display='none'; let html = cart.length===0 ? '<p>Keranjang masih kosong Bro, ayo belanja!</p>' : ''; let total=0; cart.forEach((c,idx)=>{ total+=Number(c.harga); html+=`<div class="cart-item"><img src="${c.foto||''}"><div style="flex:1"><b>${c.nama_produk}</b><br><small>Ukuran: ${c.size}</small><br><span style="color:#FFD700">${fmt(c.harga)}</span></div><button onclick="removeItem(${idx})" style="background:none;border:none;color:#fff">✕</button></div>`; }); document.getElementById('cartItems').innerHTML=html; document.getElementById('cartTotal').innerText = cart.length ? 'Total: '+fmt(total) : ''; document.getElementById('cartDrawer').classList.add('open'); }
 function closeCart(){ document.getElementById('cartDrawer').classList.remove('open'); }
 function removeItem(i){ cart.splice(i,1); document.getElementById('cartCount').innerText=cart.length; openCart(); }
-function checkout(){ if(cart.length===0){ alert('Keranjang kosong!'); return; } let msg = "Halo CASA MODA, saya mau order:\n"; cart.forEach(c=>{ msg += "- " + c.name + " Ukuran " + c.size + " " + fmt(c.price) + "\n"; }); window.open("https://wa.me/6285890611111?text=" + encodeURIComponent(msg), "_blank"); }
-render();
+async function loginMember(){
+  const akun=document.getElementById('memberAkun').value.trim(); const pass=document.getElementById('memberPass').value.trim();
+  if(!akun||!pass) return alert('Isi akun & password dulu');
+  const { data, error } = await supabaseClient.from('member').select('*').eq('akun',akun).eq('password',pass).single();
+  if(error||!data){ document.getElementById('memberMsg').innerText="Akun / Password salah!"; return; }
+  currentUser=akun; document.getElementById('memberMsg').innerText="Login berhasil! Halo "+akun+" ("+data.member+")"; document.getElementById('userInfo').innerText="Login sebagai: "+akun+" • Level: "+data.member; showPage('home');
+}
+async function daftarMember(){
+  const akun=document.getElementById('memberAkun').value.trim(); const pass=document.getElementById('memberPass').value.trim();
+  if(!akun||!pass) return alert('Isi akun & password dulu');
+  const { error } = await supabaseClient.from('member').insert({akun, password:pass, member:'Silver'});
+  if(error){ document.getElementById('memberMsg').innerText="Gagal daftar: "+error.message; return; }
+  document.getElementById('memberMsg').innerText="Daftar berhasil! Sekarang login."; loginMember();
+}
+async function checkout(){
+  if(cart.length===0) return alert('Keranjang kosong!');
+  if(!currentUser) return alert('Login Member dulu!'), showPage('member');
+  for(let c of cart){
+    const { error } = await supabaseClient.rpc('bot_masuk_keranjang', { p_akun: currentUser, p_produk_id: c.id, p_jumlah: 1 });
+    if(error){ alert('Gagal masuk Supabase: '+error.message); return; }
+  }
+  let msg="Halo CASA MODA, saya mau order:\nMember: "+currentUser+"\n"; cart.forEach(c=>{ msg+="- "+c.nama_produk+" Ukuran "+c.size+" "+fmt(c.harga)+"\n"; });
+  alert('Pesanan masuk ke Supabase! Status: Menunggu Admin. Lanjut ke WA ya!');
+  cart=[]; document.getElementById('cartCount').innerText=0; closeCart();
+  window.open("https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent(msg), "_blank");
+}
+async function loginAdmin(){
+  const pin=document.getElementById('adminPin').value.trim();
+  const { data, error } = await supabaseClient.rpc('bot_login_pin', { p_pin: pin });
+  if(error||!data||data.length===0){ document.getElementById('adminMsg').innerText="PIN salah!"; return; }
+  adminUser=data[0]; document.getElementById('adminMsg').innerText="Login berhasil! Halo "+adminUser.nama+" ("+adminUser.role+")"; document.getElementById('adminPanel').style.display='block'; loadAdminOrders(); loadOmset();
+}
+async function loadAdminOrders(){
+  const { data } = await supabaseClient.rpc('admin_lihat_menunggu');
+  document.getElementById('adminOrders').innerHTML = !data||data.length===0 ? '<p>Gak ada pesanan menunggu.</p>' : data.map(o=>`<div class="admin-card"><b>${o.nama_produk}</b> - ${o.akun_member}<br>Jumlah: ${o.jumlah} • ${fmt(o.harga_saat_pesan)}<br><button class="buy-btn" onclick="accOrder(${o.id})">✅ ACC</button><button class="buy-btn" style="background:#ff4444" onclick="tolakOrder(${o.id})">❌ Tolak</button></div>`).join('');
+}
+async function accOrder(id){ const { data } = await supabaseClient.rpc('admin_acc_pesanan', { p_keranjang_id: id }); alert(data); loadAdminOrders(); loadOmset(); loadProduk(); }
+async function tolakOrder(id){ const { data } = await supabaseClient.rpc('admin_tolak_pesanan', { p_id: id }); alert(data); loadAdminOrders(); }
+async function loadOmset(){ const { data } = await supabaseClient.rpc('admin_cek_omset_hari_ini'); document.getElementById('omsetHariIni').innerHTML = !data||data.length===0 ? 'Belum ada omset hari ini' : data.map(o=>`Tanggal: ${o.tanggal}<br>Omset: ${fmt(o.omset_harian)}<br>Laba: ${fmt(o.laba)}`).join(''); }
+async function tambahProduk(){
+  const { data, error } = await supabaseClient.rpc('tambah_produk', { p_nama: document.getElementById('newNama').value, p_ukuran: document.getElementById('newUkuran').value, p_jenis: document.getElementById('newJenis').value, p_stok: Number(document.getElementById('newStok').value), p_modal: Number(document.getElementById('newModal').value), p_harga: Number(document.getElementById('newHarga').value), p_foto: document.getElementById('newFoto').value });
+  if(error) return alert('Gagal: '+error.message);
+  alert('Produk berhasil ditambah! ID: '+data); loadProduk();
+}
+loadProduk();
 </script>
 </body>
 </html>
