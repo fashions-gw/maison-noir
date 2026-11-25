@@ -113,7 +113,11 @@ async function sb(method, table, body, query){
   let txt = await res.text(); return txt ? JSON.parse(txt) : [];
 }
 const WA_NUMBER = "6285890611111";
-let products = []; let cart = []; let current = null; let selectedSize = "42"; let currentUser = null;
+// === KERANJANG NYAMBUNG KE MEMBER.HTML ===
+function loadCartFromStorage(){ try{ return JSON.parse(localStorage.getItem('casa_cart')||'[]'); }catch(e){ return []; } }
+function saveCartToStorage(){ localStorage.setItem('casa_cart', JSON.stringify(cart)); }
+function loadMemberFromStorage(){ try{ let m = JSON.parse(localStorage.getItem('casa_member')||'null'); return m ? m.nama : null; }catch(e){ return null; } }
+let products = []; let cart = loadCartFromStorage(); let current = null; let selectedSize = "42"; let currentUser = loadMemberFromStorage();
 let DB = { produk:[], member:[], bot:[], admin:[], pegawai:[] };
 let pendingAdmin = null; let pinInput = ""; let pinSalahCount = 0; let dbLoaded = false;
 let kategoriAktif = 'populer'; let KATEGORI_LIST = []; let URUTAN_KAT = ['populer'];
@@ -145,6 +149,7 @@ async function loadProduk(){
     let el = document.getElementById('dbError'); el.style.display='block'; el.innerText = '⚠️ Gagal load Supabase: ' + e.message;
   }
   products = DB.produk || []; buildKategori(); renderProdukFiltered();
+  document.getElementById('cartCount').innerText = cart.length;
 }
 function buildKategori(){
   let seen = [];
@@ -192,15 +197,15 @@ function renderProdukFiltered(){
 function openDetail(i){ current=products[i]; if(isHabis(current)) return alert('Produk ini lagi Habis!'); selectedSize=String(current.ukuran||'').split(',')[0]||"42"; document.getElementById('pImg').src=current.foto||''; document.getElementById('pCat').innerText=(current.jenis||'')+" • "+(current.status||''); document.getElementById('pName').innerText=getNama(current); document.getElementById('pPrice').innerText=fmt(current.harga); document.getElementById('pPrice2').innerText=fmt(current.harga); document.getElementById('pDesc').innerText=(current.ket||'')+" Stok: "+current.stok+" • Premium material, handcrafted in Bandung. Limited stock!"; let sizes = String(current.ukuran||'42').split(',').map(s=>s.trim()).filter(Boolean); document.getElementById('sizeBox').innerHTML=sizes.map(s=>`<button class="size-btn ${s==selectedSize?'active':''}" onclick="pickSize(this)">${s}</button>`).join(''); document.getElementById('popup').classList.add('open'); }
 function closePopup(){ document.getElementById('popup').classList.remove('open'); }
 function pickSize(el){ document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); selectedSize=el.innerText; }
-function addToCart(){ cart.push({...current, size:selectedSize}); document.getElementById('cartCount').innerText=cart.length; closePopup(); alert('Masuk keranjang! 🔥 '+getNama(current)+' Ukuran '+selectedSize); }
+function addToCart(){ cart.push({...current, size:selectedSize}); saveCartToStorage(); document.getElementById('cartCount').innerText=cart.length; closePopup(); alert('Masuk keranjang! 🔥 '+getNama(current)+' Ukuran '+selectedSize+' - Cek di Member ya!'); }
 function openCart(){ document.getElementById('menuBox').style.display='none'; let html = cart.length===0 ? '<p>Keranjang masih kosong Bro, ayo belanja!</p>' : ''; let total=0; cart.forEach((c,idx)=>{ total+=Number(c.harga); html+=`<div class="cart-item"><img src="${c.foto||''}"><div style="flex:1"><b>${getNama(c)}</b><br><small>Ukuran: ${c.size}</small><br><span style="color:#FFD700">${fmt(c.harga)}</span></div><button onclick="removeItem(${idx})" style="background:none;border:none;color:#fff">✕</button></div>`; }); document.getElementById('cartItems').innerHTML=html; document.getElementById('cartTotal').innerText = cart.length ? 'Total: '+fmt(total) : ''; document.getElementById('cartDrawer').classList.add('open'); }
 function closeCart(){ document.getElementById('cartDrawer').classList.remove('open'); }
-function removeItem(i){ cart.splice(i,1); document.getElementById('cartCount').innerText=cart.length; openCart(); }
+function removeItem(i){ cart.splice(i,1); saveCartToStorage(); document.getElementById('cartCount').innerText=cart.length; openCart(); }
 function checkout(){
   if(cart.length===0) return alert('Keranjang kosong!');
   if(!currentUser){ alert('Login Member dulu!'); window.location.href='member.html'; return; }
   let msg="Halo CASA MODA, saya mau order:\nMember: "+currentUser+"\n"; cart.forEach(c=>{ msg+="- "+getNama(c)+" Ukuran "+c.size+" "+fmt(c.harga)+"\n"; });
-  alert('Lanjut ke WA ya!'); cart=[]; document.getElementById('cartCount').innerText=0; closeCart();
+  alert('Lanjut ke WA ya!'); cart=[]; saveCartToStorage(); document.getElementById('cartCount').innerText=0; closeCart();
   window.open("https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent(msg), "_blank");
 }
 function toggleBot(){ document.getElementById('botBox').classList.toggle('open'); }
@@ -275,6 +280,7 @@ function kirimBot(){
 }
 buildKeypad();
 loadProduk();
+document.getElementById('cartCount').innerText = cart.length;
 document.addEventListener('keydown', (e)=>{
   if(!document.getElementById('lockScreen').classList.contains('open')) return;
   if(/^[0-9]$/.test(e.key)) tekanPin(e.key);
