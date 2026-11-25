@@ -15,17 +15,17 @@ body{background:#000;color:#fff;overflow-x:hidden}
 .menu-box a{display:block;color:#fff;text-decoration:none;padding:13px 16px;border-bottom:1px solid #333;font-size:14px;cursor:pointer}
 .hero h1{font-size:38px;line-height:1.1;margin-top:18px}
 .hero p{font-size:14px;line-height:1.5;max-width:340px;margin:10px auto 0}
-.kategori-bar{display:flex;gap:8px;overflow-x:auto;padding:14px 4px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.kategori-bar{display:flex;gap:8px;overflow-x:auto;padding:14px 4px 4px;scrollbar-width:none}
 .kategori-bar::-webkit-scrollbar{display:none}
-.kat-btn{background:rgba(0,0,0,0.55);color:#fff;border:1px solid rgba(255,215,0,0.7);padding:10px 16px;border-radius:20px;white-space:nowrap;cursor:pointer;font-weight:bold;font-size:13px;backdrop-filter:blur(4px)}
+.kat-btn{background:rgba(0,0,0,0.55);color:#fff;border:1px solid rgba(255,215,0,0.7);padding:10px 16px;border-radius:20px;white-space:nowrap;cursor:pointer;font-weight:bold;font-size:13px}
 .kat-btn.active{background:#FFD700;color:#000;border-color:#FFD700}
-.section{padding:14px 16px 20px;background:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.65)),url('background-emas.jpg');background-size:cover;background-position:center;background-attachment:fixed;min-height:60vh;touch-action:pan-y}
+.section{padding:14px 16px 20px;background:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.65)),url('background-emas.jpg');background-size:cover;background-position:center;min-height:60vh}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .card{background:rgba(0,0,0,0.55);border-radius:20px;overflow:hidden;border:1px solid rgba(255,215,0,0.6);cursor:pointer;position:relative}
 .card.populer{border:2px solid #FFD700}
 .badge-populer{position:absolute;top:8px;left:8px;background:#FFD700;color:#000;font-size:11px;font-weight:bold;padding:4px 8px;border-radius:10px;z-index:2}
 .card img{width:100%;height:180px;object-fit:cover;display:block}
-.card-body{padding:12px;text-align:left;background:rgba(0,0,0,0.35)}.card-body small{color:#FFD700;font-size:11px}.card-body h3{font-size:14px;margin:5px 0;text-shadow:0 1px 6px rgba(0,0,0,0.9);min-height:36px;line-height:1.3}.price{color:#FFD700;font-weight:bold}
+.card-body{padding:12px;text-align:left;background:rgba(0,0,0,0.35)}.card-body small{color:#FFD700;font-size:11px}.card-body h3{font-size:14px;margin:5px 0;min-height:36px;line-height:1.3}.price{color:#FFD700;font-weight:bold}
 .add{width:100%;background:#FFD700;border:none;padding:10px;border-radius:12px;font-weight:bold;margin-top:8px;cursor:pointer}
 .footer{text-align:center;padding:30px 30px 90px;color:#fff;font-size:13px;background:#000}
 .chat-float{position:fixed;bottom:20px;right:20px;background:#25D366;color:#fff;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;z-index:100;text-decoration:none}
@@ -49,10 +49,10 @@ input{width:100%;padding:12px;border-radius:10px;border:1px solid #444;backgroun
 .lock-logo{font-size:26px;letter-spacing:4px;font-weight:bold}.lock-logo span{display:block;font-size:11px;color:#FFD700;letter-spacing:5px;margin-top:2px}
 .lock-avatar{width:80px;height:80px;border-radius:50%;border:3px solid #FFD700;background:#111;display:flex;align-items:center;justify-content:center;font-size:36px;margin:22px 0 10px}
 .lock-dots{display:flex;gap:12px;margin:14px 0 22px}
-.lock-dot{width:14px;height:14px;border-radius:50%;border:2px solid #FFD700;background:transparent;transition:0.15s}
+.lock-dot{width:14px;height:14px;border-radius:50%;border:2px solid #FFD700;background:transparent}
 .lock-dot.fill{background:#FFD700}
 .lock-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:280px}
-.lock-key{background:rgba(255,255,255,0.12);border:1px solid rgba(255,215,0,0.5);color:#fff;width:80px;height:80px;border-radius:50%;font-size:26px;font-weight:bold;cursor:pointer;backdrop-filter:blur(4px)}
+.lock-key{background:rgba(255,255,255,0.12);border:1px solid rgba(255,215,0,0.5);color:#fff;width:80px;height:80px;border-radius:50%;font-size:26px;font-weight:bold;cursor:pointer}
 .lock-key:active{background:#FFD700;color:#000}
 .lock-key.empty{background:transparent;border:none}
 .lock-cancel{margin-top:22px;background:transparent;color:#fff;border:1px solid #fff;padding:10px 24px;border-radius:20px;cursor:pointer}
@@ -77,17 +77,14 @@ input{width:100%;padding:12px;border-radius:10px;border:1px solid #444;backgroun
 <p>Exclusive premium fashion for those who refuse to be ordinary. Limited edition. Handcrafted.</p>
 <div class="kategori-bar" id="kategoriBar"></div>
 </div>
-
 <div class="section" id="page-home">
 <div class="db-error" id="dbError"></div>
 <div class="grid" id="grid"><p style="grid-column:1/3;text-align:center;padding:20px">Loading dari Supabase...</p></div>
 </div>
-
 <div class="section" id="page-about" style="display:none">
 <h2>About <i>CASA MODA</i></h2><p style="text-align:left;max-width:none;margin-top:10px">CASA MODA adalah brand luxury dari Bandung. Premium material, handcrafted, limited stock. Dibuat oleh Ko Cheng, Bandung, 2026.</p>
 <p style="text-align:left;max-width:none;margin-top:10px">📍 Bandung, West Java<br>💬 WA: 0858-9061-1111<br>📦 Pengiriman seluruh Indonesia</p>
 </div>
-
 <div class="section" id="page-member" style="display:none">
 <h2>Login <i>Member</i></h2><p style="text-align:left;margin:0">Masuk pake akun lu, biar bisa checkout.</p>
 <input id="memberAkun" placeholder="Akun Member, contoh: andi123">
@@ -96,7 +93,6 @@ input{width:100%;padding:12px;border-radius:10px;border:1px solid #444;backgroun
 <button class="btn-add" onclick="daftarMember()">Daftar Baru</button>
 <div id="memberMsg" style="margin-top:10px;color:#FFD700"></div>
 </div>
-
 <div class="footer">© 2026 CASA MODA • Made with luxury in Bandung • Data dari Supabase Baru</div>
 <button class="chat-float" onclick="toggleBot()">💬</button>
 <div class="bot-box" id="botBox">
@@ -104,10 +100,8 @@ input{width:100%;padding:12px;border-radius:10px;border:1px solid #444;backgroun
 <div class="bot-msgs" id="botMsgs"><div class="msg-bot">Halo! Mau liat koleksi? Ketik 'populer' buat liat yang paling laris! 🔥</div></div>
 <div class="bot-input"><input id="botInput" placeholder="Ketik di sini..." onkeypress="if(event.key==='Enter') kirimBot()"><button onclick="kirimBot()">Kirim</button></div>
 </div>
-
 <div class="popup" id="popup"><div class="popup-box"><div style="padding:10px"><button class="close" onclick="closePopup()">✕</button></div><img id="pImg"><div class="popup-body"><small id="pCat" style="color:#FFD700"></small><h3 id="pName"></h3><div id="pPrice" style="color:#FFD700;font-weight:bold;font-size:18px"></div><p style="margin:10px 0;text-align:left;max-width:none" id="pDesc"></p><b>Pilih Ukuran:</b><br><div id="sizeBox"></div><button class="buy-btn" onclick="addToCart()">+ Add to Cart - <span id="pPrice2"></span></button></div></div></div>
 <div class="drawer" id="cartDrawer"><h2>🛒 Keranjang Lu <button onclick="closeCart()" style="float:right;background:none;border:none;color:#fff;font-size:22px">✕</button></h2><div id="cartItems" style="margin-top:15px"></div><div id="cartTotal" style="font-weight:bold;margin-top:10px;font-size:18px"></div><button class="buy-btn" onclick="checkout()">Checkout ke WhatsApp 💬</button></div>
-
 <div class="lock-screen" id="lockScreen">
 <div class="lock-logo">CASA MODA<span>LUXURY BANDUNG</span></div>
 <div class="lock-avatar">🔒</div>
@@ -116,7 +110,6 @@ input{width:100%;padding:12px;border-radius:10px;border:1px solid #444;backgroun
 <div class="lock-keypad" id="lockKeypad"></div>
 <button class="lock-cancel" onclick="closeLock()">Batal</button>
 </div>
-
 <script>
 const SUPABASE_URL = "https://tnpkepfjrltfryhuqnvo.supabase.co";
 const SUPABASE_KEY = "sb_publishable_D_RB0mj9X66SOlj9-4jgug_s7fvHEYO";
@@ -130,13 +123,8 @@ async function sb(method, table, body, query){
 const WA_NUMBER = "6285890611111";
 let products = []; let cart = []; let current = null; let selectedSize = "42"; let currentUser = null;
 let DB = { produk:[], member:[], bot:[], admin:[], pegawai:[] };
-let pendingAdmin = null;
-let pinInput = "";
-let pinSalahCount = 0;
-let dbLoaded = false;
-let kategoriAktif = 'populer';
-let KATEGORI_LIST = [];
-let URUTAN_KAT = ['populer'];
+let pendingAdmin = null; let pinInput = ""; let pinSalahCount = 0; let dbLoaded = false;
+let kategoriAktif = 'populer'; let KATEGORI_LIST = []; let URUTAN_KAT = ['populer'];
 let KAT_EMOJI = { Sepatu:'👟', Kemeja:'👔', Hoodie:'🧥', Dress:'👗', Jaket:'🧥', Tas:'👜', Topi:'🧢', Celana:'👖', Kaos:'👕', Kacamata:'🕶️', Jam:'⌚', Dompet:'👛' };
 function emojiKat(kat){ return KAT_EMOJI[kat] || '✨'; }
 function getNama(p){ return p.nama || 'Tanpa Nama'; }
@@ -154,25 +142,17 @@ async function loadProduk(){
     let admins = await sb("GET","admin","", "?select=*");
     let pegs = await sb("GET","pegawai","", "?select=*");
     DB = { produk: prods, member: members, bot: bots, admin: admins, pegawai: pegs };
-    dbLoaded = true;
-    document.getElementById('dbError').style.display='none';
+    dbLoaded = true; document.getElementById('dbError').style.display='none';
   }catch(e){
-    dbLoaded = false;
-    DB = { produk:[], member:[], bot:[], admin:[], pegawai:[] };
+    dbLoaded = false; DB = { produk:[], member:[], bot:[], admin:[], pegawai:[] };
     let el = document.getElementById('dbError'); el.style.display='block'; el.innerText = '⚠️ Gagal load Supabase: ' + e.message;
   }
-  products = DB.produk || [];
-  buildKategori();
-  renderProdukFiltered();
+  products = DB.produk || []; buildKategori(); renderProdukFiltered();
 }
 function buildKategori(){
   let seen = [];
-  produkReady().forEach(p=>{
-    let j = (p.jenis||'').trim();
-    if(j && !seen.includes(j)) seen.push(j);
-  });
-  KATEGORI_LIST = seen;
-  URUTAN_KAT = ['populer', ...seen];
+  produkReady().forEach(p=>{ let j = (p.jenis||'').trim(); if(j && !seen.includes(j)) seen.push(j); });
+  KATEGORI_LIST = seen; URUTAN_KAT = ['populer', ...seen];
   if(kategoriAktif !== 'populer' && !seen.includes(kategoriAktif)){ kategoriAktif = 'populer'; }
   let bar = document.getElementById('kategoriBar');
   let html = `<button class="kat-btn ${kategoriAktif==='populer'?'active':''}" data-kat="populer" onclick="pilihKategori('populer', this)">🔥 Populer</button>`;
@@ -189,8 +169,7 @@ function pilihKategori(kat, btn){
   else { let t=document.querySelector('.kat-btn[data-kat="'+kat+'"]'); if(t) t.classList.add('active'); }
   let aktifBtn = document.querySelector('.kat-btn[data-kat="'+kat+'"]');
   if(aktifBtn) aktifBtn.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
-  showPage('home');
-  renderProdukFiltered();
+  showPage('home'); renderProdukFiltered();
 }
 function geserKategori(arah){
   let idx = URUTAN_KAT.indexOf(kategoriAktif);
@@ -201,10 +180,7 @@ function geserKategori(arah){
   pilihKategori(URUTAN_KAT[next]);
 }
 function getPopuler(){ return produkReady().sort((a,b)=> Number(b.stok||0) - Number(a.stok||0)).slice(0,6); }
-function getFiltered(){
-  if(kategoriAktif === 'populer') return getPopuler();
-  return produkReady().filter(p=> String(p.jenis||'').toLowerCase() === kategoriAktif.toLowerCase());
-}
+function getFiltered(){ if(kategoriAktif === 'populer') return getPopuler(); return produkReady().filter(p=> String(p.jenis||'').toLowerCase() === kategoriAktif.toLowerCase()); }
 function kartuProduk(p, isPopuler){
   let idx = products.indexOf(p);
   return `<div class="card ${isPopuler?'populer':''}" onclick="openDetail(${idx})">${isPopuler?'<div class="badge-populer">🔥 TERLARIS</div>':''}<img src="${p.foto || ''}"><div class="card-body"><small>${p.jenis||''} • ${p.status||''}</small><h3>${getNama(p)}</h3><div>Ukuran: ${p.ukuran} • Stok: ${p.stok}</div><div class="price">${fmt(p.harga)}</div><button class="add" onclick="event.stopPropagation();openDetail(${idx})">Lihat Detail →</button></div></div>`;
@@ -212,12 +188,8 @@ function kartuProduk(p, isPopuler){
 function renderProdukFiltered(){
   let grid = document.getElementById('grid');
   if(produkReady().length===0){ grid.innerHTML='<div class="empty-box"><b>Belum ada produk Ready di Supabase</b><br><span style="font-size:13px;color:#ccc">Buka Admin, tambah produk baru, langsung nongol di sini.</span></div>'; return; }
-  let list = getFiltered();
-  let isPopuler = kategoriAktif === 'populer';
-  if(list.length===0){
-    grid.innerHTML = '<div class="empty-box"><b>Belum ada produk Ready di ' + kategoriAktif + '</b><br><span style="font-size:13px;color:#ccc">Produknya mungkin lagi Habis, jadi disembunyiin dari depan.</span><br><button onclick="pilihKategori(\'populer\')" style="background:#FFD700;border:none;padding:10px 18px;border-radius:12px;font-weight:bold;margin-top:12px;cursor:pointer">Lihat Populer</button></div>';
-    return;
-  }
+  let list = getFiltered(); let isPopuler = kategoriAktif === 'populer';
+  if(list.length===0){ grid.innerHTML = '<div class="empty-box"><b>Belum ada produk Ready di ' + kategoriAktif + '</b><br><span style="font-size:13px;color:#ccc">Produknya mungkin lagi Habis, jadi disembunyiin dari depan.</span><br><button onclick="pilihKategori(\'populer\')" style="background:#FFD700;border:none;padding:10px 18px;border-radius:12px;font-weight:bold;margin-top:12px;cursor:pointer">Lihat Populer</button></div>'; return; }
   grid.innerHTML = list.map(p=>kartuProduk(p, isPopuler)).join('');
 }
 function openDetail(i){ current=products[i]; if(isHabis(current)) return alert('Produk ini lagi Habis!'); selectedSize=String(current.ukuran||'').split(',')[0]||"42"; document.getElementById('pImg').src=current.foto||''; document.getElementById('pCat').innerText=(current.jenis||'')+" • "+(current.status||''); document.getElementById('pName').innerText=getNama(current); document.getElementById('pPrice').innerText=fmt(current.harga); document.getElementById('pPrice2').innerText=fmt(current.harga); document.getElementById('pDesc').innerText=(current.ket||'')+" Stok: "+current.stok+" • Premium material, handcrafted in Bandung. Limited stock!"; let sizes = String(current.ukuran||'42').split(',').map(s=>s.trim()).filter(Boolean); document.getElementById('sizeBox').innerHTML=sizes.map(s=>`<button class="size-btn ${s==selectedSize?'active':''}" onclick="pickSize(this)">${s}</button>`).join(''); document.getElementById('popup').classList.add('open'); }
@@ -243,17 +215,14 @@ async function daftarMember(){
     let cek = await sb("GET","member","", "?select=*&nama=eq."+encodeURIComponent(akun));
     if(cek && cek.length>0){ document.getElementById('memberMsg').innerText="Akun udah ada, tinggal login."; return; }
     await sb("POST","member", { nama:akun, password:pass, WA:"", tingkat:"Silver", alamat:"", saldo:0 }, "");
-    document.getElementById('memberMsg').innerText="Daftar berhasil! Sekarang login.";
-    await loadProduk();
-    loginMember();
+    document.getElementById('memberMsg').innerText="Daftar berhasil! Sekarang login."; await loadProduk(); loginMember();
   }catch(e){ document.getElementById('memberMsg').innerText="Gagal daftar: "+e.message; }
 }
 function checkout(){
   if(cart.length===0) return alert('Keranjang kosong!');
   if(!currentUser) return alert('Login Member dulu!'), showPage('member');
   let msg="Halo CASA MODA, saya mau order:\nMember: "+currentUser+"\n"; cart.forEach(c=>{ msg+="- "+getNama(c)+" Ukuran "+c.size+" "+fmt(c.harga)+"\n"; });
-  alert('Lanjut ke WA ya!');
-  cart=[]; document.getElementById('cartCount').innerText=0; closeCart();
+  alert('Lanjut ke WA ya!'); cart=[]; document.getElementById('cartCount').innerText=0; closeCart();
   window.open("https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent(msg), "_blank");
 }
 function toggleBot(){ document.getElementById('botBox').classList.toggle('open'); }
@@ -288,6 +257,7 @@ function tekanPin(angka){
 function cekPin(){
   if(!pendingAdmin){ closeLock(); return; }
   if(pinInput === String(pendingAdmin.pin).trim()){
+    sessionStorage.setItem('casa_login', JSON.stringify({code: pendingAdmin.code, role: pendingAdmin.role, at: Date.now()}));
     let tujuan = pendingAdmin.role === 'pegawai' ? 'pegawai.html' : 'ass.html';
     window.location.href = tujuan + '?code=' + encodeURIComponent(pendingAdmin.code);
     return;
@@ -313,22 +283,26 @@ function kirimBot(){
     return;
   }
   let botRow = (DB.bot||[]).find(b=> kata.includes(String(b.kata_kunci||'').toLowerCase()));
-  if(botRow){ botBalas(botRow.jawaban,false); }
+  if(botRow){ botBalas(botRow.jawaban,false); return; }
   if(kata.includes('populer')||kata.includes('terlaris')||kata.includes('laris')){
-    pilihKategori('populer');
-    botBalas("Nih yang paling laris! 🔥 Maksimal 6:", false);
-    getPopuler().forEach(p=>{ botBalasHTML(botKartuProduk(p)); });
-    return;
+    pilihKategori('populer'); botBalas("Nih yang paling laris! 🔥 Maksimal 6:", false);
+    getPopuler().forEach(p=>{ botBalasHTML(botKartuProduk(p)); }); return;
   }
   let katDariBot = KATEGORI_LIST.find(k=> kata.includes(k.toLowerCase()));
   if(katDariBot){ pilihKategori(katDariBot); botBalas("Nih koleksi " + katDariBot + " kita! 🔥 " + getFiltered().length + " produk", false); getFiltered().slice(0,5).forEach(p=>{ botBalasHTML(botKartuProduk(p)); }); return; }
   if(kata.includes('koleksi')||kata.includes('produk')||kata.includes('cari')||kata.includes('lihat')){ pilihKategori('populer'); if(produkReady().length===0){ botBalas("Belum ada produk Ready di Supabase!",false); return; } botBalas("Ini yang Populer! 🔥 Maksimal 6:",false); getPopuler().forEach(p=>{ botBalasHTML(botKartuProduk(p)); }); return; }
   let ketemu = produkReady().filter(p=> getNama(p).toLowerCase().includes(kata) || (p.jenis||'').toLowerCase().includes(kata));
   if(ketemu.length>0){ botBalas("Ketemu nih 🔥 Klik buat liat detailnya:",false); ketemu.forEach(p=>{ botBalasHTML(botKartuProduk(p)); }); return; }
-  if(!botRow) botBalas("Halo! Mau liat koleksi CASA MODA? Ketik 'populer' ya! 🔥",false);
+  botBalas("Halo! Mau liat koleksi CASA MODA? Ketik 'populer' ya! 🔥",false);
 }
 buildKeypad();
 loadProduk();
+document.addEventListener('keydown', (e)=>{
+  if(!document.getElementById('lockScreen').classList.contains('open')) return;
+  if(/^[0-9]$/.test(e.key)) tekanPin(e.key);
+  if(e.key==='Backspace') hapusPin();
+  if(e.key==='Escape') closeLock();
+});
 let swipeX = null, swipeY = null;
 let areaProduk = document.getElementById('page-home');
 areaProduk.addEventListener('touchstart', (e)=>{
@@ -344,13 +318,6 @@ areaProduk.addEventListener('touchend', (e)=>{
     else geserKategori(-1);
   }
 }, {passive:true});
-document.addEventListener('keydown', (e)=>{
-  if(!document.getElementById('lockScreen').classList.contains('open')) return;
-  if(/^[0-9]$/.test(e.key)) tekanPin(e.key);
-  if(e.key==='Backspace') hapusPin();
-  if(e.key==='Escape') closeLock();
-});
-window.addEventListener('pageshow', ()=>{ loadProduk(); });
 </script>
 </body>
 </html>
