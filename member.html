@@ -16,9 +16,8 @@ h2{font-size:22px;text-align:center} h2 i{color:#FFD700}
 input,button{width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #444;background:#222;color:#fff;font-size:15px}
 button{background:#FFD700;color:#000;border:none;font-weight:bold;cursor:pointer}
 button.abu{background:#222;color:#fff;border:1px solid #FFD700}
-.foto-wrap{text-align:center;position:relative;width:120px;height:120px;margin:14px auto}
+.foto-wrap{text-align:center;margin:14px auto}
 #fotoPreview{width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid #FFD700;background:#222}
-#btnFoto{position:absolute;bottom:0;right:0;width:36px;height:36px;border-radius:50%;padding:0;font-size:18px;background:#FFD700}
 .info{background:rgba(0,0,0,0.55);border:1px solid rgba(255,215,0,0.4);border-radius:12px;padding:14px;margin-top:10px;font-size:14px;line-height:1.9;text-align:left}
 .badge{display:inline-block;background:#FFD700;color:#000;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:bold}
 .hidden{display:none}
@@ -41,10 +40,8 @@ a{color:#FFD700}
   <h2>Profil <i>Member</i></h2>
   <div class="foto-wrap">
     <img id="fotoPreview" src="https://via.placeholder.com/120?text=CASA">
-    <button id="btnFoto" onclick="document.getElementById('inputFoto').click()">📸</button>
-    <input type="file" id="inputFoto" accept="image/*" style="display:none" onchange="uploadFoto(this)">
+    <p style="font-size:12px;color:#ccc;margin-top:6px">Foto profil nonaktif sementara biar login aman dulu</p>
   </div>
-  <p id="status2"></p>
   <div class="info" id="infoMember"></div>
   <button onclick="logout()" class="abu">KELUAR</button>
   <a href="index.html"><button class="abu" style="margin-top:4px">🛍️ Belanja Lagi</button></a>
@@ -55,77 +52,36 @@ const SUPABASE_URL = "https://tnpkepfjrltfryhuqnvo.supabase.co";
 const SUPABASE_KEY = "sb_publishable_D_RB0mj9X66SOlj9-4jgug_s7fvHEYO";
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let userSaatIni = null;
-
-// Bikin semua versi WA: 0858..., 62858..., +62858...
 function variasiWA(wa){
   let w = wa.replace(/[^0-9]/g,'');
   if(w.startsWith('62')) w = '0' + w.slice(2);
   if(!w.startsWith('0')) w = '0' + w;
-  let v1 = w; // 0858...
-  let v2 = '62' + w.slice(1); // 62858...
-  let v3 = '+' + v2;
-  return [...new Set([wa, v1, v2, v3])];
+  return [...new Set([wa, w, '62'+w.slice(1)])];
 }
-
 async function login(){
   const waRaw = document.getElementById('loginWa').value.trim();
   const pass = document.getElementById('loginPass').value.trim();
   if(!waRaw || !pass) return alert('Isi WA & Password dulu');
   document.getElementById('status').innerText = 'Mengecek...';
   let ketemu = null;
-  let lastError = '';
-  // Coba semua variasi WA
   for(let wa of variasiWA(waRaw)){
-    let { data, error } = await supabase.from('member').select('*').eq('wa', wa).eq('password', pass).maybeSingle();
-    if(data){ ketemu = data; break; }
-    if(error) lastError = error.message;
+    let { data } = await supabase.from('member').select('*').eq('wa', wa).eq('password', pass).maybeSingle();
+    if(data){ ketemu=data; break; }
   }
-  // Kalau masih gak ketemu, coba tanpa password dulu buat cek apakah WA-nya ketemu tapi password salah
   if(!ketemu){
-    for(let wa of variasiWA(waRaw)){
-      let { data } = await supabase.from('member').select('*').eq('wa', wa).maybeSingle();
-      if(data){
-        document.getElementById('status').innerText = 'WA ketemu, tapi Password salah! Cek password di kasir. (WA di DB: '+data.wa+')';
-        return;
-      }
-    }
-    document.getElementById('status').innerText = 'WA / Password salah! ' + (lastError ? 'Error: '+lastError : 'Coba cek RLS di Supabase masih nyala atau tidak.');
+    document.getElementById('status').innerText = 'WA / Password salah! Coba cek di admin, WA-nya sama gak?';
     return;
   }
-  userSaatIni = ketemu;
-  localStorage.setItem('casa_member', JSON.stringify(ketemu));
-  tampilProfil();
+  userSaatIni=ketemu; localStorage.setItem('casa_member', JSON.stringify(ketemu)); tampilProfil();
 }
 function tampilProfil(){
   if(!userSaatIni) return;
   document.getElementById('loginCard').classList.add('hidden');
   document.getElementById('profilCard').classList.remove('hidden');
+  // Kalau ada foto_url, tampilkan. Kalau gak ada, pake placeholder. GAK ADA UPLOAD, GAK BISA RUSAK!
   const foto = userSaatIni.foto_url || userSaatIni.foto || 'https://via.placeholder.com/120?text=CASA';
   document.getElementById('fotoPreview').src = foto;
-  document.getElementById('infoMember').innerHTML = `
-    <b>${userSaatIni.nama}</b> <span class="badge">${userSaatIni.tingkat || 'Member'}</span><br>
-    📱 ${userSaatIni.wa}<br>
-    🏠 ${userSaatIni.alamat || '-'} - ${userSaatIni.kota || ''}<br>
-    💰 Saldo: <b style="color:#FFD700">Rp ${(userSaatIni.saldo||0).toLocaleString('id-ID')}</b><br>
-    ⭐ Poin: ${userSaatIni.poin||0} | 🛍️ Total Belanja: Rp ${(userSaatIni.total_belanja||0).toLocaleString('id-ID')}
-  `;
-}
-async function uploadFoto(input){
-  const file = input.files[0];
-  if(!file) return;
-  if(!userSaatIni) return alert('Login dulu');
-  document.getElementById('status2').innerText = 'Uploading...';
-  const namaFile = `member-${userSaatIni.id}-${Date.now()}.jpg`;
-  const { error: upErr } = await supabase.storage.from('foto-profil').upload(namaFile, file, { upsert: true, contentType: file.type });
-  if(upErr){ document.getElementById('status2').innerText = 'Gagal upload: ' + upErr.message; return; }
-  const { data: urlData } = supabase.storage.from('foto-profil').getPublicUrl(namaFile);
-  const fotoUrl = urlData.publicUrl;
-  const { error: dbErr } = await supabase.from('member').update({ foto_url: fotoUrl }).eq('id', userSaatIni.id);
-  if(dbErr){ document.getElementById('status2').innerText = 'Gagal simpan: ' + dbErr.message; return; }
-  userSaatIni.foto_url = fotoUrl;
-  localStorage.setItem('casa_member', JSON.stringify(userSaatIni));
-  document.getElementById('fotoPreview').src = fotoUrl;
-  document.getElementById('status2').innerText = 'Foto tersimpan! ☁️✅';
+  document.getElementById('infoMember').innerHTML = `<b>${userSaatIni.nama}</b> <span class="badge">${userSaatIni.tingkat || 'Member'}</span><br>📱 ${userSaatIni.wa}<br>🏠 ${userSaatIni.alamat || '-'} - ${userSaatIni.kota || ''}<br>💰 Saldo: <b style="color:#FFD700">Rp ${(userSaatIni.saldo||0).toLocaleString('id-ID')}</b><br>⭐ Poin: ${userSaatIni.poin||0} | 🛍️ Total Belanja: Rp ${(userSaatIni.total_belanja||0).toLocaleString('id-ID')}`;
 }
 const saved = localStorage.getItem('casa_member');
 if(saved){ try{ userSaatIni = JSON.parse(saved); tampilProfil(); }catch(e){} }
