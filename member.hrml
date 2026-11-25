@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Member CASA MODA</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body{font-family:sans-serif;background:#111;color:#fff;padding:15px}
+input,button{width:100%;padding:12px;margin:6px 0;border-radius:10px;border:none}
+input{background:#222;color:#fff}
+button{background:#f5c518;color:#000;font-weight:bold}
+.tab{display:flex;gap:8px}
+.tab button{background:#222;color:#fff}
+.tab button.active{background:#f5c518;color:#000}
+.card{background:#222;padding:12px;border-radius:12px;margin:8px 0}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<h2>CASA MODA - MEMBER</h2>
+<div class="tab">
+  <button id="btnDaftar" class="active" onclick="showTab('daftar')">DAFTAR</button>
+  <button id="btnMasuk" onclick="showTab('masuk')">MASUK</button>
+</div>
+
+<!-- HALAMAN DAFTAR -->
+<div id="tab-daftar">
+  <input id="nama" placeholder="Nama">
+  <input id="wa_daftar" placeholder="No WA ex: 0812xxxx">
+  <input id="password_daftar" type="password" placeholder="Password">
+  <input id="alamat" placeholder="Alamat">
+  <input id="kota" placeholder="Kota">
+  <input id="email" placeholder="Email (boleh kosong)">
+  <input id="tanggal_lahir" type="date">
+  <button onclick="daftar()">DAFTAR JADI MEMBER</button>
+</div>
+
+<!-- HALAMAN MASUK -->
+<div id="tab-masuk" class="hidden">
+  <input id="wa_masuk" placeholder="No WA">
+  <input id="password_masuk" type="password" placeholder="Password">
+  <button onclick="masuk()">MASUK</button>
+  <div id="profil"></div>
+</div>
+
+<h3>LIST MEMBER</h3>
+<div id="list"></div>
+
+<script>
+const supabaseClient = supabase.createClient(
+  "https://tnpkepfjrltfryhuqnvo.supabase.co",
+  "sb_publishable_D_RB0mj9X66SOlj9-4jgug_s7fvHEYO"
+);
+
+function showTab(t){
+  document.getElementById('tab-daftar').classList.toggle('hidden', t!=='daftar');
+  document.getElementById('tab-masuk').classList.toggle('hidden', t!=='masuk');
+  document.getElementById('btnDaftar').classList.toggle('active', t==='daftar');
+  document.getElementById('btnMasuk').classList.toggle('active', t==='masuk');
+}
+
+async function daftar(){
+  const data = {
+    nama: document.getElementById('nama').value,
+    wa: document.getElementById('wa_daftar').value,
+    password: document.getElementById('password_daftar').value,
+    alamat: document.getElementById('alamat').value,
+    kota: document.getElementById('kota').value,
+    email: document.getElementById('email').value || null,
+    tanggal_lahir: document.getElementById('tanggal_lahir').value || null,
+    tingkat: 'Silver', saldo: 0, poin: 0, total_belanja: 0
+  };
+  if(!data.nama || !data.wa || !data.password){ alert('Nama, WA, Password wajib!'); return; }
+  const { error } = await supabaseClient.from('member').insert([data]);
+  if(error) alert(error.message);
+  else { alert('Berhasil daftar! Silahkan MASUK!'); showTab('masuk'); load(); }
+}
+
+async function masuk(){
+  const wa = document.getElementById('wa_masuk').value;
+  const pw = document.getElementById('password_masuk').value;
+  const { data, error } = await supabaseClient.from('member').select('*').eq('wa',wa).eq('password',pw).single();
+  if(error || !data){ alert('WA / Password salah!'); return; }
+  document.getElementById('profil').innerHTML = `
+    <div class="card">
+      <b>Selamat datang, ${data.nama}!</b><br>
+      Tingkat: ${data.tingkat}<br>
+      Poin: ${data.poin} | Saldo: Rp ${data.saldo}<br>
+      Total Belanja: Rp ${data.total_belanja}<br>
+      Kota: ${data.kota || '-'}
+    </div>`;
+  alert('Berhasil masuk!');
+}
+
+async function load(){
+  const { data } = await supabaseClient.from('member').select('*').order('id',{ascending:false});
+  document.getElementById('list').innerHTML = (data||[]).map(m=>`
+    <div class="card"><b>${m.nama}</b> - ${m.tingkat}<br>WA: ${m.wa} | Poin: ${m.poin} | Belanja: Rp ${m.total_belanja}</div>`).join('');
+}
+load();
+</script>
+</body>
+</html>
