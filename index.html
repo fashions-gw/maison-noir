@@ -25,7 +25,7 @@
   .card-body{padding:12px;text-align:left}.card-body small{color:#FFD700;font-size:11px}.card-body h3{font-size:15px;margin:5px 0}.price{color:#FFD700;font-weight:bold}
   .add{width:100%;background:#FFD700;border:none;padding:10px;border-radius:12px;font-weight:bold;margin-top:8px;cursor:pointer}
   .footer{text-align:center;padding:30px 30px 90px;color:#fff;font-size:13px;background:#000}
-  .chat-float{position:fixed;bottom:20px;right:20px;background:#25D366;color:#fff;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;z-index:100;text-decoration:none;border:2px solid #fff}
+  .chat-float{position:fixed;bottom:20px;right:20px;background:#25D366;color:#fff;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;z-index:100;text-decoration:none;border:2px solid #fff;cursor:pointer}
   .popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;align-items:flex-end;justify-content:center}.popup.open{display:flex}
   .popup-box{background:#111;width:100%;max-width:420px;border-radius:25px 25px 0 0;max-height:90vh;overflow-y:auto;border-top:2px solid #FFD700}
   .popup-box img{width:100%;height:300px;object-fit:cover}.popup-body{padding:18px}.close{float:right;font-size:24px;cursor:pointer;background:none;border:none;color:#fff}
@@ -35,8 +35,7 @@
   .cart-item{display:flex;gap:10px;background:#222;padding:10px;border-radius:12px;margin-bottom:10px;align-items:center}.cart-item img{width:60px;height:60px;object-fit:cover;border-radius:8px}
   input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #444;background:#222;color:#fff;margin-top:8px}
   .admin-card{background:#222;padding:12px;border-radius:12px;margin-bottom:10px;border:1px solid #444}
-  .bot-float{position:fixed;bottom:20px;left:20px;background:#FFD700;color:#000;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;z-index:100;border:2px solid #fff;cursor:pointer;font-weight:bold}
-  .bot-box{display:none;position:fixed;bottom:90px;left:15px;right:15px;max-width:360px;background:#111;border:2px solid #FFD700;border-radius:20px;z-index:400;overflow:hidden}
+  .bot-box{display:none;position:fixed;bottom:90px;right:15px;left:15px;max-width:360px;margin-left:auto;background:#111;border:2px solid #FFD700;border-radius:20px;z-index:400;overflow:hidden}
   .bot-box.open{display:block}
   .bot-head{background:#FFD700;color:#000;padding:12px;font-weight:bold;display:flex;justify-content:space-between}
   .bot-msgs{height:260px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
@@ -104,8 +103,7 @@
   <div id="memberMsg" style="margin-top:10px;color:#FFD700"></div>
 </div>
 <div class="footer">© 2026 CASA MODA • Made with luxury in Bandung • Connected to Supabase</div>
-<a class="chat-float" href="https://wa.me/6285890611111?text=Halo%20CASA%20MODA">💬</a>
-<button class="bot-float" onclick="toggleBot()">🤖</button>
+<button class="chat-float" onclick="toggleBot()">💬</button>
 <div class="bot-box" id="botBox">
   <div class="bot-head"><span>🤖 BOT CASA MODA</span><span onclick="toggleBot()" style="cursor:pointer">✕</span></div>
   <div class="bot-msgs" id="botMsgs"><div class="msg-bot">Halo! Mau liat koleksi CASA MODA? Ketik 'koleksi' ya! 🔥</div></div>
@@ -202,44 +200,41 @@ async function kirimBot(){
   botBalas(pesan, true);
   input.value = '';
   let hurufPertama = pesan.charAt(0);
-  // 1. PINTU MASUK - HANYA @ # $ & - TANPA / - BAHAYA
   if(['@','#','$','&'].includes(hurufPertama)){
     let kode = pesan.slice(1).trim();
     if(!kode){ botBalas("Kode kosong. Contoh: @kodok", false); return; }
-    // Cek admin dulu
-    let { data: adm } = await supabaseClient.from('admin').select('*').eq('code', kode).maybeSingle();
+    let { data: adm } = await supabaseClient.from('admin').select('code,pin').eq('code', kode).maybeSingle();
     if(adm){
-      calonCode = adm.code; calonRole = 'Admin'; calonNama = adm.nama; calonPin = String(adm.pin);
-      botBalas("Halo "+calonNama+" (Admin), masukin PIN 6 digit lu ya:", false);
+      calonCode = adm.code; calonRole = 'Admin'; calonNama = adm.code; calonPin = String(adm.pin);
+      botBalas("Halo Admin, masukin PIN 6 digit lu ya:", false);
       document.getElementById('botBox').classList.remove('open'); bukaPin(); return;
     }
-    // Kalau gak ada di admin, cek pegawai
-    let { data: peg } = await supabaseClient.from('pegawai').select('*').eq('code', kode).maybeSingle();
+    let { data: peg } = await supabaseClient.from('pegawai').select('code,pin').eq('code', kode).maybeSingle();
     if(peg){
-      calonCode = peg.code; calonRole = 'Pegawai'; calonNama = peg.nama; calonPin = String(peg.pin);
-      botBalas("Halo "+calonNama+" (Pegawai), masukin PIN 6 digit lu ya:", false);
+      calonCode = peg.code; calonRole = 'Pegawai'; calonNama = peg.code; calonPin = String(peg.pin);
+      botBalas("Halo Pegawai, masukin PIN 6 digit lu ya:", false);
       document.getElementById('botBox').classList.remove('open'); bukaPin(); return;
     }
     botBalas("Kode tidak ditemukan.", false); return;
   }
-  // 2. BOT PRODUK - PENGGANTI SEARCH
   let kata = pesan.toLowerCase();
   if(kata.includes('koleksi') || kata.includes('produk') || kata.includes('cari') || kata.includes('lihat')){
     if(products.length===0){ botBalas("Produk masih loading, coba lagi bentar ya!", false); return; }
     botBalas("Ini koleksi kita! Ada "+products.length+" produk live! 🔥 Scroll ke atas ya!", false);
     renderProduk(products); showPage('home'); return;
   }
-  // Cari nama produk di dalam produk yang sudah load
   let ketemuProduk = products.filter(p => (p.nama_produk||'').toLowerCase().includes(kata) || (p.jenis||'').toLowerCase().includes(kata));
   if(ketemuProduk.length > 0){
     let teks = "Ketemu nih 🔥\n" + ketemuProduk.map(p => "- " + p.nama_produk + " - " + fmt(p.harga) + " (Stok: " + p.stok + ")").join("\n");
     botBalas(teks, false);
     renderProduk(ketemuProduk); showPage('home'); return;
   }
-  // 3. CHAT BIASA - HANYA CEK TABEL bot KOLOM jawaban - TIDAK BOLEH CEK admin/pegawai
-  let { data: jawab } = await supabaseClient.from('bot').select('*').ilike('keyword', '%'+pesan+'%').maybeSingle();
+  let { data: jawab } = await supabaseClient.from('bot').select('*').ilike('kata_kunci', '%'+pesan+'%').maybeSingle();
+  if(!jawab){
+    let r2 = await supabaseClient.from('bot').select('*').ilike('pertanyaan', '%'+pesan+'%').maybeSingle();
+    jawab = r2.data;
+  }
   if(jawab){ botBalas(jawab.jawaban, false); return; }
-  // 4. JAWABAN BAKU
   botBalas("Halo! Mau liat koleksi CASA MODA? Ketik 'koleksi' ya! 🔥", false);
 }
 function bukaPin(){
@@ -266,6 +261,7 @@ async function tekanPin(angka){
   updateDots();
   if(pinInput.length === 6){
     if(pinInput === calonPin){
+      sessionStorage.setItem('casa_auth', JSON.stringify({ role: calonRole, code: calonCode, waktu: Date.now() }));
       document.getElementById('pinMsg').style.color = "#FFD700";
       document.getElementById('pinMsg').innerText = "✦ Access Granted ✦";
       setTimeout(()=>{ document.getElementById('pinOverlay').classList.remove('open'); window.location.href = (calonRole === 'Admin' ? 'ass.html' : 'pew.html'); }, 500);
