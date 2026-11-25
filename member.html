@@ -4,84 +4,64 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Member - CASA MODA</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Georgia',serif}
-body{background:#000;color:#fff;overflow-x:hidden}
-.hero{background:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.65)),url('background-emas.jpg');background-size:cover;padding:20px}
-.logo{font-size:22px;letter-spacing:3px;font-weight:bold}.logo span{color:#FFD700;font-size:11px;display:block;letter-spacing:5px}
-.section{padding:15px 20px 110px;background:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.65)),url('background-emas.jpg');background-size:cover;min-height:100vh}
-.card{background:rgba(0,0,0,0.55);border:1px solid rgba(255,215,0,0.6);border-radius:18px;padding:20px;max-width:480px;margin:auto;text-align:center}
-h2{font-size:22px} h2 i{color:#FFD700}
-input,button{width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #444;background:#222;color:#fff;font-size:15px}
-button{background:#FFD700;color:#000;border:none;font-weight:bold;cursor:pointer}
-button.abu{background:#222;color:#fff;border:1px solid #FFD700}
-.foto-wrap{text-align:center;margin:14px auto}
-#fotoPreview{width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid #FFD700;background:#222}
-.info{background:rgba(0,0,0,0.55);border:1px solid rgba(255,215,0,0.4);border-radius:12px;padding:14px;margin-top:10px;font-size:14px;line-height:1.9;text-align:left}
-.badge{display:inline-block;background:#FFD700;color:#000;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:bold}
+*{box-sizing:border-box;font-family:Arial,sans-serif}
+body{margin:0;background:#f5f5f5;padding:16px}
+.card{background:#fff;border-radius:16px;padding:20px;max-width:480px;margin:auto;box-shadow:0 4px 20px rgba(0,0,0,.08)}
+h2{text-align:center}
+input,button{width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #ddd;font-size:15px}
+button{background:#111;color:#fff;border:none;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.6}
+.foto-wrap{text-align:center;position:relative;width:120px;height:120px;margin:10px auto}
+#fotoPreview{width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid #111;background:#eee}
+#btnFoto{position:absolute;bottom:0;right:0;width:36px;height:36px;border-radius:50%;padding:0;font-size:18px;background:#111}
+.info{background:#f9f9f9;border-radius:12px;padding:12px;margin-top:10px;font-size:14px;line-height:1.8}
+.badge{display:inline-block;background:#eee;padding:2px 10px;border-radius:20px;font-size:12px}
 .hidden{display:none}
-#status{text-align:center;font-size:13px;color:#FFD700;min-height:18px;word-break:break-word}
-#infoKompres{text-align:center;font-size:12px;color:#aaa}
-a{color:#FFD700}
+#status{text-align:center;font-size:13px;color:#666;min-height:18px}
 </style>
 </head>
 <body>
-<div class="hero"><div class="logo">CASA MODA<span>MEMBER LUXURY</span></div></div>
-<div class="section">
+
 <div class="card" id="loginCard">
-  <h2>Login <i>Member</i><br>CASA MODA</h2>
-  <input id="loginWa" placeholder="No WA (contoh: 092123332321)">
+  <h2>Login Member<br>CASA MODA</h2>
+  <input id="loginWa" placeholder="No WA (contoh: 085890611111)">
   <input id="loginPass" type="password" placeholder="Password">
   <button onclick="login()">MASUK</button>
   <p id="status"></p>
-  <p style="font-size:13px;color:#ccc"><a href="index.html">← Kembali ke Katalog</a></p>
+  <p style="text-align:center;font-size:13px;color:#888">Belum punya akun? Daftar di kasir</p>
 </div>
+
 <div class="card hidden" id="profilCard">
-  <h2>Profil <i>Member</i></h2>
+  <h2>Profil Member</h2>
   <div class="foto-wrap">
     <img id="fotoPreview" src="https://via.placeholder.com/120?text=CASA">
-    <input type="file" id="inputFoto" accept="image/*" style="display:none" onchange="prosesFoto(event)">
-    <button class="abu" style="width:auto;padding:8px 16px;font-size:13px" onclick="document.getElementById('inputFoto').click()">📸 Ganti Foto</button>
-    <p id="infoKompres"></p>
+    <button id="btnFoto" onclick="document.getElementById('inputFoto').click()">📸</button>
+    <input type="file" id="inputFoto" accept="image/*" style="display:none" onchange="uploadFoto(this)">
   </div>
+  <p id="status"></p>
   <div class="info" id="infoMember"></div>
-  <button onclick="logout()" class="abu">KELUAR</button>
-  <a href="index.html"><button class="abu" style="margin-top:4px">🛍️ Belanja Lagi</button></a>
+  <button onclick="logout()" style="background:#eee;color:#111">KELUAR</button>
 </div>
-</div>
+
 <script>
-// FETCH KAYAK ADMIN - GAK PAKE supabase-js!
-const SUPABASE_URL = "https://tnpkepfjrltfryhuqnvo.supabase.co";
-const SUPABASE_KEY = "sb_publishable_D_RB0mj9X66SOlj9-4jgug_s7fvHEYO";
-const HEADERS = { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=representation" };
+// ==== GANTI 2 INI PAKE PUNYA LU ====
+const SUPABASE_URL = "https://URL-PROYEK-LU.supabase.co";
+const SUPABASE_KEY = "ANON-KEY-LU";
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 let userSaatIni = null;
 
-function variasiWA(wa){
-  let w = wa.replace(/[^0-9]/g,'').trim();
-  let list = [wa.trim(), w];
-  if(w.startsWith('62')) list.push('0' + w.slice(2));
-  if(w.startsWith('0')) list.push('62' + w.slice(1));
-  if(!w.startsWith('0') && !w.startsWith('62')) list.push('0' + w);
-  return [...new Set(list)];
-}
-
 async function login(){
-  const waRaw = document.getElementById('loginWa').value.trim();
+  const wa = document.getElementById('loginWa').value.trim();
   const pass = document.getElementById('loginPass').value.trim();
-  if(!waRaw || !pass) return alert('Isi WA & Password dulu');
+  if(!wa || !pass) return alert('Isi WA & Password dulu');
   document.getElementById('status').innerText = 'Mengecek...';
-  let ketemu = null;
-  for(let wa of variasiWA(waRaw)){
-    try{
-      let res = await fetch(SUPABASE_URL + "/rest/v1/member?select=*&wa=eq." + encodeURIComponent(wa) + "&password=eq." + encodeURIComponent(pass), { headers: HEADERS });
-      let data = await res.json();
-      if(data && data.length > 0){ ketemu = data[0]; break; }
-    }catch(e){ document.getElementById('status').innerText = 'Gagal: ' + e.message; return; }
-  }
-  if(!ketemu){ document.getElementById('status').innerText = 'WA / Password salah!'; return; }
-  userSaatIni = ketemu;
-  localStorage.setItem('casa_member', JSON.stringify(ketemu));
-  localStorage.setItem('casa_member_v2', JSON.stringify(ketemu));
+  const { data, error } = await supabase.from('member').select('*').eq('wa', wa).eq('password', pass).single();
+  if(error || !data){ document.getElementById('status').innerText = 'WA / Password salah!'; return; }
+  userSaatIni = data;
+  localStorage.setItem('casa_member', JSON.stringify(data));
   tampilProfil();
 }
 
@@ -89,71 +69,44 @@ function tampilProfil(){
   if(!userSaatIni) return;
   document.getElementById('loginCard').classList.add('hidden');
   document.getElementById('profilCard').classList.remove('hidden');
-  document.getElementById('fotoPreview').src = userSaatIni.foto_url || userSaatIni.foto || 'https://via.placeholder.com/120?text=CASA';
-  document.getElementById('infoMember').innerHTML = `<b>${userSaatIni.nama}</b> <span class="badge">${userSaatIni.tingkat || 'Member'}</span><br>📱 ${userSaatIni.wa}<br>🏠 ${userSaatIni.alamat || '-'} - ${userSaatIni.kota || ''}<br>💰 Saldo: <b style="color:#FFD700">Rp ${(userSaatIni.saldo||0).toLocaleString('id-ID')}</b><br>⭐ Poin: ${userSaatIni.poin||0} | 🛍️ Total Belanja: Rp ${(userSaatIni.total_belanja||0).toLocaleString('id-ID')}`;
+  // Foto: pake foto_url, kalau kosong pake foto lama, kalau kosong pake placeholder
+  const foto = userSaatIni.foto_url || userSaatIni.foto || 'https://via.placeholder.com/120?text=CASA';
+  document.getElementById('fotoPreview').src = foto;
+  document.getElementById('infoMember').innerHTML = `
+    <b>${userSaatIni.nama}</b> <span class="badge">${userSaatIni.tingkat || 'Member'}</span><br>
+    📱 ${userSaatIni.wa}<br>
+    🏠 ${userSaatIni.alamat || '-'} - ${userSaatIni.kota || ''}<br>
+    💰 Saldo: Rp ${(userSaatIni.saldo||0).toLocaleString('id-ID')}<br>
+    ⭐ Poin: ${userSaatIni.poin||0} | 🛍️ Total Belanja: Rp ${(userSaatIni.total_belanja||0).toLocaleString('id-ID')}
+  `;
 }
 
-// ========== KOMPRES FOTO BIAR DB GAK JEBOL ==========
-function kompresFoto(file){
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        // MAX 600x600 - kalau foto 4000px, dikecilin jadi 600px!
-        let w = img.width, h = img.height;
-        const MAX = 600;
-        if(w > MAX || h > MAX){
-          let ratio = Math.min(MAX / w, MAX / h);
-          w = Math.round(w * ratio); h = Math.round(h * ratio);
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        // Kualitas 0.6 = 60% - udah tajem buat foto profil, tapi enteng!
-        let hasil = canvas.toDataURL('image/jpeg', 0.6);
-        // Kalau masih gede > 150KB, kompres lagi lebih kecil!
-        if(hasil.length > 150 * 1024){
-          hasil = canvas.toDataURL('image/jpeg', 0.4);
-        }
-        resolve({ hasil, ukuranAwal: file.size, ukuranAkhir: Math.round(hasil.length * 0.75) });
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-async function prosesFoto(event){
-  const file = event.target.files[0];
+async function uploadFoto(input){
+  const file = input.files[0];
   if(!file) return;
-  if(!userSaatIni) return alert('Login dulu!');
-  if(file.size > 5 * 1024 * 1024) return alert('Fotonya kegedean! Max 5MB, pilih yang lebih kecil!');
-  document.getElementById('infoKompres').innerText = 'Mengompres foto... sabar...';
-  try{
-    const { hasil, ukuranAwal, ukuranAkhir } = await kompresFoto(file);
-    document.getElementById('fotoPreview').src = hasil;
-    document.getElementById('infoKompres').innerText = `Dari ${(ukuranAwal/1024).toFixed(0)}KB dikompres jadi ${(ukuranAkhir/1024).toFixed(0)}KB! Hemat ${Math.round(100 - (ukuranAkhir/ukuranAwal*100))}%! Lagi nyimpen...`;
-    // Simpen yang udah dikompres ke Supabase via PATCH
-    let res = await fetch(SUPABASE_URL + "/rest/v1/member?id=eq." + userSaatIni.id, {
-      method: "PATCH", headers: HEADERS,
-      body: JSON.stringify({ foto_url: hasil })
-    });
-    if(!res.ok) throw new Error('Gagal simpen ke DB');
-    userSaatIni.foto_url = hasil;
-    localStorage.setItem('casa_member', JSON.stringify(userSaatIni));
-    localStorage.setItem('casa_member_v2', JSON.stringify(userSaatIni));
-    document.getElementById('infoKompres').innerText = `✅ Berhasil! Foto udah ke-kompres jadi ${(ukuranAkhir/1024).toFixed(0)}KB, DB aman!`;
-  }catch(e){
-    document.getElementById('infoKompres').innerText = '❌ Gagal: ' + e.message;
-  }
-  event.target.value = '';
+  if(!userSaatIni) return alert('Login dulu');
+  document.getElementById('status').innerText = 'Uploading... Ke Database ☁️';
+  const namaFile = `member-${userSaatIni.id}-${Date.now()}.jpg`;
+  // 1. Upload ke bucket foto-profil
+  const { error: upErr } = await supabase.storage.from('foto-profil').upload(namaFile, file, { upsert: true, contentType: file.type });
+  if(upErr){ document.getElementById('status').innerText = 'Gagal upload: ' + upErr.message; return; }
+  // 2. Ambil URL public-nya
+  const { data: urlData } = supabase.storage.from('foto-profil').getPublicUrl(namaFile);
+  const fotoUrl = urlData.publicUrl;
+  // 3. Simpan URL ke tabel member
+  const { error: dbErr } = await supabase.from('member').update({ foto_url: fotoUrl }).eq('id', userSaatIni.id);
+  if(dbErr){ document.getElementById('status').innerText = 'Gagal simpan: ' + dbErr.message; return; }
+  userSaatIni.foto_url = fotoUrl;
+  localStorage.setItem('casa_member', JSON.stringify(userSaatIni));
+  document.getElementById('fotoPreview').src = fotoUrl;
+  document.getElementById('status').innerText = 'Foto tersimpan di Database! ☁️✅';
 }
 
-const saved = localStorage.getItem('casa_member') || localStorage.getItem('casa_member_v2');
-if(saved){ try{ userSaatIni = JSON.parse(saved); tampilProfil(); }catch(e){} }
-function logout(){ localStorage.removeItem('casa_member'); localStorage.removeItem('casa_member_v2'); location.reload(); }
+// Auto-login kalau udah pernah login
+const saved = localStorage.getItem('casa_member');
+if(saved){ userSaatIni = JSON.parse(saved); tampilProfil(); }
+
+function logout(){ localStorage.removeItem('casa_member'); location.reload(); }
 </script>
 </body>
 </html>
