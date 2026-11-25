@@ -13,7 +13,7 @@ body{background:#000;color:#fff;overflow-x:hidden}
 .logout{background:#FFD700;color:#000;padding:8px 16px;border-radius:20px;font-weight:bold;border:none;cursor:pointer}
 .admin-info{margin-top:15px;background:rgba(0,0,0,0.55);border:1px solid rgba(255,215,0,0.6);border-radius:18px;padding:14px;display:flex;gap:12px;align-items:center;text-align:left}
 .admin-info img{width:55px;height:55px;border-radius:50%;object-fit:cover;border:2px solid #FFD700}
-.section{padding:15px 20px 100px;background:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.65)),url('background-emas.jpg');background-size:cover;background-position:center;min-height:100vh}
+.section{padding:15px 20px 110px;background:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.65)),url('background-emas.jpg');background-size:cover;background-position:center;min-height:100vh}
 .section h2{font-size:22px;margin-bottom:12px}.section h2 i{color:#FFD700}
 .sub{font-size:12px;color:#ccc;text-align:left;margin-bottom:12px}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
@@ -44,8 +44,8 @@ input,select,textarea{width:100%;padding:12px;border-radius:10px;border:1px soli
 label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 .detail-row{display:flex;justify-content:space-between;font-size:13px;color:#ccc;padding:4px 0;border-bottom:1px dashed #333}
 .detail-row b{color:#fff;text-align:right;max-width:60%}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.92);border-top:1px solid #FFD700;display:flex;justify-content:space-around;padding:12px 0;z-index:99}
-.bottom-nav a{color:#fff;text-decoration:none;font-size:11px;text-align:center;cursor:pointer}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.95);border-top:1px solid #FFD700;display:flex;justify-content:space-around;padding:16px 0 18px;z-index:99}
+.bottom-nav a{color:#fff;text-decoration:none;font-size:13px;text-align:center;cursor:pointer;flex:1;line-height:1.5;padding:4px 2px}
 .bottom-nav a.active{color:#FFD700}
 .popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;align-items:flex-end;justify-content:center}.popup.open{display:flex}
 .popup-box{background:#111;width:100%;max-width:420px;border-radius:25px 25px 0 0;max-height:92vh;overflow-y:auto;border-top:2px solid #FFD700;padding:18px}
@@ -123,7 +123,6 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 <a id="nav-adminlist" onclick="navAdmin(this,'adminlist')">👥<br>Admin</a>
 <a id="nav-pegawai" onclick="navAdmin(this,'pegawai')">🧑‍💼<br>Pegawai</a>
 <a id="nav-pengaturan" onclick="navAdmin(this,'pengaturan')">⚙️<br>Pengaturan</a>
-<a onclick="logout()">🚪<br>Logout</a>
 </div>
 <div class="popup" id="popupDetail"><div class="popup-box"><button class="close" onclick="closeDetail()">✕</button><img id="dImg" style="width:100%;height:280px;object-fit:cover;border-radius:14px"><h3 id="dNama" style="margin-top:12px"></h3><div id="dHarga" style="color:#FFD700;font-weight:bold;font-size:18px"></div><div id="dDetail" style="margin-top:12px"></div><div class="btn-row"><button class="btn-edit" id="dEditBtn">✏️ Edit Produk Ini</button><button class="btn-hapus" onclick="closeDetail()">Tutup</button></div></div></div>
 <div class="popup" id="popupForm"><div class="popup-box"><button class="close" onclick="closeForm()">✕</button><h3 id="formTitle">Tambah Barang Baru</h3>
