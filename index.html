@@ -71,6 +71,7 @@ input{width:100%;padding:12px;border-radius:10px;border:1px solid #444;backgroun
 <a onclick="showPage('about')">✨ About Us</a>
 <a onclick="openCart()">🛒 Cart • <span id="cartCount">0</span></a>
 <a href="member.html">👤 Member</a>
+<a onclick="openTopUp()">💰 Top Up Saldo</a>
 <a href="https://wa.me/6285890611111">💬 Chat Admin</a>
 </div>
 <h1>Wear<br><em style="color:#FFD700">Your Power.</em></h1>
@@ -92,8 +93,8 @@ input{width:100%;padding:12px;border-radius:10px;border:1px solid #444;backgroun
 <div class="bot-msgs" id="botMsgs"><div class="msg-bot">Halo! Mau liat koleksi? Ketik 'populer' buat liat yang paling laris! 🔥</div></div>
 <div class="bot-input"><input id="botInput" placeholder="Ketik di sini..." onkeypress="if(event.key==='Enter') kirimBot()"><button onclick="kirimBot()">Kirim</button></div>
 </div>
-<div class="popup" id="popup"><div class="popup-box"><div style="padding:10px"><button class="close" onclick="closePopup()">✕</button></div><img id="pImg"><div class="popup-body"><small id="pCat" style="color:#FFD700"></small><h3 id="pName"></h3><div id="pPrice" style="color:#FFD700;font-weight:bold;font-size:18px"></div><p style="margin:10px 0;text-align:left;max-width:none" id="pDesc"></p><b>Pilih Ukuran:</b><br><div id="sizeBox"></div><button class="buy-btn" onclick="addToCart()">+ Add to Cart - <span id="pPrice2"></span></button></div></div></div>
-<div class="drawer" id="cartDrawer"><h2>🛒 Keranjang Lu <button onclick="closeCart()" style="float:right;background:none;border:none;color:#fff;font-size:22px">✕</button></h2><div id="cartItems" style="margin-top:15px"></div><div id="cartTotal" style="font-weight:bold;margin-top:10px;font-size:18px"></div><button class="buy-btn" onclick="checkout()">Checkout ke WhatsApp 💬</button></div>
+<div class="popup" id="popup"><div class="popup-box"><div style="padding:10px"><button class="close" onclick="closePopup()">✕</button></div><img id="pImg"><div class="popup-body"><small id="pCat" style="color:#FFD700"></small><h3 id="pName"></h3><div id="pPrice" style="color:#FFD700;font-weight:bold;font-size:18px"></div><p style="margin:10px 0;text-align:left;max-width:none" id="pDesc"></p><b>Pilih Ukuran:</b><br><div id="sizeBox"></div><button class="buy-btn" onclick="beliSekarang()">⚡ BELI SEKARANG - <span id="pPrice2"></span></button><button class="btn-add" onclick="addToCart()">🛒 + Add to Cart (Simpen Dulu)</button><div style="font-size:12px;color:#FFD700;margin-top:10px;text-align:center">Keranjang lu: <span id="cartInfoCount">0</span> barang • Saldo: <span id="saldoInfo">-</span> • Cek di Menu &gt; Cart / Member</div></div></div></div>
+<div class="drawer" id="cartDrawer"><h2>🛒 Keranjang Lu <button onclick="closeCart()" style="float:right;background:none;border:none;color:#fff;font-size:22px">✕</button></h2><div id="cartItems" style="margin-top:15px"></div><div id="cartTotal" style="font-weight:bold;margin-top:10px;font-size:18px"></div><div id="cartSaldo" style="font-size:13px;color:#FFD700;margin-top:6px"></div><button class="buy-btn" onclick="checkout()">💰 Bayar Pake Saldo</button><button class="btn-add" onclick="closeCart();openTopUp()">💰 Top Up Saldo Dulu</button><button class="btn-add" onclick="closeCart();window.location.href='member.html'">👤 Lihat di Member</button></div>
 <div class="lock-screen" id="lockScreen">
 <div class="lock-logo">CASA MODA<span>LUXURY BANDUNG</span></div>
 <div class="lock-avatar">🔒</div>
@@ -102,6 +103,19 @@ input{width:100%;padding:12px;border-radius:10px;border:1px solid #444;backgroun
 <div class="lock-keypad" id="lockKeypad"></div>
 <button class="lock-cancel" onclick="closeLock()">Batal</button>
 </div>
+<div class="popup" id="topupPopup"><div class="popup-box" style="padding:18px">
+<button class="close" onclick="closeTopUp()">✕</button>
+<h3>💰 TOP UP SALDO</h3>
+<p style="font-size:13px;color:#ccc">Saldo lu: <b id="topupSaldo" style="color:#FFD700">Rp 0</b></p>
+<label>Pilih Nominal:</label>
+<div id="nominalBox" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0"></div>
+<input id="topupNominalCustom" type="number" placeholder="Nominal lain, ex: 75000">
+<label style="margin-top:12px;display:block">Pilih Pembayaran:</label>
+<div id="payList"></div>
+<div id="payDetail" style="margin-top:12px"></div>
+<button class="buy-btn" id="btnKonfirmTopup" onclick="konfirmTopUp()" style="display:none">Saya Sudah Bayar / Transfer ✅</button>
+<div style="font-size:11px;color:#999;margin-top:10px;text-align:center">Pembayaran diverifikasi admin max 1x24 jam. Simpan bukti transfer lu ya!</div>
+</div></div>
 <script>
 const SUPABASE_URL = "https://tnpkepfjrltfryhuqnvo.supabase.co";
 const SUPABASE_KEY = "sb_publishable_D_RB0mj9X66SOlj9-4jgug_s7fvHEYO";
@@ -113,10 +127,10 @@ async function sb(method, table, body, query){
   let txt = await res.text(); return txt ? JSON.parse(txt) : [];
 }
 const WA_NUMBER = "6285890611111";
-// === KERANJANG NYAMBUNG KE MEMBER.HTML ===
 function loadCartFromStorage(){ try{ return JSON.parse(localStorage.getItem('casa_cart')||'[]'); }catch(e){ return []; } }
 function saveCartToStorage(){ localStorage.setItem('casa_cart', JSON.stringify(cart)); }
-function loadMemberFromStorage(){ try{ let m = JSON.parse(localStorage.getItem('casa_member')||'null'); return m ? m.nama : null; }catch(e){ return null; } }
+function loadMemberFromStorage(){ try{ let m = JSON.parse(localStorage.getItem('casa_member')||'null'); if(m && typeof m === 'string') return { nama: m }; return m; }catch(e){ return null; } }
+function updateCartUI(){ document.getElementById('cartCount').innerText = cart.length; let info = document.getElementById('cartInfoCount'); if(info) info.innerText = cart.length; if(currentUser && currentUser.saldo !== undefined){ let s = document.getElementById('saldoInfo'); if(s) s.innerText = fmt(currentUser.saldo); } }
 let products = []; let cart = loadCartFromStorage(); let current = null; let selectedSize = "42"; let currentUser = loadMemberFromStorage();
 let DB = { produk:[], member:[], bot:[], admin:[], pegawai:[] };
 let pendingAdmin = null; let pinInput = ""; let pinSalahCount = 0; let dbLoaded = false;
@@ -148,8 +162,10 @@ async function loadProduk(){
     dbLoaded = false; DB = { produk:[], member:[], bot:[], admin:[], pegawai:[] };
     let el = document.getElementById('dbError'); el.style.display='block'; el.innerText = '⚠️ Gagal load Supabase: ' + e.message;
   }
-  products = DB.produk || []; buildKategori(); renderProdukFiltered();
-  document.getElementById('cartCount').innerText = cart.length;
+  products = DB.produk || []; buildKategori(); renderProdukFiltered(); updateCartUI();
+  if(currentUser && currentUser.id){
+    try{ let r = await sb("GET","member","", "?select=*&id=eq."+currentUser.id); if(r[0]){ currentUser = r[0]; localStorage.setItem('casa_member', JSON.stringify(r[0])); updateCartUI(); } }catch(e){}
+  }
 }
 function buildKategori(){
   let seen = [];
@@ -194,19 +210,68 @@ function renderProdukFiltered(){
   if(list.length===0){ grid.innerHTML = '<div class="empty-box"><b>Belum ada produk Ready di ' + kategoriAktif + '</b><br><span style="font-size:13px;color:#ccc">Produknya mungkin lagi Habis, jadi disembunyiin dari depan.</span><br><button onclick="pilihKategori(\'populer\')" style="background:#FFD700;border:none;padding:10px 18px;border-radius:12px;font-weight:bold;margin-top:12px;cursor:pointer">Lihat Populer</button></div>'; return; }
   grid.innerHTML = list.map(p=>kartuProduk(p, isPopuler)).join('');
 }
-function openDetail(i){ current=products[i]; if(isHabis(current)) return alert('Produk ini lagi Habis!'); selectedSize=String(current.ukuran||'').split(',')[0]||"42"; document.getElementById('pImg').src=current.foto||''; document.getElementById('pCat').innerText=(current.jenis||'')+" • "+(current.status||''); document.getElementById('pName').innerText=getNama(current); document.getElementById('pPrice').innerText=fmt(current.harga); document.getElementById('pPrice2').innerText=fmt(current.harga); document.getElementById('pDesc').innerText=(current.ket||'')+" Stok: "+current.stok+" • Premium material, handcrafted in Bandung. Limited stock!"; let sizes = String(current.ukuran||'42').split(',').map(s=>s.trim()).filter(Boolean); document.getElementById('sizeBox').innerHTML=sizes.map(s=>`<button class="size-btn ${s==selectedSize?'active':''}" onclick="pickSize(this)">${s}</button>`).join(''); document.getElementById('popup').classList.add('open'); }
+function openDetail(i){ current=products[i]; if(isHabis(current)) return alert('Produk ini lagi Habis!'); selectedSize=String(current.ukuran||'').split(',')[0]||"42"; document.getElementById('pImg').src=current.foto||''; document.getElementById('pCat').innerText=(current.jenis||'')+" • "+(current.status||''); document.getElementById('pName').innerText=getNama(current); document.getElementById('pPrice').innerText=fmt(current.harga); document.getElementById('pPrice2').innerText=fmt(current.harga); document.getElementById('pDesc').innerText=(current.ket||'')+" Stok: "+current.stok+" • Premium material, handcrafted in Bandung. Limited stock!"; let sizes = String(current.ukuran||'42').split(',').map(s=>s.trim()).filter(Boolean); document.getElementById('sizeBox').innerHTML=sizes.map(s=>`<button class="size-btn ${s==selectedSize?'active':''}" onclick="pickSize(this)">${s}</button>`).join(''); document.getElementById('popup').classList.add('open'); updateCartUI(); }
 function closePopup(){ document.getElementById('popup').classList.remove('open'); }
 function pickSize(el){ document.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); selectedSize=el.innerText; }
-function addToCart(){ cart.push({...current, size:selectedSize}); saveCartToStorage(); document.getElementById('cartCount').innerText=cart.length; closePopup(); alert('Masuk keranjang! 🔥 '+getNama(current)+' Ukuran '+selectedSize+' - Cek di Member ya!'); }
-function openCart(){ document.getElementById('menuBox').style.display='none'; let html = cart.length===0 ? '<p>Keranjang masih kosong Bro, ayo belanja!</p>' : ''; let total=0; cart.forEach((c,idx)=>{ total+=Number(c.harga); html+=`<div class="cart-item"><img src="${c.foto||''}"><div style="flex:1"><b>${getNama(c)}</b><br><small>Ukuran: ${c.size}</small><br><span style="color:#FFD700">${fmt(c.harga)}</span></div><button onclick="removeItem(${idx})" style="background:none;border:none;color:#fff">✕</button></div>`; }); document.getElementById('cartItems').innerHTML=html; document.getElementById('cartTotal').innerText = cart.length ? 'Total: '+fmt(total) : ''; document.getElementById('cartDrawer').classList.add('open'); }
+function addToCart(){
+  cart.push({...current, size:selectedSize}); saveCartToStorage(); updateCartUI(); closePopup();
+  if(!currentUser || !currentUser.id){
+    let mau = confirm('Masuk keranjang! 🔥 '+getNama(current)+' Ukuran '+selectedSize+'\n\nKeranjang lu kesimpen di HP ini, cek di Menu > Cart.\n\nMau langsung Login Member biar keranjang lu keliatan di halaman Member?');
+    if(mau) window.location.href='member.html';
+  } else {
+    alert('Masuk keranjang! 🔥 '+getNama(current)+' Ukuran '+selectedSize+'\nCek di Menu > Cart atau di halaman Member ya!');
+  }
+}
+async function getMemberFresh(){
+  if(!currentUser || !currentUser.id) return null;
+  let r = await sb("GET","member","", "?select=*&id=eq."+currentUser.id);
+  if(r[0]){ currentUser = r[0]; localStorage.setItem('casa_member', JSON.stringify(r[0])); updateCartUI(); return r[0]; }
+  return currentUser;
+}
+async function beliSekarang(){
+  if(!currentUser || !currentUser.id){ alert('Login Member dulu biar bisa Beli!'); cart.push({...current, size:selectedSize}); saveCartToStorage(); updateCartUI(); window.location.href='member.html'; return; }
+  let harga = Number(current.harga||0);
+  let m = await getMemberFresh();
+  let saldo = Number(m.saldo||0);
+  if(saldo < harga){
+    let mau = confirm('Saldo lu '+fmt(saldo)+'\nHarga barang '+fmt(harga)+'\n\nSaldo KURANG! Mau Top Up sekarang via QRIS / GOPAY / DANA / OVO / Bank?');
+    if(mau){ closePopup(); openTopUp(); }
+    return;
+  }
+  let konfirm = confirm('Beli '+getNama(current)+' Ukuran '+selectedSize+'\nHarga: '+fmt(harga)+'\nSaldo lu: '+fmt(saldo)+'\nSisa saldo jadi: '+fmt(saldo-harga)+'\n\nLanjut potong saldo?');
+  if(!konfirm) return;
+  let saldoBaru = saldo - harga;
+  let poinBaru = Number(m.poin||0) + Math.floor(harga / 10000);
+  let belanjaBaru = Number(m.total_belanja||0) + harga;
+  await sb("PATCH","member", { saldo: saldoBaru, poin: poinBaru, total_belanja: belanjaBaru }, "?id=eq."+m.id);
+  m.saldo = saldoBaru; m.poin = poinBaru; m.total_belanja = belanjaBaru;
+  localStorage.setItem('casa_member', JSON.stringify(m)); currentUser = m; updateCartUI(); closePopup();
+  alert('BERHASIL BELI! 🎉\n'+getNama(current)+' Ukuran '+selectedSize+'\nSaldo terpotong: '+fmt(harga)+'\nSisa saldo: '+fmt(saldoBaru)+'\nPoin lu sekarang: '+poinBaru);
+}
+function openCart(){ document.getElementById('menuBox').style.display='none'; let html = cart.length===0 ? '<p>Keranjang masih kosong Bro, ayo belanja!</p>' : ''; let total=0; cart.forEach((c,idx)=>{ total+=Number(c.harga); html+=`<div class="cart-item"><img src="${c.foto||''}"><div style="flex:1"><b>${getNama(c)}</b><br><small>Ukuran: ${c.size}</small><br><span style="color:#FFD700">${fmt(c.harga)}</span></div><button onclick="removeItem(${idx})" style="background:none;border:none;color:#fff">✕</button></div>`; }); document.getElementById('cartItems').innerHTML=html; document.getElementById('cartTotal').innerText = cart.length ? 'Total: '+fmt(total) : ''; document.getElementById('cartSaldo').innerText = currentUser ? 'Saldo lu: '+fmt(currentUser.saldo||0) : 'Login dulu buat liat saldo'; document.getElementById('cartDrawer').classList.add('open'); }
 function closeCart(){ document.getElementById('cartDrawer').classList.remove('open'); }
-function removeItem(i){ cart.splice(i,1); saveCartToStorage(); document.getElementById('cartCount').innerText=cart.length; openCart(); }
-function checkout(){
+function removeItem(i){ cart.splice(i,1); saveCartToStorage(); updateCartUI(); openCart(); }
+async function checkout(){
   if(cart.length===0) return alert('Keranjang kosong!');
-  if(!currentUser){ alert('Login Member dulu!'); window.location.href='member.html'; return; }
-  let msg="Halo CASA MODA, saya mau order:\nMember: "+currentUser+"\n"; cart.forEach(c=>{ msg+="- "+getNama(c)+" Ukuran "+c.size+" "+fmt(c.harga)+"\n"; });
-  alert('Lanjut ke WA ya!'); cart=[]; saveCartToStorage(); document.getElementById('cartCount').innerText=0; closeCart();
-  window.open("https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent(msg), "_blank");
+  if(!currentUser || !currentUser.id){ alert('Login Member dulu!'); window.location.href='member.html'; return; }
+  let total = cart.reduce((s,c)=> s + Number(c.harga||0), 0);
+  let m = await getMemberFresh();
+  let saldo = Number(m.saldo||0);
+  if(saldo < total){
+    let mau = confirm('Total keranjang '+fmt(total)+'\nSaldo lu '+fmt(saldo)+'\n\nSaldo KURANG! Mau Top Up sekarang via QRIS / GOPAY / DANA / OVO / Bank?');
+    if(mau){ closeCart(); openTopUp(); }
+    return;
+  }
+  let konfirm = confirm('Checkout '+cart.length+' barang?\nTotal: '+fmt(total)+'\nSaldo lu: '+fmt(saldo)+'\nSisa: '+fmt(saldo-total)+'\n\nLanjut potong saldo?');
+  if(!konfirm) return;
+  let saldoBaru = saldo - total;
+  let poinBaru = Number(m.poin||0) + Math.floor(total / 10000);
+  let belanjaBaru = Number(m.total_belanja||0) + total;
+  await sb("PATCH","member", { saldo: saldoBaru, poin: poinBaru, total_belanja: belanjaBaru, keranjang: [] }, "?id=eq."+m.id);
+  m.saldo = saldoBaru; m.poin = poinBaru; m.total_belanja = belanjaBaru;
+  localStorage.setItem('casa_member', JSON.stringify(m)); currentUser = m;
+  alert('CHECKOUT BERHASIL! 🎉\nTotal dipotong: '+fmt(total)+'\nSisa saldo: '+fmt(saldoBaru)+'\nPoin: '+poinBaru);
+  cart=[]; saveCartToStorage(); updateCartUI(); closeCart();
 }
 function toggleBot(){ document.getElementById('botBox').classList.toggle('open'); }
 function botBalas(teks, isUser){ let div=document.createElement('div'); div.className=isUser?'msg-user':'msg-bot'; div.innerText=teks; document.getElementById('botMsgs').appendChild(div); document.getElementById('botMsgs').scrollTop=99999; }
@@ -278,9 +343,106 @@ function kirimBot(){
   if(ketemu.length>0){ botBalas("Ketemu nih 🔥 Klik buat liat detailnya:",false); ketemu.forEach(p=>{ botBalasHTML(botKartuProduk(p)); }); return; }
   botBalas("Halo! Mau liat koleksi CASA MODA? Ketik 'populer' ya! 🔥",false);
 }
+// ===== TOP UP - LOGO PAKE SCRIPT, QRIS PAKE FOTO ASLI LU =====
+function logoPay(nama){
+  let s = {
+    'QRIS': '<div style="background:#fff;color:#000;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">QRIS<span style="color:#E4002B">•</span><span style="color:#0057A8">•</span></div>',
+    'GOPAY': '<div style="background:#00AED6;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">GOPAY</div>',
+    'DANA': '<div style="background:#118EEA;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">DANA</div>',
+    'OVO': '<div style="background:#4C2A85;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">OVO</div>',
+    'MANDIRI': '<div style="background:#003A8C;color:#FFD700;border-radius:8px;padding:6px 10px;font-weight:900;font-size:12px">mandiri</div>',
+    'BRI': '<div style="background:#00529C;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">BRI</div>',
+    'BCA': '<div style="background:#0060AF;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:13px">BCA</div>'
+  };
+  return s[nama] || nama;
+}
+const PAY_INFO = {
+  'QRIS': { title:'QRIS - Scan di Semua Aplikasi', desc:'Buka GOPAY / DANA / OVO / M-Banking lu, scan QR di bawah.', qris:true },
+  'GOPAY': { title:'GOPAY', desc:'Transfer ke GOPAY:', nomor:'0858-9061-1111', nama:'KO CHENG - CASA MODA' },
+  'DANA': { title:'DANA', desc:'Transfer ke DANA:', nomor:'0858-9061-1111', nama:'KO CHENG - CASA MODA' },
+  'OVO': { title:'OVO', desc:'Transfer ke OVO:', nomor:'0858-9061-1111', nama:'KO CHENG - CASA MODA' },
+  'MANDIRI': { title:'Bank Mandiri', desc:'Transfer ke Mandiri:', nomor:'137-00-1234567-8', nama:'KO CHENG' },
+  'BRI': { title:'Bank BRI', desc:'Transfer ke BRI:', nomor:'1234-01-012345-67-8', nama:'KO CHENG' },
+  'BCA': { title:'Bank BCA', desc:'Transfer ke BCA:', nomor:'123-456-7890', nama:'KO CHENG' }
+};
+let topupNominal = 50000;
+let topupMetode = 'QRIS';
+// QRIS pake FOTO ASLI lu - bukan gambar script lagi!
+function getQrisFoto(){
+  let upload = localStorage.getItem('casa_qris_foto');
+  if(upload) return upload;
+  return 'qris.jpg';
+}
+function gantiQris(event){
+  let file = event.target.files[0];
+  if(!file) return;
+  let reader = new FileReader();
+  reader.onload = function(e){
+    localStorage.setItem('casa_qris_foto', e.target.result);
+    alert('Foto QRIS berhasil diganti! ✅');
+    renderPayDetail();
+  };
+  reader.readAsDataURL(file);
+}
+async function openTopUp(){
+  if(!currentUser || !currentUser.id){ alert('Login Member dulu!'); window.location.href='member.html'; return; }
+  document.getElementById('menuBox').style.display='none';
+  document.getElementById('topupPopup').classList.add('open');
+  let m = await getMemberFresh();
+  document.getElementById('topupSaldo').innerText = fmt(m ? m.saldo : 0);
+  renderNominal(); renderPayList(); renderPayDetail();
+}
+function closeTopUp(){ document.getElementById('topupPopup').classList.remove('open'); }
+function renderNominal(){
+  let list = [20000,50000,100000,200000,500000,1000000];
+  document.getElementById('nominalBox').innerHTML = list.map(n=>`<button onclick="pilihNominal(${n})" style="background:${topupNominal===n?'#FFD700':'#222'};color:${topupNominal===n?'#000':'#fff'};border:1px solid #FFD700;padding:10px 14px;border-radius:10px;font-weight:bold;cursor:pointer">${fmt(n)}</button>`).join('');
+}
+function pilihNominal(n){ topupNominal = n; document.getElementById('topupNominalCustom').value=''; renderNominal(); renderPayDetail(); }
+function renderPayList(){
+  let methods = ['QRIS','GOPAY','DANA','OVO','MANDIRI','BRI','BCA'];
+  document.getElementById('payList').innerHTML = methods.map(m=>`
+    <div onclick="pilihPay('${m}')" style="display:flex;align-items:center;gap:10px;background:${topupMetode===m?'#FFD700':'#222'};color:${topupMetode===m?'#000':'#fff'};padding:10px;border-radius:12px;margin-top:8px;cursor:pointer">
+      ${logoPay(m)} <b>${PAY_INFO[m].title}</b> <span style="margin-left:auto">${topupMetode===m?'✅':''}</span>
+    </div>`).join('');
+}
+function pilihPay(m){ topupMetode = m; renderPayList(); renderPayDetail(); }
+function renderPayDetail(){
+  let custom = Number(document.getElementById('topupNominalCustom').value||0);
+  let nominal = custom>0 ? custom : topupNominal;
+  let info = PAY_INFO[topupMetode];
+  let el = document.getElementById('payDetail');
+  let html = `<div style="background:#222;padding:14px;border-radius:12px"><b>${info.title}</b><br><span style="font-size:13px;color:#ccc">${info.desc}</span><br><b style="font-size:18px;color:#FFD700">Transfer: ${fmt(nominal)}</b><br>`;
+  if(info.qris){
+    html += `<div style="text-align:center;margin:12px 0">
+      <img src="${getQrisFoto()}" onerror="this.style.display='none';document.getElementById('qrisKosong').style.display='block'" style="width:230px;height:230px;object-fit:contain;background:#fff;border-radius:12px;padding:10px" alt="QRIS CASA MODA">
+      <div id="qrisKosong" style="display:none;background:#fff;color:#000;border-radius:12px;padding:20px;margin:0 auto;max-width:230px">Belum ada foto QRIS!<br><small>Klik tombol di bawah buat upload foto QRIS lu</small></div>
+      <br><b>CASA MODA</b><br><small>Scan pake GOPAY / DANA / OVO / M-Banking</small><br>
+      <label style="display:inline-block;margin-top:10px;background:#222;border:1px dashed #FFD700;padding:8px 12px;border-radius:10px;font-size:12px;cursor:pointer;color:#fff">📸 Ganti Foto QRIS (Admin)<input type="file" accept="image/*" onchange="gantiQris(event)" style="display:none"></label>
+    </div>`;
+    html += `<small>Setelah scan, pencet "Saya Sudah Bayar" di bawah, admin akan verifikasi & saldo masuk max 1x24 jam.</small>`;
+  } else {
+    html += `<div style="background:#000;padding:10px;border-radius:10px;margin:10px 0;display:flex;justify-content:space-between;align-items:center"><span><b style="font-size:18px">${info.nomor}</b><br><small>a.n ${info.nama}</small></span><button onclick="salinNomor('${info.nomor}')" style="background:#FFD700;border:none;padding:8px 12px;border-radius:8px;font-weight:bold">Salin</button></div>`;
+    html += `<small>Transfer sesuai nominal, jangan lupa simpan bukti. Pencet "Saya Sudah Bayar" setelah transfer.</small>`;
+  }
+  html += `</div>`;
+  el.innerHTML = html;
+  document.getElementById('btnKonfirmTopup').style.display='block';
+}
+function salinNomor(n){ if(navigator.clipboard) navigator.clipboard.writeText(n); alert('Disalin: '+n); }
+async function konfirmTopUp(){
+  let custom = Number(document.getElementById('topupNominalCustom').value||0);
+  let nominal = custom>0 ? custom : topupNominal;
+  if(!nominal || nominal < 10000) return alert('Minimal Top Up Rp 10.000');
+  let riwayat = JSON.parse(localStorage.getItem('casa_topup')||'[]');
+  riwayat.push({ member: currentUser.nama, member_id: currentUser.id, nominal, metode: topupMetode, at: new Date().toISOString(), status:'Menunggu Verifikasi' });
+  localStorage.setItem('casa_topup', JSON.stringify(riwayat));
+  alert('Request Top Up Terkirim! 🎉\nNominal: '+fmt(nominal)+'\nVia: '+topupMetode+'\n\nAdmin akan cek & masukin saldo lu max 1x24 jam. Simpan bukti transfer lu ya!');
+  closeTopUp();
+}
+document.getElementById('topupNominalCustom').addEventListener('input', renderPayDetail);
 buildKeypad();
 loadProduk();
-document.getElementById('cartCount').innerText = cart.length;
+updateCartUI();
 document.addEventListener('keydown', (e)=>{
   if(!document.getElementById('lockScreen').classList.contains('open')) return;
   if(/^[0-9]$/.test(e.key)) tekanPin(e.key);
