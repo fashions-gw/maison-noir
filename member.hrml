@@ -15,6 +15,8 @@ button{background:#f5c518;color:#000;font-weight:bold}
 .tab button.active{background:#f5c518;color:#000}
 .card{background:#222;padding:12px;border-radius:12px;margin:8px 0}
 .hidden{display:none}
+.cart-item{display:flex;gap:10px;background:#333;padding:10px;border-radius:12px;margin-bottom:8px;align-items:center}
+.cart-item img{width:60px;height:60px;object-fit:cover;border-radius:8px}
 </style>
 </head>
 <body>
@@ -25,7 +27,6 @@ button{background:#f5c518;color:#000;font-weight:bold}
   <button id="btnMasuk" onclick="showTab('masuk')">MASUK</button>
 </div>
 
-<!-- HALAMAN DAFTAR -->
 <div id="tab-daftar">
   <input id="nama" placeholder="Nama">
   <input id="wa_daftar" placeholder="No WA ex: 0812xxxx">
@@ -37,12 +38,16 @@ button{background:#f5c518;color:#000;font-weight:bold}
   <button onclick="daftar()">DAFTAR JADI MEMBER</button>
 </div>
 
-<!-- HALAMAN MASUK -->
 <div id="tab-masuk" class="hidden">
   <input id="wa_masuk" placeholder="No WA">
   <input id="password_masuk" type="password" placeholder="Password">
   <button onclick="masuk()">MASUK</button>
   <div id="profil"></div>
+  <h3>🛒 KERANJANG KAMU</h3>
+  <div id="keranjangList"><p style="color:#aaa">Belum ada barang di keranjang.</p></div>
+  <div id="keranjangTotal" style="font-weight:bold;margin-top:8px"></div>
+  <button id="btnCheckout" class="hidden" onclick="checkoutWA()" style="background:#25D366;color:#fff">Checkout ke WhatsApp 💬</button>
+  <button onclick="kosongkanKeranjang()" style="background:#333;color:#fff">Kosongkan Keranjang</button>
 </div>
 
 <h3>LIST MEMBER</h3>
@@ -53,6 +58,7 @@ const supabaseClient = supabase.createClient(
   "https://tnpkepfjrltfryhuqnvo.supabase.co",
   "sb_publishable_D_RB0mj9X66SOlj9-4jgug_s7fvHEYO"
 );
+let userLogin = null;
 
 function showTab(t){
   document.getElementById('tab-daftar').classList.toggle('hidden', t!=='daftar');
@@ -60,6 +66,8 @@ function showTab(t){
   document.getElementById('btnDaftar').classList.toggle('active', t==='daftar');
   document.getElementById('btnMasuk').classList.toggle('active', t==='masuk');
 }
+function getCart(){ try{ return JSON.parse(localStorage.getItem('casa_cart')||'[]'); }catch(e){ return []; } }
+function saveCart(c){ localStorage.setItem('casa_cart', JSON.stringify(c)); }
 
 async function daftar(){
   const data = {
@@ -70,7 +78,7 @@ async function daftar(){
     kota: document.getElementById('kota').value,
     email: document.getElementById('email').value || null,
     tanggal_lahir: document.getElementById('tanggal_lahir').value || null,
-    tingkat: 'Silver', saldo: 0, poin: 0, total_belanja: 0
+    tingkat: 'Silver', saldo: 0, poin: 0, total_belanja: 0, keranjang: []
   };
   if(!data.nama || !data.wa || !data.password){ alert('Nama, WA, Password wajib!'); return; }
   const { error } = await supabaseClient.from('member').insert([data]);
@@ -83,6 +91,8 @@ async function masuk(){
   const pw = document.getElementById('password_masuk').value;
   const { data, error } = await supabaseClient.from('member').select('*').eq('wa',wa).eq('password',pw).single();
   if(error || !data){ alert('WA / Password salah!'); return; }
+  userLogin = data;
+  localStorage.setItem('casa_member', JSON.stringify(data));
   document.getElementById('profil').innerHTML = `
     <div class="card">
       <b>Selamat datang, ${data.nama}!</b><br>
@@ -91,15 +101,58 @@ async function masuk(){
       Total Belanja: Rp ${data.total_belanja}<br>
       Kota: ${data.kota || '-'}
     </div>`;
+  // Kalau di database ada keranjang, gabungin sama local
+  if(data.keranjang && data.keranjang.length>0){
+    let lokal = getCart();
+    let gabung = [...lokal, ...data.keranjang];
+    saveCart(gabung);
+  }
+  tampilKeranjang();
   alert('Berhasil masuk!');
+}
+
+function tampilKeranjang(){
+  let cart = getCart();
+  let el = document.getElementById('keranjangList');
+  let totalEl = document.getElementById('keranjangTotal');
+  let btn = document.getElementById('btnCheckout');
+  if(cart.length===0){
+    el.innerHTML = '<p style="color:#aaa">Belum ada barang. Balik ke Home, pilih dulu!</p>';
+    totalEl.innerHTML = ''; btn.classList.add('hidden'); return;
+  }
+  let total = 0;
+  el.innerHTML = cart.map((c,i)=>{
+    total += Number(c.harga||0);
+    return `<div class="cart-item"><img src="${c.foto||''}"><div style="flex:1"><b>${c.nama||c.name||'Produk'}</b><br><small>Ukuran: ${c.size||c.ukuran||'-'}</small><br><span style="color:#f5c518">Rp ${Number(c.harga||0).toLocaleString('id-ID')}</span></div><button onclick="hapusItem(${i})" style="width:auto;background:none;color:#fff">✕</button></div>`;
+  }).join('');
+  totalEl.innerHTML = 'Total: Rp ' + total.toLocaleString('id-ID');
+  btn.classList.remove('hidden');
+  // Simpan juga ke database member kalau udah login
+  if(userLogin) supabaseClient.from('member').update({keranjang: cart}).eq('id', userLogin.id);
+}
+
+function hapusItem(i){
+  let cart = getCart(); cart.splice(i,1); saveCart(cart); tampilKeranjang();
+}
+function kosongkanKeranjang(){ saveCart([]); tampilKeranjang(); }
+function checkoutWA(){
+  let cart = getCart();
+  if(cart.length===0) return alert('Keranjang kosong!');
+  let msg = "Halo CASA MODA, saya mau order:\nMember: " + (userLogin ? userLogin.nama + " ("+userLogin.wa+")" : "-") + "\n";
+  cart.forEach(c=>{ msg += "- " + (c.nama||'Produk') + " Ukuran " + (c.size||'-') + " Rp " + Number(c.harga||0).toLocaleString('id-ID') + "\n"; });
+  window.open("https://wa.me/6285890611111?text="+encodeURIComponent(msg), "_blank");
 }
 
 async function load(){
   const { data } = await supabaseClient.from('member').select('*').order('id',{ascending:false});
   document.getElementById('list').innerHTML = (data||[]).map(m=>`
-    <div class="card"><b>${m.nama}</b> - ${m.tingkat}<br>WA: ${m.wa} | Poin: ${m.poin} | Belanja: Rp ${m.total_belanja}</div>`).join('');
+    <div class="card"><b>${m.nama}</b> - ${m.tingkat}<br>WA: ${m.wa} | Poin: ${m.poin} | Belanja: Rp ${m.total_belanja}<br>Keranjang: ${(m.keranjang||[]).length} item</div>`).join('');
 }
 load();
+// Kalau udah pernah login, langsung tampilin keranjang
+let saved = localStorage.getItem('casa_member');
+if(saved){ userLogin = JSON.parse(saved); }
+tampilKeranjang();
 </script>
 </body>
 </html>
