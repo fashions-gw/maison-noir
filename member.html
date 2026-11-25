@@ -50,7 +50,7 @@ input.locked{background:#333;border-color:#222;color:#888}
 <div id="boxDaftar" style="display:none">
 <input id="dNama" placeholder="Nama Lengkap" autocomplete="off">
 <input id="dWa" type="tel" inputmode="numeric" placeholder="No WA, ex: 085890611111" autocomplete="off">
-<div class="hint">Minimal 10 digit, cuma angka, harus diawali 08</div>
+<div class="hint">Minimal 10 digit, cuma angka, harus diawali 0 (boleh 08 / 09)</div>
 <input id="dPass" type="password" placeholder="Password (min 6 karakter)" autocomplete="new-password">
 <div class="hint">Minimal 6 karakter, jangan cuma 1 huruf 😂</div>
 <button class="buy-btn" onclick="daftar()">Daftar Member ✨</button>
@@ -63,17 +63,17 @@ input.locked{background:#333;border-color:#222;color:#888}
 </div>
 
 <div id="memberBox" style="display:none">
-<div style="background:linear-gradient(135deg,#FFD700,#FFE99A,#FFD700);border-radius:20px;padding:18px;margin-top:14px;color:#000;box-shadow:0 10px 25px rgba(255,215,0,.25)">
-  <div style="display:flex;gap:12px;align-items:flex-start">
-    <div style="flex:1;min-width:0">
+<div style="background:linear-gradient(135deg,#FFD700,#FFE99A,#FFD700);border-radius:20px;padding:16px 14px 16px 16px;margin-top:14px;color:#000;box-shadow:0 10px 25px rgba(255,215,0,.25);overflow:hidden">
+  <div style="display:flex;gap:8px;align-items:flex-start">
+    <div style="flex:1;min-width:0;max-width:calc(100% - 92px)">
       <div style="font-size:14px;font-weight:bold">Halo <span id="namaMember">Ko Cheng</span></div>
       <div style="font-size:13px;margin-top:2px">👑 <span id="levelMember">Gold member</span></div>
-      <div style="font-size:16px;font-weight:bold;margin-top:14px">Saldo</div>
-      <div id="saldoMember" style="font-size:30px;font-weight:900;line-height:1.1;white-space:nowrap">Rp 0</div>
+      <div style="font-size:15px;font-weight:bold;margin-top:14px">Saldo</div>
+      <div id="saldoMember" style="font-size:22px;font-weight:900;line-height:1.2;word-break:break-all;white-space:normal">Rp 0</div>
       <div style="font-size:13px;margin-top:10px">⭐ Poin <b id="poinMember">0</b> Poin</div>
       <div style="font-size:13px;margin-top:4px">🛍️ Total Belanja <b id="belanjaMember">Rp 0</b></div>
     </div>
-    <label style="width:92px;min-width:92px;height:118px;background:#111;border:2px solid #fff;border-radius:14px;overflow:hidden;position:relative;cursor:pointer;display:block;box-shadow:0 6px 15px rgba(0,0,0,.3)">
+    <label style="width:84px;min-width:84px;height:108px;background:#111;border:2px solid #fff;border-radius:14px;overflow:hidden;position:relative;cursor:pointer;display:block;box-shadow:0 6px 15px rgba(0,0,0,.3);margin-left:auto;flex-shrink:0">
       <img id="fotoProfil" src="" style="width:100%;height:100%;object-fit:cover;display:none">
       <div id="fotoKosong" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#FFD700;font-size:28px">👤<span style="font-size:10px;color:#aaa">Foto</span></div>
       <div style="position:absolute;bottom:6px;right:6px;background:#FFD700;color:#000;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px">📸</div>
@@ -121,7 +121,7 @@ function validasiWA(wa){
   if(!w) return 'No WA wajib diisi!';
   if(w.length < 10) return 'No WA minimal 10 digit!\nLu isi cuma '+w.length+' digit, kurang!';
   if(w.length > 14) return 'No WA kepanjangan! Max 14 digit!';
-  if(!w.startsWith('08')) return 'No WA harus diawali 08!\nEx: 085890611111';
+  if(!w.startsWith('0')) return 'No WA harus diawali 0!\nEx: 085890611111 atau 092123332321';
   return null;
 }
 function validasiPass(pass){
@@ -137,8 +137,61 @@ function tutupCasa(v){ document.getElementById('casaModal').classList.remove('op
 function gantiTab(t){ document.getElementById('tabDaftar').classList.toggle('active',t==='daftar'); document.getElementById('tabMasuk').classList.toggle('active',t==='masuk'); document.getElementById('boxDaftar').style.display=t==='daftar'?'block':'none'; document.getElementById('boxMasuk').style.display=t==='masuk'?'block':'none'; }
 function getCart(){ try{ return JSON.parse(localStorage.getItem('casa_cart')||'[]'); }catch(e){ return []; } }
 function getMember(){ try{ return JSON.parse(localStorage.getItem('casa_member')||'null'); }catch(e){ return null; } }
-function gantiFotoProfil(e){ let f = e.target.files[0]; if(!f) return; let r = new FileReader(); r.onload = function(ev){ localStorage.setItem('casa_foto_profil', ev.target.result); tampilFotoProfil(); showToast('Foto profil diganti! ✅'); }; r.readAsDataURL(f); }
-function tampilFotoProfil(){ let foto = localStorage.getItem('casa_foto_profil'); let img = document.getElementById('fotoProfil'); let kosong = document.getElementById('fotoKosong'); if(!img) return; if(foto){ img.src = foto; img.style.display='block'; kosong.style.display='none'; } else { img.style.display='none'; kosong.style.display='flex'; } }
+// ===== UPLOAD FOTO KE SUPABASE + KOMPRES BIAR DB GAK JEBOL =====
+function kompresFotoMember(file){
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        const MAX = 600;
+        if(w > MAX || h > MAX){
+          let ratio = Math.min(MAX / w, MAX / h);
+          w = Math.round(w * ratio); h = Math.round(h * ratio);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        let hasil = canvas.toDataURL('image/jpeg', 0.6);
+        if(hasil.length > 150 * 1024) hasil = canvas.toDataURL('image/jpeg', 0.4);
+        resolve(hasil);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+async function gantiFotoProfil(e){
+  let f = e.target.files[0]; if(!f) return;
+  let m = getMember(); if(!m || !m.id) return showToast('Login dulu!');
+  if(f.size > 5 * 1024 * 1024) return showToast('Fotonya kegedean! Max 5MB!');
+  showToast('Mengompres foto... sabar...');
+  try{
+    let ukuranAwal = f.size;
+    let fotoKecil = await kompresFotoMember(f);
+    let ukuranAkhir = Math.round(fotoKecil.length * 0.75);
+    localStorage.setItem('casa_foto_profil', fotoKecil);
+    tampilFotoProfil();
+    let r = await sb("PATCH","member", { foto_url: fotoKecil }, "?id=eq."+m.id);
+    if(r[0]) m = r[0];
+    m.foto_url = fotoKecil;
+    localStorage.setItem('casa_member', JSON.stringify(m));
+    showToast('Foto ke-upload! Dari ' + Math.round(ukuranAwal/1024) + 'KB jadi ' + Math.round(ukuranAkhir/1024) + 'KB! ✅');
+  }catch(err){
+    showToast('Gagal upload: ' + err.message);
+  }
+  e.target.value = '';
+}
+function tampilFotoProfil(){
+  let m = getMember();
+  let foto = (m && (m.foto_url || m.foto)) || localStorage.getItem('casa_foto_profil');
+  let img = document.getElementById('fotoProfil');
+  let kosong = document.getElementById('fotoKosong');
+  if(!img) return;
+  if(foto){ img.src = foto; img.style.display='block'; kosong.style.display='none'; }
+  else { img.style.display='none'; kosong.style.display='flex'; }
+}
 function openEditProfil(){
   let m = getMember(); if(!m) return;
   document.getElementById('eNama').value = m.nama || '';
