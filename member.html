@@ -3,182 +3,103 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CASA MODA - Luxury Bandung</title>
+<title>Member - CASA MODA</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Georgia',serif}
 body{background:#000;color:#fff;overflow-x:hidden}
 .hero{background:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.65)),url('background-emas.jpg');background-size:cover;background-position:center top;padding:20px;text-align:center}
-.top{display:flex;justify-content:space-between;align-items:center}
 .logo{font-size:22px;letter-spacing:3px;font-weight:bold;text-align:left}.logo span{color:#FFD700;font-size:11px;display:block;letter-spacing:5px}
-.top a{color:#fff;text-decoration:none;font-size:13px;border:1px solid #FFD700;padding:8px 12px;border-radius:20px}
 .section{padding:15px 20px 110px;background:linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.65)),url('background-emas.jpg');background-size:cover;background-position:center;min-height:100vh}
-.section h2{font-size:22px;margin-bottom:4px}.section h2 i{color:#FFD700}
-.sub{font-size:12px;color:#ccc;margin-bottom:12px}
-.search{width:100%;padding:12px;border-radius:12px;border:1px solid #444;background:#222;color:#fff;margin-bottom:12px}
-.menu-top{display:flex;gap:8px;overflow-x:auto;padding-bottom:5px;margin-bottom:14px;scrollbar-width:none}
-.menu-top::-webkit-scrollbar{display:none}
-.menu-top button{background:rgba(0,0,0,0.55);color:#fff;border:1px solid rgba(255,215,0,0.6);padding:10px 16px;border-radius:20px;white-space:nowrap;cursor:pointer;font-weight:bold}
-.menu-top button.active{background:#FFD700;color:#000}
-.card{background:rgba(0,0,0,0.55);border:1px solid rgba(255,215,0,0.6);border-radius:18px;padding:14px;margin-bottom:12px;text-align:left}
-.card-flex{display:flex;gap:12px}
-.card-flex img{width:90px;height:90px;object-fit:cover;border-radius:12px;border:1px solid rgba(255,215,0,0.4);cursor:pointer}
-.price{color:#FFD700;font-weight:bold;font-size:16px}
-.badge-aman{background:#22C55E;color:#000;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:bold;margin-left:5px}
-.badge-habis{background:#888;color:#000;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:bold;margin-left:5px}
-.btn-row{display:flex;gap:8px;margin-top:10px}
-.btn-edit{flex:1;background:#FFD700;border:none;padding:10px;border-radius:10px;font-weight:bold;cursor:pointer}
-.btn-hapus{flex:1;background:transparent;color:#FFD700;border:1px solid #FFD700;padding:10px;border-radius:10px;font-weight:bold;cursor:pointer}
-.btn-add{width:100%;background:#FFD700;border:none;padding:15px;border-radius:14px;font-weight:bold;font-size:15px;cursor:pointer;margin-bottom:12px}
-.btn-add.green{background:#22C55E;color:#000}
-.btn-add.dark{background:#222;color:#fff;border:1px solid #FFD700}
-input,select,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid #444;background:#222;color:#fff;margin-top:8px}
-label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
-.cart-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.95);border-top:1px solid #FFD700;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;z-index:99}
-.cart-bar b{color:#FFD700}
-.cart-bar button{background:#FFD700;border:none;padding:10px 18px;border-radius:20px;font-weight:bold;cursor:pointer}
-.popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:200;align-items:flex-end;justify-content:center}.popup.open{display:flex}
-.popup-box{background:#111;width:100%;max-width:420px;border-radius:25px 25px 0 0;max-height:92vh;overflow-y:auto;border-top:2px solid #FFD700;padding:18px}
-.close{float:right;font-size:24px;cursor:pointer;background:none;border:none;color:#fff}
-.cart-item{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed #333;font-size:14px}
-.qris-box{background:#fff;color:#000;border-radius:16px;padding:16px;text-align:center;margin-top:12px}
-.qris-box img{width:100%;max-width:280px;border-radius:12px}
+.card{background:rgba(0,0,0,0.55);border:1px solid rgba(255,215,0,0.6);border-radius:18px;padding:20px;max-width:480px;margin:auto;text-align:center}
+h2{font-size:22px;text-align:center} h2 i{color:#FFD700}
+input,button{width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #444;background:#222;color:#fff;font-size:15px}
+button{background:#FFD700;color:#000;border:none;font-weight:bold;cursor:pointer}
+button.abu{background:#222;color:#fff;border:1px solid #FFD700}
+.foto-wrap{text-align:center;position:relative;width:120px;height:120px;margin:14px auto}
+#fotoPreview{width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid #FFD700;background:#222}
+#btnFoto{position:absolute;bottom:0;right:0;width:36px;height:36px;border-radius:50%;padding:0;font-size:18px;background:#FFD700}
+.info{background:rgba(0,0,0,0.55);border:1px solid rgba(255,215,0,0.4);border-radius:12px;padding:14px;margin-top:10px;font-size:14px;line-height:1.9;text-align:left}
+.badge{display:inline-block;background:#FFD700;color:#000;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:bold}
+.hidden{display:none}
+#status{text-align:center;font-size:13px;color:#FFD700;min-height:18px}
+a{color:#FFD700}
 </style>
 </head>
 <body>
-<div class="hero">
-<div class="top"><div class="logo">CASA MODA<span>LUXURY BANDUNG</span></div><div><a href="member.html">👑 Member</a> <a href="https://wa.me/6285890611111" target="_blank">💬 WA</a></div></div>
-<p style="margin-top:14px;font-size:13px;color:#FFD700">Handcrafted in Bandung • Premium Quality</p>
-</div>
+<div class="hero"><div class="logo">CASA MODA<span>MEMBER LUXURY</span></div></div>
 <div class="section">
-<h2>Katalog <i>CASA MODA</i></h2>
-<p class="sub">Klik produk buat liat detail • Tambah ke keranjang, bayar via QRIS</p>
-<input class="search" id="cari" placeholder="Cari produk... Dompet, Sepatu, Jaket..." oninput="renderProduk()">
-<div class="menu-top" id="menuTop"></div>
-<div id="listProduk"></div>
+<div class="card" id="loginCard">
+  <h2>Login <i>Member</i><br>CASA MODA</h2>
+  <input id="loginWa" placeholder="No WA (contoh: 085890611111)">
+  <input id="loginPass" type="password" placeholder="Password">
+  <button onclick="login()">MASUK</button>
+  <p id="status"></p>
+  <p style="text-align:center;font-size:13px;color:#ccc">Belum punya akun? Daftar di kasir<br><a href="index.html">← Kembali ke Katalog</a></p>
 </div>
-<div class="cart-bar" id="cartBar" style="display:none">
-<div>🛒 <span id="cartCount">0</span> item • <b id="cartTotal">Rp 0</b></div>
-<button onclick="openCheckout()">Checkout →</button>
+<div class="card hidden" id="profilCard">
+  <h2>Profil <i>Member</i></h2>
+  <div class="foto-wrap">
+    <img id="fotoPreview" src="https://via.placeholder.com/120?text=CASA">
+    <button id="btnFoto" onclick="document.getElementById('inputFoto').click()">📸</button>
+    <input type="file" id="inputFoto" accept="image/*" style="display:none" onchange="uploadFoto(this)">
+  </div>
+  <p id="status"></p>
+  <div class="info" id="infoMember"></div>
+  <button onclick="logout()" class="abu">KELUAR</button>
+  <a href="index.html"><button class="abu" style="margin-top:4px">🛍️ Belanja Lagi</button></a>
 </div>
-
-<!-- POPUP DETAIL -->
-<div class="popup" id="popupDetail"><div class="popup-box"><button class="close" onclick="closeDetail()">✕</button><img id="dImg" style="width:100%;height:280px;object-fit:cover;border-radius:14px"><h3 id="dNama" style="margin-top:12px"></h3><div id="dHarga" style="color:#FFD700;font-weight:bold;font-size:18px"></div><p id="dKet" style="margin-top:10px;font-size:14px;line-height:1.6;color:#ccc"></p><div class="btn-row"><button class="btn-edit" onclick="tambahDariDetail()">🛒 Tambah ke Keranjang</button><button class="btn-hapus" onclick="closeDetail()">Tutup</button></div></div></div>
-
-<!-- POPUP CHECKOUT + QRIS PATEN -->
-<div class="popup" id="popupCheckout"><div class="popup-box"><button class="close" onclick="closeCheckout()">✕</button><h3>Checkout</h3>
-<label>Nama Pembeli *</label><input id="namaPembeli" placeholder="Nama lengkap">
-<label>No WA *</label><input id="waPembeli" placeholder="0858xxxx">
-<div id="checkoutList" style="margin-top:12px"></div>
-<div style="display:flex;justify-content:space-between;margin-top:12px;font-size:16px"><span>Total:</span><b style="color:#FFD700" id="checkoutTotal">Rp 0</b></div>
-
-<!-- QRIS PATEN - DARI FILE qris.jpg DI FOLDER YANG SAMA - TIDAK ADA TOMBOL GANTI! -->
-<div class="qris-box">
-<b style="font-size:16px">QRIS - Scan di Semua Aplikasi</b><br>
-<small>CASA MODA • Bandung</small><br><br>
-<img src="qris.jpg" id="fotoQRIS" alt="QRIS CASA MODA">
-<p style="margin-top:10px;font-size:13px">Atas Nama: <b>CASA MODA</b><br>1. Scan QRIS di atas<br>2. Bayar sesuai total<br>3. Klik tombol hijau di bawah</p>
 </div>
-
-<button class="btn-add green" style="margin-top:14px" onclick="sudahBayar()">✅ Saya Sudah Bayar - Kirim ke WA</button>
-<p style="font-size:12px;color:#ccc;text-align:center">Klik tombol di atas, langsung kebuka WhatsApp CASA MODA, pesanan lu udah keisi otomatis. Tinggal kirim + lampirin bukti transfer!</p>
-</div></div>
-
 <script>
 const SUPABASE_URL = "https://tnpkepfjrltfryhuqnvo.supabase.co";
 const SUPABASE_KEY = "sb_publishable_D_RB0mj9X66SOlj9-4jgug_s7fvHEYO";
-const HEADERS = { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=representation" };
-const NO_WA_TOKO = "6285890611111";
-
-let products = [];
-let cart = JSON.parse(localStorage.getItem('casa_cart')||'[]');
-let filterAktif = 'semua';
-let detailId = null;
-let KAT_EMOJI = { Sepatu:'👟', Kemeja:'👔', Hoodie:'🧥', Dress:'👗', Jaket:'🧥', Tas:'👜', Topi:'🧢', Celana:'👖', Kaos:'👕', Kacamata:'🕶️', Jam:'⌚', Dompet:'👛' };
-function emojiKat(k){ return KAT_EMOJI[k] || '✨'; }
-function fmt(n){ return "Rp " + Number(n||0).toLocaleString('id-ID'); }
-function isHabis(p){ return Number(p.stok||0) <= 0 || String(p.status||'').toLowerCase() === 'habis'; }
-
-async function loadProduk(){
-  try{
-    let res = await fetch(SUPABASE_URL + "/rest/v1/produk?select=*&order=id.asc", { headers: HEADERS });
-    products = await res.json();
-  }catch(e){ products = []; }
-  buildKategori(); renderProduk(); updateCartBar();
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let userSaatIni = null;
+async function login(){
+  const wa = document.getElementById('loginWa').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+  if(!wa || !pass) return alert('Isi WA & Password dulu');
+  document.getElementById('status').innerText = 'Mengecek...';
+  const { data, error } = await supabase.from('member').select('*').eq('wa', wa).eq('password', pass).single();
+  if(error || !data){ document.getElementById('status').innerText = 'WA / Password salah!'; return; }
+  userSaatIni = data;
+  localStorage.setItem('casa_member', JSON.stringify(data));
+  tampilProfil();
 }
-function buildKategori(){
-  let seen = [];
-  products.forEach(p=>{ let j=(p.jenis||'').trim(); if(j && !seen.includes(j)) seen.push(j); });
-  let html = `<button class="${filterAktif==='semua'?'active':''}" onclick="filterTab('semua')">Semua</button>`;
-  seen.forEach(kat=>{ html += `<button class="${filterAktif===kat?'active':''}" onclick="filterTab('${kat}')">${emojiKat(kat)} ${kat}</button>`; });
-  document.getElementById('menuTop').innerHTML = html;
+function tampilProfil(){
+  if(!userSaatIni) return;
+  document.getElementById('loginCard').classList.add('hidden');
+  document.getElementById('profilCard').classList.remove('hidden');
+  const foto = userSaatIni.foto_url || userSaatIni.foto || 'https://via.placeholder.com/120?text=CASA';
+  document.getElementById('fotoPreview').src = foto;
+  document.getElementById('infoMember').innerHTML = `
+    <b>${userSaatIni.nama}</b> <span class="badge">${userSaatIni.tingkat || 'Member'}</span><br>
+    📱 ${userSaatIni.wa}<br>
+    🏠 ${userSaatIni.alamat || '-'} - ${userSaatIni.kota || ''}<br>
+    💰 Saldo: <b style="color:#FFD700">Rp ${(userSaatIni.saldo||0).toLocaleString('id-ID')}</b><br>
+    ⭐ Poin: ${userSaatIni.poin||0} | 🛍️ Total Belanja: Rp ${(userSaatIni.total_belanja||0).toLocaleString('id-ID')}
+  `;
 }
-function filterTab(f){ filterAktif = f; buildKategori(); renderProduk(); }
-function renderProduk(){
-  let cari = (document.getElementById('cari').value||'').toLowerCase();
-  let list = products;
-  if(filterAktif!=='semua') list = list.filter(p=> String(p.jenis||'').toLowerCase()===filterAktif.toLowerCase());
-  if(cari) list = list.filter(p=> (p.nama||'').toLowerCase().includes(cari));
-  document.getElementById('listProduk').innerHTML = list.length===0 ? '<div class="card">Belum ada produk.</div>' : list.map(p=>{
-    let habis = isHabis(p);
-    return `<div class="card"><div class="card-flex"><img src="${p.foto||''}" onclick="openDetail(${p.id})"><div style="flex:1"><small style="color:#FFD700">${p.jenis} • ${p.status}</small><br><b>${p.nama}</b> ${habis?'<span class="badge-habis">HABIS</span>':'<span class="badge-aman">Ready</span>'}<br><small>Stok: ${p.stok} pcs • ${p.ukuran||''}</small><div class="price">${fmt(p.harga)} ${p.discount?'<small style="color:#fff">Disc '+p.discount+'%</small>':''}</div><small style="color:#ccc">${(p.ket||'').slice(0,60)}</small></div></div><div class="btn-row"><button class="btn-edit" ${habis?'disabled style="opacity:.5"':''} onclick="tambahKeranjang(${p.id})">🛒 + Keranjang</button><button class="btn-hapus" onclick="openDetail(${p.id})">Lihat Detail</button></div></div>`;
-  }).join('');
+async function uploadFoto(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(!userSaatIni) return alert('Login dulu');
+  document.getElementById('status').innerText = 'Uploading... Ke Database ☁️';
+  const namaFile = `member-${userSaatIni.id}-${Date.now()}.jpg`;
+  const { error: upErr } = await supabase.storage.from('foto-profil').upload(namaFile, file, { upsert: true, contentType: file.type });
+  if(upErr){ document.getElementById('status').innerText = 'Gagal upload: ' + upErr.message; return; }
+  const { data: urlData } = supabase.storage.from('foto-profil').getPublicUrl(namaFile);
+  const fotoUrl = urlData.publicUrl;
+  const { error: dbErr } = await supabase.from('member').update({ foto_url: fotoUrl }).eq('id', userSaatIni.id);
+  if(dbErr){ document.getElementById('status').innerText = 'Gagal simpan: ' + dbErr.message; return; }
+  userSaatIni.foto_url = fotoUrl;
+  localStorage.setItem('casa_member', JSON.stringify(userSaatIni));
+  document.getElementById('fotoPreview').src = fotoUrl;
+  document.getElementById('status').innerText = 'Foto tersimpan di Database! ☁️✅';
 }
-function openDetail(id){
-  let p = products.find(x=>x.id===id); if(!p) return;
-  detailId = id;
-  document.getElementById('dImg').src = p.foto||'';
-  document.getElementById('dNama').innerText = p.nama;
-  document.getElementById('dHarga').innerText = fmt(p.harga);
-  document.getElementById('dKet').innerText = `${p.jenis} • ${p.status} • Ukuran: ${p.ukuran||'-'} • Warna: ${p.warna||'-'} • Bahan: ${p.bahan||'-'}\n\n${p.ket||''}`;
-  document.getElementById('popupDetail').classList.add('open');
-}
-function closeDetail(){ document.getElementById('popupDetail').classList.remove('open'); }
-function tambahDariDetail(){ if(detailId) tambahKeranjang(detailId); closeDetail(); }
-function tambahKeranjang(id){
-  let p = products.find(x=>x.id===id); if(!p) return;
-  let ada = cart.find(x=>x.id===id);
-  if(ada) ada.qty++;
-  else cart.push({ id:p.id, nama:p.nama, harga:Number(p.harga), qty:1 });
-  localStorage.setItem('casa_cart', JSON.stringify(cart));
-  updateCartBar();
-  alert(p.nama + ' masuk keranjang! 🛒');
-}
-function updateCartBar(){
-  let total = cart.reduce((a,c)=> a + (c.harga*c.qty), 0);
-  let jml = cart.reduce((a,c)=> a + c.qty, 0);
-  document.getElementById('cartCount').innerText = jml;
-  document.getElementById('cartTotal').innerText = fmt(total);
-  document.getElementById('cartBar').style.display = jml>0 ? 'flex' : 'none';
-}
-function openCheckout(){
-  if(cart.length===0) return alert('Keranjang masih kosong!');
-  let total = cart.reduce((a,c)=> a + (c.harga*c.qty), 0);
-  document.getElementById('checkoutList').innerHTML = cart.map((c,i)=>`<div class="cart-item"><span>${i+1}. ${c.nama} x${c.qty}</span><b>${fmt(c.harga*c.qty)}</b></div>`).join('') + `<div style="text-align:right;margin-top:8px"><button onclick="kosongkanCart()" style="background:none;border:none;color:#FFD700;cursor:pointer;font-size:12px">🗑️ Kosongkan Keranjang</button></div>`;
-  document.getElementById('checkoutTotal').innerText = fmt(total);
-  try{ let m = JSON.parse(localStorage.getItem('casa_member')||'null'); if(m){ document.getElementById('namaPembeli').value = m.nama||''; document.getElementById('waPembeli').value = m.wa||''; } }catch(e){}
-  document.getElementById('popupCheckout').classList.add('open');
-}
-function closeCheckout(){ document.getElementById('popupCheckout').classList.remove('open'); }
-function kosongkanCart(){ cart=[]; localStorage.setItem('casa_cart','[]'); updateCartBar(); closeCheckout(); }
-function sudahBayar(){
-  let nama = document.getElementById('namaPembeli').value.trim();
-  let wa = document.getElementById('waPembeli').value.trim();
-  if(!nama) return alert('Isi Nama Pembeli dulu!');
-  if(!wa) return alert('Isi No WA dulu!');
-  if(cart.length===0) return alert('Keranjang kosong!');
-  let total = cart.reduce((a,c)=> a + (c.harga*c.qty), 0);
-  let daftar = '';
-  cart.forEach((c,i)=>{ daftar += `${i+1}. ${c.nama} x${c.qty} - Rp ${(c.harga*c.qty).toLocaleString('id-ID')}%0A`; });
-  let pesan = `Halo CASA MODA! 👋%0A` +
-  `Saya *SUDAH BAYAR* via QRIS ✅%0A%0A` +
-  `Nama: ${nama}%0A` +
-  `No WA: ${wa}%0A` +
-  `Pesanan:%0A${daftar}%0A` +
-  `Total Bayar: *Rp ${total.toLocaleString('id-ID')}*%0A%0A` +
-  `Saya lampirkan bukti transfernya ya kak 🙏`;
-  window.open(`https://wa.me/${NO_WA_TOKO}?text=${pesan}`, '_blank');
-}
-loadProduk();
+const saved = localStorage.getItem('casa_member');
+if(saved){ try{ userSaatIni = JSON.parse(saved); tampilProfil(); }catch(e){} }
+function logout(){ localStorage.removeItem('casa_member'); location.reload(); }
 </script>
 </body>
 </html>
