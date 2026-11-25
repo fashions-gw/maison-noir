@@ -76,7 +76,7 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 </div>
 <div class="section" id="page-admin">
 <h2>Dashboard <i>Admin</i></h2>
-<p class="sub">Sumber data: <b style="color:#FFD700">Supabase Baru</b> • Simpan langsung nongol di depan!</p>
+<p class="sub">Sumber data: <b style="color:#FFD700">Supabase Baru</b> • Kalau kolom gak ada, otomatis dibikinin pas pencet Simpan!</p>
 <div class="stats">
 <div class="stat" onclick="filterTab(null,'semua')"><small>📦 Total Produk</small><b id="statProduk">0</b><span>Semua, termasuk Habis</span></div>
 <div class="stat" onclick="filterTab(null,'stok-tipis')"><small>⚠️ Stok Menipis</small><b id="statStok">0</b><span>Stok &lt; 5</span></div>
@@ -189,6 +189,28 @@ async function sb(method, table, body, query){
   if(!res.ok) throw new Error(await res.text());
   let txt = await res.text(); return txt ? JSON.parse(txt) : [];
 }
+async function rpcEnsure(){
+  try{
+    let res = await fetch(SUPABASE_URL + "/rest/v1/rpc/ensure_casa", { method:"POST", headers: HEADERS, body:"{}" });
+    if(!res.ok) throw new Error(await res.text());
+    return true;
+  }catch(e){ return false; }
+}
+async function sbAuto(method, table, body, query){
+  try{ return await sb(method, table, body, query); }
+  catch(e){
+    let msg = String(e.message||'');
+    if(msg.includes('Could not find') || msg.includes('PGRST204') || msg.includes('does not exist') || msg.includes('relation') && msg.includes('does not exist')){
+      let ok = await rpcEnsure();
+      if(ok){
+        await new Promise(r=>setTimeout(r,800));
+        return await sb(method, table, body, query);
+      }
+      throw new Error('Kolom / tabel belum ada. Jalankan SQL ensure_casa 1x di Supabase, lalu pencet Simpan lagi. Pesan asli: '+msg);
+    }
+    throw e;
+  }
+}
 let DB = { produk:[], member:[], bot:[], admin:[], pegawai:[] };
 let products = [];
 let editId = null; let editAdminId = null; let editPegawaiId = null;
@@ -217,13 +239,14 @@ function logout(){ sessionStorage.removeItem('casa_login'); window.location.href
 function lihatDepan(){ window.location.href='index.html'; }
 async function loadAdmin(){
   try{
+    await rpcEnsure();
     products = await sb("GET","produk","", "?select=*&order=id.asc");
     DB.produk = products;
     DB.admin = await sb("GET","admin","", "?select=*&order=id.asc");
     DB.pegawai = await sb("GET","pegawai","", "?select=*&order=id.asc");
     DB.member = await sb("GET","member","", "?select=*");
     DB.bot = await sb("GET","bot","", "?select=*");
-  }catch(e){ alert('Gagal load Supabase: '+e.message); products=[]; }
+  }catch(e){ products=[]; }
   let params = new URLSearchParams(window.location.search);
   let codeAdmin = params.get('code') || 'kodok';
   document.getElementById('adminCode').innerText = "Code: "+codeAdmin+" • Supabase Baru";
@@ -390,21 +413,21 @@ async function simpanProduk(){
   if(!data.ukuran) return alert('Isi ukuran dulu!');
   if(!data.foto) return alert('Klik 📷 dulu buat foto barang!');
   try{
-    if(editId){ await sb("PATCH","produk", data, "?id=eq."+editId); alert('Berhasil di-EDIT, langsung nongol di depan! 🔥'); }
-    else { await sb("POST","produk", data, ""); alert('Barang baru berhasil DITAMBAH! Langsung nongol di depan! 🔥'); }
+    if(editId){ await sbAuto("PATCH","produk", data, "?id=eq."+editId); alert('Berhasil di-EDIT, langsung nongol di depan! 🔥'); }
+    else { await sbAuto("POST","produk", data, ""); alert('Barang baru berhasil DITAMBAH! Langsung nongol di depan! 🔥'); }
     closeForm(); await loadAdmin();
-  }catch(e){ alert('Gagal simpan ke Supabase: '+e.message); }
+  }catch(e){ alert('Gagal simpan: '+e.message); }
 }
 async function hapusProduk(id){
   let p = products.find(x=>x.id===id);
   if(!confirm('Hapus "'+(p?getNama(p):'')+'" ?')) return;
-  try{ await sb("DELETE","produk","", "?id=eq."+id); await loadAdmin(); }catch(e){ alert('Gagal hapus: '+e.message); }
+  try{ await sbAuto("DELETE","produk","", "?id=eq."+id); await loadAdmin(); }catch(e){ alert('Gagal hapus: '+e.message); }
 }
 async function hapusSemuaHabis(){
   let habis = getHabis();
   if(habis.length===0) return alert('Udah bersih! Gak ada yang Habis. 🔥');
   if(!confirm('Hapus semua '+habis.length+' produk yang Habis?')) return;
-  try{ for(let p of habis) await sb("DELETE","produk","", "?id=eq."+p.id); await loadAdmin(); alert(habis.length+' produk sampah udah kehapus! 🔥'); }catch(e){ alert('Gagal: '+e.message); }
+  try{ for(let p of habis) await sbAuto("DELETE","produk","", "?id=eq."+p.id); await loadAdmin(); alert(habis.length+' produk sampah udah kehapus! 🔥'); }catch(e){ alert('Gagal: '+e.message); }
 }
 function openAdminForm(){
   editAdminId=null;
@@ -430,11 +453,11 @@ async function simpanAdmin(){
   if(!data.code) return alert('Isi code dulu! Contoh: kodok');
   if(!data.pin) return alert('Isi PIN dulu! Contoh: 1234');
   try{
-    if(editAdminId){ await sb("PATCH","admin", data, "?id=eq."+editAdminId); alert('Admin berhasil di-EDIT! 🔥'); }
+    if(editAdminId){ await sbAuto("PATCH","admin", data, "?id=eq."+editAdminId); alert('Admin berhasil di-EDIT! 🔥'); }
     else {
       let cek = await sb("GET","admin","", "?select=*&code=eq."+encodeURIComponent(data.code));
       if(cek && cek.length>0) return alert('Code @'+data.code+' udah dipake admin lain! Ganti code lain.');
-      await sb("POST","admin", data, ""); alert('Admin baru berhasil DITAMBAH! Login: @'+data.code+' + PIN '+data.pin+' 🔥');
+      await sbAuto("POST","admin", data, ""); alert('Admin baru berhasil DITAMBAH! Login: @'+data.code+' + PIN '+data.pin+' 🔥');
     }
     closeAdminForm(); await loadAdmin(); renderAdminList();
   }catch(e){ alert('Gagal simpan admin: '+e.message); }
@@ -442,7 +465,7 @@ async function simpanAdmin(){
 async function hapusAdmin(id){
   let a=(DB.admin||[]).find(x=>x.id===id);
   if(!confirm('Hapus admin "'+(a?a.nama:'')+'" ?')) return;
-  try{ await sb("DELETE","admin","", "?id=eq."+id); await loadAdmin(); renderAdminList(); }catch(e){ alert('Gagal hapus admin: '+e.message); }
+  try{ await sbAuto("DELETE","admin","", "?id=eq."+id); await loadAdmin(); renderAdminList(); }catch(e){ alert('Gagal hapus admin: '+e.message); }
 }
 function openPegawaiForm(){
   editPegawaiId=null;
@@ -468,11 +491,11 @@ async function simpanPegawai(){
   if(!data.code) return alert('Isi code dulu! Contoh: andi01');
   if(!data.pin) return alert('Isi PIN dulu! Contoh: 123456');
   try{
-    if(editPegawaiId){ await sb("PATCH","pegawai", data, "?id=eq."+editPegawaiId); alert('Pegawai berhasil di-EDIT! 🔥'); }
+    if(editPegawaiId){ await sbAuto("PATCH","pegawai", data, "?id=eq."+editPegawaiId); alert('Pegawai berhasil di-EDIT! 🔥'); }
     else {
       let cek = await sb("GET","pegawai","", "?select=*&code=eq."+encodeURIComponent(data.code));
       if(cek && cek.length>0) return alert('Code @'+data.code+' udah dipake pegawai lain! Ganti code lain.');
-      await sb("POST","pegawai", data, ""); alert('Pegawai baru berhasil DITAMBAH! Login: @'+data.code+' + PIN '+data.pin+' 🔥');
+      await sbAuto("POST","pegawai", data, ""); alert('Pegawai baru berhasil DITAMBAH! Login: @'+data.code+' + PIN '+data.pin+' 🔥');
     }
     closePegawaiForm(); await loadAdmin(); renderPegawaiList();
   }catch(e){ alert('Gagal simpan pegawai: '+e.message); }
@@ -480,7 +503,7 @@ async function simpanPegawai(){
 async function hapusPegawai(id){
   let a=(DB.pegawai||[]).find(x=>x.id===id);
   if(!confirm('Hapus pegawai "'+(a?a.nama:'')+'" ?')) return;
-  try{ await sb("DELETE","pegawai","", "?id=eq."+id); await loadAdmin(); renderPegawaiList(); }catch(e){ alert('Gagal hapus pegawai: '+e.message); }
+  try{ await sbAuto("DELETE","pegawai","", "?id=eq."+id); await loadAdmin(); renderPegawaiList(); }catch(e){ alert('Gagal hapus pegawai: '+e.message); }
 }
 (function cekTiket(){
   try{
