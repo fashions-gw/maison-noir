@@ -38,6 +38,7 @@ textarea{min-height:70px;resize:vertical}
 .close{float:right;font-size:24px;cursor:pointer;background:none;border:none;color:#fff}
 label.small{font-size:12px;color:#aaa;margin-top:12px;display:block}
 input.locked{background:#333;border-color:#222;color:#888}
+.hint{font-size:11px;color:#aaa;margin-top:4px}
 </style>
 </head>
 <body>
@@ -48,13 +49,15 @@ input.locked{background:#333;border-color:#222;color:#888}
 <div id="formBox">
 <div id="boxDaftar" style="display:none">
 <input id="dNama" placeholder="Nama Lengkap">
-<input id="dWa" placeholder="No WA, ex: 085890611111">
-<input id="dPass" type="password" placeholder="Password">
+<input id="dWa" type="tel" inputmode="numeric" placeholder="No WA, ex: 085890611111">
+<div class="hint">Minimal 10 digit, cuma angka, harus diawali 08</div>
+<input id="dPass" type="password" placeholder="Password (min 6 karakter)">
+<div class="hint">Minimal 6 karakter, jangan cuma 1 huruf 😂</div>
 <button class="buy-btn" onclick="daftar()">Daftar Member ✨</button>
 </div>
 <div id="boxMasuk">
-<input id="mWa" placeholder="No WA, ex: 085890611111" value="08">
-<input id="mPass" type="password" placeholder="Password" value="">
+<input id="mWa" type="tel" inputmode="numeric" placeholder="No WA, ex: 085890611111">
+<input id="mPass" type="password" placeholder="Password">
 <button class="buy-btn" onclick="masuk()">MASUK</button>
 </div>
 </div>
@@ -79,35 +82,31 @@ input.locked{background:#333;border-color:#222;color:#888}
   </div>
 </div>
 <button onclick="openTopUp()" style="width:100%;background:linear-gradient(135deg,#FFD700,#FFAA00);border:none;padding:14px;border-radius:14px;font-weight:900;font-size:15px;margin-top:12px;cursor:pointer">TOP UP SALDO</button>
-
 <div class="card"><h3>🛒 Keranjang Lu</h3><div id="cartList"></div><div id="cartTotal" style="font-weight:bold;margin-top:10px"></div><button class="buy-btn" onclick="checkoutMember()">💰 Bayar Pake Saldo</button><button class="btn-add" onclick="kosongkanCart()">Kosongkan Keranjang</button></div>
 <div class="card"><h3>📜 Riwayat Top Up</h3><div id="riwayatTopup"></div></div>
 </div>
 
-<div class="card"><h3>LIST MEMBER</h3><div id="listMember"></div></div>
+<!-- LIST MEMBER - HILANG KALAU UDAH KELUAR -->
+<div class="card" id="listMemberBox" style="display:none"><h3>LIST MEMBER</h3><div id="listMember"></div></div>
 
-<!-- TOMBOL BAGI 2 - EDIT PROFIL + KELUAR - PALING BAWAH -->
 <div id="bawahBox" style="display:none;gap:12px;margin-top:14px">
   <button onclick="openEditProfil()" style="flex:1;background:#FFD700;border:none;padding:14px;border-radius:14px;font-weight:900;font-size:15px;cursor:pointer">✏️ Edit Profil</button>
   <button onclick="logout()" style="flex:1;background:#400;color:#fff;border:1px solid #ff4444;padding:14px;border-radius:14px;font-weight:bold;font-size:15px;cursor:pointer">🚪 Keluar</button>
 </div>
 
-<!-- POPUP EDIT PROFIL -->
 <div class="popup" id="editPopup"><div class="popup-box"><button class="close" onclick="closeEditProfil()">✕</button><h3>✏️ Edit Profil</h3><p style="font-size:12px;color:#aaa;margin-top:4px">Bisa ganti semua, kecuali saldo! Saldo dikunci 😂</p>
 <label class="small">Nama Lengkap</label><input id="eNama" placeholder="Nama Lengkap">
-<label class="small">No WA</label><input id="eWa" placeholder="085890611111">
+<label class="small">No WA (min 10 digit)</label><input id="eWa" type="tel" inputmode="numeric" placeholder="085890611111">
 <label class="small">Alamat Lengkap</label><textarea id="eAlamat" placeholder="Jl. ... , Bandung, Jawa Barat"></textarea>
 <label class="small">Kota / Kecamatan</label><input id="eKota" placeholder="Ex: Bandung - Dago">
-<label class="small">Password Baru (kosongkan kalau gak mau ganti)</label><input id="ePass" type="password" placeholder="Password baru">
+<label class="small">Password Baru (kosongkan kalau gak mau ganti, kalau diisi min 6 karakter)</label><input id="ePass" type="password" placeholder="Password baru">
 <label class="small">🔒 Saldo - TIDAK BISA DIEDIT 😂</label><input id="eSaldo" class="locked" readonly disabled value="Rp 0">
 <label class="small">⭐ Poin - TIDAK BISA DIEDIT</label><input id="ePoin" class="locked" readonly disabled value="0">
 <button class="buy-btn" onclick="simpanEditProfil()">Simpan Perubahan ✅</button>
 </div></div>
 
-<!-- POPUP TOP UP -->
 <div class="popup" id="topupPopup"><div class="popup-box"><button class="close" onclick="closeTopUp()">✕</button><h3>💰 TOP UP SALDO</h3><p style="font-size:13px;color:#ccc">Saldo lu: <b id="topupSaldo" style="color:#FFD700">Rp 0</b></p><label>Pilih Nominal:</label><div id="nominalBox" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0"></div><input id="topupNominalCustom" type="number" placeholder="Nominal lain, ex: 75000"><label style="margin-top:12px;display:block">Pilih Pembayaran:</label><div id="payList"></div><div id="payDetail" style="margin-top:12px"></div><button class="buy-btn" id="btnKonfirmTopup" onclick="konfirmTopUp()" style="display:none">Saya Sudah Bayar ✅</button></div></div>
 
-<!-- POPUP CANTIK -->
 <div class="casa-modal" id="casaModal"><div class="casa-modal-box"><div class="casa-modal-icon" id="casaModalIcon">✨</div><div class="casa-modal-title" id="casaModalTitle">CASA MODA</div><div class="casa-modal-msg" id="casaModalMsg"></div><div class="casa-modal-btns" id="casaModalBtns"></div></div></div>
 <div class="casa-toast" id="casaToast"></div>
 
@@ -117,6 +116,21 @@ const SUPABASE_KEY = "sb_publishable_D_RB0mj9X66SOlj9-4jgug_s7fvHEYO";
 const HEADERS = { apikey: SUPABASE_KEY, Authorization: "Bearer " + SUPABASE_KEY, "Content-Type": "application/json", Prefer: "return=representation" };
 async function sb(method, table, body, query){ let url = SUPABASE_URL + "/rest/v1/" + table + (query || ""); let res = await fetch(url, { method, headers: HEADERS, body: body ? JSON.stringify(body) : undefined }); if(!res.ok) throw new Error(await res.text()); let txt = await res.text(); return txt ? JSON.parse(txt) : []; }
 function fmt(n){ return "Rp " + Number(n||0).toLocaleString('id-ID'); }
+// VALIDASI BARU - JANGAN SAMPE LOLOS LAGI!
+function bersihWA(wa){ return String(wa||'').replace(/[^0-9]/g,''); }
+function validasiWA(wa){
+  let w = bersihWA(wa);
+  if(!w) return 'No WA wajib diisi!';
+  if(w.length < 10) return 'No WA minimal 10 digit!\nLu isi cuma '+w.length+' digit, kurang!';
+  if(w.length > 14) return 'No WA kepanjangan! Max 14 digit!';
+  if(!w.startsWith('08')) return 'No WA harus diawali 08!\nEx: 085890611111';
+  return null;
+}
+function validasiPass(pass){
+  if(!pass) return 'Password wajib diisi!';
+  if(pass.length < 6) return 'Password minimal 6 karakter!\nLu isi cuma '+pass.length+' karakter, kurang!';
+  return null;
+}
 let _res=null;
 function showToast(m){ let t=document.getElementById('casaToast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
 function casaAlert(msg,title,icon){ return new Promise(r=>{ document.getElementById('casaModalIcon').innerText=icon||'✨'; document.getElementById('casaModalTitle').innerText=title||'CASA MODA'; document.getElementById('casaModalMsg').innerText=msg; document.getElementById('casaModalBtns').innerHTML=`<button class="casa-btn-yes" onclick="tutupCasa(true)">OK, Siap! ✨</button>`; _res=r; document.getElementById('casaModal').classList.add('open'); }); }
@@ -127,8 +141,6 @@ function getCart(){ try{ return JSON.parse(localStorage.getItem('casa_cart')||'[
 function getMember(){ try{ return JSON.parse(localStorage.getItem('casa_member')||'null'); }catch(e){ return null; } }
 function gantiFotoProfil(e){ let f = e.target.files[0]; if(!f) return; let r = new FileReader(); r.onload = function(ev){ localStorage.setItem('casa_foto_profil', ev.target.result); tampilFotoProfil(); showToast('Foto profil diganti! ✅'); }; r.readAsDataURL(f); }
 function tampilFotoProfil(){ let foto = localStorage.getItem('casa_foto_profil'); let img = document.getElementById('fotoProfil'); let kosong = document.getElementById('fotoKosong'); if(!img) return; if(foto){ img.src = foto; img.style.display='block'; kosong.style.display='none'; } else { img.style.display='none'; kosong.style.display='flex'; } }
-
-// EDIT PROFIL
 function openEditProfil(){
   let m = getMember(); if(!m) return;
   document.getElementById('eNama').value = m.nama || '';
@@ -144,20 +156,19 @@ function closeEditProfil(){ document.getElementById('editPopup').classList.remov
 async function simpanEditProfil(){
   let m = getMember(); if(!m) return;
   let nama = document.getElementById('eNama').value.trim();
-  let wa = document.getElementById('eWa').value.trim();
+  let wa = bersihWA(document.getElementById('eWa').value);
   let alamat = document.getElementById('eAlamat').value.trim();
   let kota = document.getElementById('eKota').value.trim();
   let pass = document.getElementById('ePass').value.trim();
-  if(!nama || !wa){ await casaAlert('Nama + WA wajib diisi!', 'Belum Lengkap!', '⚠️'); return; }
+  if(!nama){ await casaAlert('Nama wajib diisi!', 'Belum Lengkap!', '⚠️'); return; }
+  let errWA = validasiWA(wa); if(errWA){ await casaAlert(errWA, 'No WA Salah!', '📱'); return; }
+  if(pass){ let errP = validasiPass(pass); if(errP){ await casaAlert(errP, 'Password Kurang!', '🔒'); return; } }
   let data = { nama, wa, alamat, kota };
   if(pass) data.password = pass;
-  // Simpan ke Supabase - saldo TIDAK ikut, jadi aman!
-  try{ let r = await sb("PATCH","member", data, "?id=eq."+m.id); if(r[0]) m = r[0]; }catch(e){ 
-    // Kalau kolom alamat/kota belum ada di Supabase, simpan tanpa alamat/kota dulu, alamat simpan lokal
+  try{ let r = await sb("PATCH","member", data, "?id=eq."+m.id); if(r[0]) m = r[0]; }catch(e){
     try{ let r2 = await sb("PATCH","member", { nama, wa, ...(pass?{password:pass}:{}) }, "?id=eq."+m.id); if(r2[0]) m = r2[0]; }catch(e2){}
   }
   m.nama = nama; m.wa = wa; m.alamat = alamat; m.kota = kota; if(pass) m.password = pass;
-  // Saldo & Poin TIDAK diubah sama sekali!
   localStorage.setItem('casa_member', JSON.stringify(m));
   localStorage.setItem('casa_alamat_'+m.id, alamat);
   localStorage.setItem('casa_kota_'+m.id, kota);
@@ -165,10 +176,11 @@ async function simpanEditProfil(){
   await casaAlert('Profil berhasil diupdate! ✅\n\nNama: '+nama+'\nWA: '+wa+'\nAlamat: '+(alamat||'-')+'\n\nSaldo lu aman, gak berubah! 😂', 'Profil Diupdate! ✅', '✅');
   tampilMember();
 }
-
 async function daftar(){
-  let nama=document.getElementById('dNama').value.trim(), wa=document.getElementById('dWa').value.trim(), pass=document.getElementById('dPass').value.trim();
-  if(!nama||!wa||!pass){ await casaAlert('Isi semua dulu ya!', 'Belum Lengkap!', '⚠️'); return; }
+  let nama=document.getElementById('dNama').value.trim(), wa=bersihWA(document.getElementById('dWa').value), pass=document.getElementById('dPass').value.trim();
+  if(!nama){ await casaAlert('Nama wajib diisi!', 'Belum Lengkap!', '⚠️'); return; }
+  let errWA = validasiWA(wa); if(errWA){ await casaAlert(errWA, 'No WA Salah!', '📱'); return; }
+  let errP = validasiPass(pass); if(errP){ await casaAlert(errP, 'Password Kurang!', '🔒'); return; }
   let cek = await sb("GET","member","", "?select=*&wa=eq."+wa);
   if(cek.length){ await casaAlert('No WA ini udah terdaftar! Langsung Masuk aja.', 'Udah Terdaftar!', '⚠️'); gantiTab('masuk'); return; }
   let baru = await sb("POST","member", { nama, wa, password: pass, saldo: 0, poin: 0, total_belanja: 0, keranjang: [] }, "?select=*");
@@ -177,8 +189,9 @@ async function daftar(){
   tampilMember();
 }
 async function masuk(){
-  let wa=document.getElementById('mWa').value.trim(), pass=document.getElementById('mPass').value.trim();
-  if(!wa||!pass){ await casaAlert('Isi WA + Password dulu!', 'Belum Lengkap!', '⚠️'); return; }
+  let wa=bersihWA(document.getElementById('mWa').value), pass=document.getElementById('mPass').value.trim();
+  let errWA = validasiWA(wa); if(errWA){ await casaAlert(errWA, 'No WA Salah!', '📱'); return; }
+  let errP = validasiPass(pass); if(errP){ await casaAlert(errP, 'Password Kurang!', '🔒'); return; }
   let r = await sb("GET","member","", "?select=*&wa=eq."+wa);
   if(!r.length){ await casaAlert('WA belum terdaftar! Daftar dulu ya.', 'Belum Terdaftar!', '⚠️'); gantiTab('daftar'); return; }
   if(String(r[0].password)!==String(pass)){ await casaAlert('Password salah!', 'Password Salah!', '🔒'); return; }
@@ -188,9 +201,16 @@ async function masuk(){
 }
 async function tampilMember(){
   let m = getMember();
-  if(!m){ document.getElementById('memberBox').style.display='none'; document.getElementById('formBox').style.display='block'; document.getElementById('tabsBox').style.display='flex'; document.getElementById('bawahBox').style.display='none'; loadList(); return; }
+  if(!m){
+    document.getElementById('memberBox').style.display='none';
+    document.getElementById('formBox').style.display='block';
+    document.getElementById('tabsBox').style.display='flex';
+    document.getElementById('bawahBox').style.display='none';
+    document.getElementById('listMemberBox').style.display='none';
+    return;
+  }
   if(m.id){ try{ let r=await sb("GET","member","", "?select=*&id=eq."+m.id); if(r[0]){ m=r[0]; m.alamat = m.alamat || localStorage.getItem('casa_alamat_'+m.id) || ''; m.kota = m.kota || localStorage.getItem('casa_kota_'+m.id) || ''; localStorage.setItem('casa_member', JSON.stringify(m)); } }catch(e){} }
-  document.getElementById('formBox').style.display='none'; document.getElementById('tabsBox').style.display='none'; document.getElementById('memberBox').style.display='block'; document.getElementById('bawahBox').style.display='flex';
+  document.getElementById('formBox').style.display='none'; document.getElementById('tabsBox').style.display='none'; document.getElementById('memberBox').style.display='block'; document.getElementById('bawahBox').style.display='flex'; document.getElementById('listMemberBox').style.display='block';
   document.getElementById('namaMember').innerText=m.nama; document.getElementById('levelMember').innerText = Number(m.total_belanja||0) >= 1000000 ? 'Gold member' : 'Silver member'; document.getElementById('saldoMember').innerText=fmt(m.saldo); document.getElementById('poinMember').innerText=m.poin||0; document.getElementById('belanjaMember').innerText=fmt(m.total_belanja); tampilFotoProfil();
   let cart=getCart(), total=0;
   document.getElementById('cartList').innerHTML = cart.length ? cart.map((c,i)=>{ total+=Number(c.harga); return `<div class="cart-item"><img src="${c.foto||''}"><div style="flex:1"><b>${c.nama||'Tanpa Nama'}</b><br><small>Ukuran: ${c.size}</small><br><span style="color:#FFD700">${fmt(c.harga)}</span></div><button onclick="hapusCart(${i})" style="background:none;border:none;color:#fff">✕</button></div>`; }).join('') : '<p style="color:#aaa;margin-top:10px">Keranjang kosong, ayo belanja di Home!</p>';
