@@ -68,22 +68,35 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 .cam-snap{width:70px;height:70px;border-radius:50%;background:#FFD700;border:4px solid #fff;font-size:30px;cursor:pointer}
 .cam-close{background:#222;color:#fff;border:1px solid #FFD700;padding:12px 20px;border-radius:20px;font-weight:bold;cursor:pointer}
 .cam-switch{background:#222;color:#fff;border:1px solid #FFD700;padding:12px 20px;border-radius:20px;font-weight:bold;cursor:pointer}
+/* ===== NOTIF ADMIN - BARU ===== */
+.notif-badge{background:#FF2D2D;color:#fff;min-width:22px;height:22px;border-radius:11px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;padding:0 6px}
+@keyframes goyang{0%,100%{transform:rotate(0)}25%{transform:rotate(15deg)}75%{transform:rotate(-15deg)}}
+.bell-goyang{animation:goyang .5s ease 3}
 </style>
 </head>
 <body>
 <div class="hero">
-<div class="top"><div class="logo">CASA MODA<span>ADMIN LUXURY</span></div><button class="logout" onclick="logout()">Logout</button></div>
+<div class="top"><div class="logo">CASA MODA<span>ADMIN LUXURY</span></div><div style="display:flex;gap:8px;align-items:center"><button id="bellAdmin" onclick="scrollKeNotif()" style="background:#222;border:1px solid #FFD700;padding:8px 14px;border-radius:20px;color:#fff;font-weight:bold;cursor:pointer">🔔 <span id="bellCount" class="notif-badge">0</span></button><button class="logout" onclick="logout()">Logout</button></div></div>
 <div class="admin-info"><img src="https://via.placeholder.com/100" id="adminFoto"><div><b id="adminNama">Admin CASA MODA</b><br><small style="color:#FFD700" id="adminCode">Code: -</small><br><small id="adminWA">WA: -</small></div></div>
 </div>
 <div class="section" id="page-admin">
 <h2>Dashboard <i>Admin</i></h2>
 <p class="sub">Sumber data: <b style="color:#FFD700">Supabase Baru</b> • Kalau dihadang polisi (42501), pencet USIR POLISI!</p>
+
+<!-- ===== NOTIF ADMIN - TOP UP + TARIK SALDO - BARU! ===== -->
+<div id="notifAdminBox" style="display:none;background:linear-gradient(135deg,#FF2D2D,#FF6B6B);border:1px solid #fff;border-radius:18px;padding:14px;margin-bottom:14px;text-align:left">
+<div style="display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:16px">🔔 NOTIF - Ada Request Baru!</h3><span id="notifCount" class="notif-badge" style="background:#fff;color:#FF2D2D;font-size:13px;min-width:24px;height:24px">0</span></div>
+<p style="font-size:12px;margin-top:4px;opacity:.95">Ada member yang minta Top Up / Tarik Saldo! Setujui / tolak di sini, saldo otomatis keubah!</p>
+<div id="notifList"></div>
+</div>
+
 <div class="stats">
 <div class="stat" onclick="filterTab(null,'semua')"><small>📦 Total Produk</small><b id="statProduk">0</b><span>Semua, termasuk Habis</span></div>
 <div class="stat" onclick="filterTab(null,'stok-tipis')"><small>⚠️ Stok Menipis</small><b id="statStok">0</b><span>Stok &lt; 5</span></div>
 <div class="stat" onclick="filterTab(null,'habis')"><small>🚫 Habis / Sampah</small><b id="statHabis">0</b><span>Klik buat liat yang Habis</span></div>
 <div class="stat" onclick="showPageAdmin('member')"><small>👑 Total Member</small><b id="statMember">0</b><span>Klik buat kelola Member</span></div>
 <div class="stat"><small>🏆 Terlaris</small><b id="statTerlaris" style="font-size:16px;line-height:1.3">-</b><span>Stok terbanyak & Ready</span></div>
+<div class="stat" onclick="showPageAdmin('member')" style="border:2px solid #FF2D2D"><small>🔔 Request Menunggu</small><b id="statPending" style="color:#FF2D2D">0</b><span>Top Up + Tarik Saldo - Klik!</span></div>
 </div>
 <div class="menu-top" id="menuTop"></div>
 <button class="btn-add" onclick="openForm()">+ TAMBAH BARANG BARU</button>
@@ -97,7 +110,7 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 </div>
 <div class="section" id="page-laporan" style="display:none">
 <h2>Laporan <i>Omset</i></h2>
-<div class="card"><small style="color:#FFD700">Total Nilai Stok (Semua Produk)</small><div class="price" style="font-size:26px" id="lapOmset">Rp 0</div><p style="margin-top:8px;font-size:13px" id="lapDetail"></p></div>
+<div class="card"><small style="color:#FFD700">Total Nilai Stok (Semua Produk)</small><div class="price" style="font-size:26px" id="lapOmset">Rp. 0,-</div><p style="margin-top:8px;font-size:13px" id="lapDetail"></p></div>
 <div class="card"><b>Per Kategori</b><div id="lapKategori" style="margin-top:10px"></div></div>
 <div class="card"><b>Produk Stok Terbanyak (Terlaris)</b><div id="lapTop" style="margin-top:10px"></div></div>
 <button class="btn-add" onclick="showPageAdmin('admin')">← Kembali ke Dashboard</button>
@@ -118,7 +131,13 @@ label{font-size:13px;color:#FFD700;display:block;margin-top:10px}
 </div>
 <div class="section" id="page-member" style="display:none">
 <h2>Kelola <i>Member</i></h2>
-<p class="sub">Edit member, Top Up Saldo, liat foto member. Total: <b style="color:#FFD700" id="memberTotal">0</b> member • Total Saldo: <b style="color:#FFD700" id="memberTotalSaldo">Rp 0</b></p>
+<p class="sub">Edit member, Top Up Saldo, liat foto member. Total: <b style="color:#FFD700" id="memberTotal">0</b> member • Total Saldo: <b style="color:#FFD700" id="memberTotalSaldo">Rp. 0,-</b></p>
+
+<!-- ===== REQUEST DI HALAMAN MEMBER JUGA - BARU! ===== -->
+<div class="card" style="border:2px solid #FF2D2D"><b>🔔 Request Top Up - Menunggu Verifikasi</b><div id="listTopupPending" style="margin-top:10px"></div></div>
+<div class="card" style="border:2px solid #FF2D2D"><b>💸 Request Tarik Saldo - Menunggu Verifikasi</b><div id="listWithdrawPending" style="margin-top:10px"></div></div>
+<div class="card"><b>📜 Riwayat Request Terakhir</b><div id="listRequestRiwayat" style="margin-top:10px"></div></div>
+
 <input id="cariMember" placeholder="Cari nama / WA member..." oninput="renderMemberList()">
 <div id="listMember" style="margin-top:12px"></div>
 <button class="btn-add dark" onclick="showPageAdmin('admin')">← Kembali ke Dashboard</button>
@@ -281,7 +300,7 @@ let KATEGORI_LIST = [];
 let KAT_EMOJI = { Sepatu:'👟', Kemeja:'👔', Hoodie:'🧥', Dress:'👗', Jaket:'🧥', Tas:'👜', Topi:'🧢', Celana:'👖', Kaos:'👕', Kacamata:'🕶️', Jam:'⌚', Dompet:'👛' };
 function emojiKat(kat){ return KAT_EMOJI[kat] || '✨'; }
 function getNama(p){ return p.nama || 'Tanpa Nama'; }
-function fmt(n){ return "Rp " + Number(n||0).toLocaleString('id-ID'); }
+function fmt(n){ return "Rp. " + Number(n||0).toLocaleString('id-ID') + ",-"; }
 function isHabis(p){ return Number(p.stok||0) <= 0 || String(p.status||'').toLowerCase() === 'habis'; }
 function showPageAdmin(p){
   document.getElementById('page-admin').style.display = p==='admin' ? 'block':'none';
@@ -295,10 +314,83 @@ function showPageAdmin(p){
   if(p==='adminlist') renderAdminList();
   if(p==='pegawai') renderPegawaiList();
   if(p==='member') renderMemberList();
+  if(p==='member' || p==='admin') loadNotifAdmin(false);
 }
 function navAdmin(el, p){ document.querySelectorAll('.bottom-nav a').forEach(a=>a.classList.remove('active')); el.classList.add('active'); showPageAdmin(p); }
 function logout(){ sessionStorage.removeItem('casa_login'); window.location.href='index.html'; }
 function lihatDepan(){ window.location.href='index.html'; }
+function scrollKeNotif(){ let el=document.getElementById('notifAdminBox'); if(el && el.style.display!=='none'){ el.scrollIntoView({behavior:'smooth'}); } else { showPageAdmin('member'); } }
+
+// ===== NOTIF ADMIN - DARI DATABASE casa_topup + casa_withdraw - BARU! =====
+let lastNotifCount = -1;
+function bunyiNotif(){ try{ let ctx=new (window.AudioContext||window.webkitAudioContext)(); let o=ctx.createOscillator(), g=ctx.createGain(); o.connect(g); g.connect(ctx.destination); o.frequency.value=880; o.type='sine'; g.gain.setValueAtTime(0.3,ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.6); o.start(); o.stop(ctx.currentTime+0.6); setTimeout(()=>{ let o2=ctx.createOscillator(), g2=ctx.createGain(); o2.connect(g2); g2.connect(ctx.destination); o2.frequency.value=1100; g2.gain.setValueAtTime(0.3,ctx.currentTime); g2.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.6); o2.start(); o2.stop(ctx.currentTime+0.6); },200); }catch(e){} if(navigator.vibrate) navigator.vibrate([200,100,200]); }
+async function loadNotifAdmin(popupBaru){
+  try{
+    let topPending = await sb("GET","casa_topup","", "?select=*&status=eq.Menunggu Verifikasi&order=created_at.desc");
+    let wdPending = await sb("GET","casa_withdraw","", "?select=*&status=eq.Menunggu Verifikasi&order=created_at.desc");
+    let count = topPending.length + wdPending.length;
+    let bell = document.getElementById('bellCount'); if(bell) bell.innerText = count;
+    let statP = document.getElementById('statPending'); if(statP) statP.innerText = count;
+    let notifCount = document.getElementById('notifCount'); if(notifCount) notifCount.innerText = count;
+    let box = document.getElementById('notifAdminBox');
+    let semua = [...topPending.map(x=>({...x,_type:'TOPUP'})), ...wdPending.map(x=>({...x,_type:'WITHDRAW'}))].sort((a,b)=>new Date(b.at||b.created_at)-new Date(a.at||a.created_at));
+    if(box){
+      if(count===0){ box.style.display='none'; }
+      else{
+        box.style.display='block';
+        document.getElementById('notifList').innerHTML = semua.map(x=>{
+          if(x._type==='TOPUP') return `<div style="background:rgba(0,0,0,.35);padding:12px;border-radius:12px;margin-top:10px"><b>💰 TOP UP - ${x.member||'-'}</b><br>${fmt(x.nominal)} • Via ${x.metode}<br><small>${new Date(x.at||x.created_at).toLocaleString('id-ID')}</small><div style="display:flex;gap:8px;margin-top:8px"><button onclick="setujuiTopupReq(${x.id})" style="flex:1;background:#22C55E;border:none;padding:10px;border-radius:10px;font-weight:bold;color:#fff;cursor:pointer">✅ Setujui + Tambah Saldo</button><button onclick="tolakTopupReq(${x.id})" style="flex:1;background:#fff;color:#FF2D2D;border:none;padding:10px;border-radius:10px;font-weight:bold;cursor:pointer">❌ Tolak</button></div></div>`;
+          return `<div style="background:rgba(0,0,0,.35);padding:12px;border-radius:12px;margin-top:10px"><b>💸 TARIK SALDO - ${x.member||'-'}</b><br>${fmt(x.nominal)} • Ke ${x.metode} - ${x.nomor} (${x.nama_rek})<br><small>${new Date(x.at||x.created_at).toLocaleString('id-ID')}</small><div style="display:flex;gap:8px;margin-top:8px"><button onclick="setujuiWithdrawReq(${x.id})" style="flex:1;background:#22C55E;border:none;padding:10px;border-radius:10px;font-weight:bold;color:#fff;cursor:pointer">✅ Sudah TF + Potong Saldo</button><button onclick="tolakWithdrawReq(${x.id})" style="flex:1;background:#fff;color:#FF2D2D;border:none;padding:10px;border-radius:10px;font-weight:bold;cursor:pointer">❌ Tolak</button></div></div>`;
+        }).join('');
+      }
+    }
+    let elTop = document.getElementById('listTopupPending');
+    if(elTop) elTop.innerHTML = topPending.length ? topPending.map(x=>`<div style="background:#222;padding:10px;border-radius:10px;margin-top:8px"><b>💰 ${x.member} - ${fmt(x.nominal)}</b><br>Via ${x.metode} • ${new Date(x.at||x.created_at).toLocaleString('id-ID')}<div style="display:flex;gap:8px;margin-top:8px"><button onclick="setujuiTopupReq(${x.id})" style="flex:1;background:#22C55E;border:none;padding:9px;border-radius:8px;font-weight:bold;color:#fff;cursor:pointer">✅ Setujui</button><button onclick="tolakTopupReq(${x.id})" style="flex:1;background:#400;color:#fff;border:1px solid #ff4444;padding:9px;border-radius:8px;font-weight:bold;cursor:pointer">❌ Tolak</button></div></div>`).join('') : '<p style="color:#ccc;font-size:13px">Gak ada request Top Up 🎉</p>';
+    let elWd = document.getElementById('listWithdrawPending');
+    if(elWd) elWd.innerHTML = wdPending.length ? wdPending.map(x=>`<div style="background:#222;padding:10px;border-radius:10px;margin-top:8px"><b>💸 ${x.member} - ${fmt(x.nominal)}</b><br>Ke ${x.metode} - ${x.nomor} (${x.nama_rek}) • ${new Date(x.at||x.created_at).toLocaleString('id-ID')}<div style="display:flex;gap:8px;margin-top:8px"><button onclick="setujuiWithdrawReq(${x.id})" style="flex:1;background:#22C55E;border:none;padding:9px;border-radius:8px;font-weight:bold;color:#fff;cursor:pointer">✅ Sudah TF</button><button onclick="tolakWithdrawReq(${x.id})" style="flex:1;background:#400;color:#fff;border:1px solid #ff4444;padding:9px;border-radius:8px;font-weight:bold;cursor:pointer">❌ Tolak</button></div></div>`).join('') : '<p style="color:#ccc;font-size:13px">Gak ada request Tarik Saldo 🎉</p>';
+    // Riwayat terakhir
+    let elRiwayat = document.getElementById('listRequestRiwayat');
+    if(elRiwayat){
+      let topSemua = await sb("GET","casa_topup","", "?select=*&order=created_at.desc&limit=5");
+      let wdSemua = await sb("GET","casa_withdraw","", "?select=*&order=created_at.desc&limit=5");
+      let gabung = [...topSemua.map(x=>({...x,_type:'TOPUP'})), ...wdSemua.map(x=>({...x,_type:'WITHDRAW'}))].sort((a,b)=>new Date(b.at||b.created_at)-new Date(a.at||a.created_at)).slice(0,5);
+      elRiwayat.innerHTML = gabung.length ? gabung.map(x=>`<div style="font-size:13px;padding:8px 0;border-bottom:1px dashed #333">${x._type==='TOPUP'?'💰 Top Up':'💸 Tarik'} - ${x.member} - ${fmt(x.nominal)} • <b>${x.status}</b><br><small style="color:#ccc">${new Date(x.at||x.created_at).toLocaleString('id-ID')}</small></div>`).join('') : '<p style="color:#ccc;font-size:13px">Belum ada request</p>';
+    }
+    if(lastNotifCount!==-1 && count>lastNotifCount && popupBaru!==false){
+      bunyiNotif();
+      let bellBtn=document.getElementById('bellAdmin'); if(bellBtn){ bellBtn.classList.remove('bell-goyang'); void bellBtn.offsetWidth; bellBtn.classList.add('bell-goyang'); }
+      let baru=semua[0];
+      if(baru) alert('ADA REQUEST BARU! 🔔\n\n'+(baru._type==='TOPUP'?'💰 TOP UP\n'+baru.member+' mau Top Up '+fmt(baru.nominal)+' via '+baru.metode:'💸 TARIK SALDO\n'+baru.member+' mau tarik '+fmt(baru.nominal)+' ke '+baru.metode+' - '+baru.nomor));
+    }
+    lastNotifCount=count;
+  }catch(e){ /* tabel belum ada = diam aja, biar gak ganggu dashboard */ }
+}
+async function setujuiTopupReq(id){
+  let r=await sb("GET","casa_topup","", "?select=*&id=eq."+id); let item=r[0]; if(!item) return;
+  if(!confirm('Setujui Top Up '+fmt(item.nominal)+' dari '+item.member+'?\nSaldo dia akan nambah '+fmt(item.nominal))) return;
+  try{ let m=await sb("GET","member","", "?select=*&id=eq."+item.member_id); if(m[0]) await sbAuto("PATCH","member",{saldo:Number(m[0].saldo||0)+Number(item.nominal)}, "?id=eq."+item.member_id); }catch(e){}
+  await sb("PATCH","casa_topup",{status:'Disetujui'}, "?id=eq."+id);
+  alert('Top Up '+fmt(item.nominal)+' dari '+item.member+' BERHASIL! ✅'); await loadAdmin(); await loadNotifAdmin(false);
+}
+async function tolakTopupReq(id){
+  let r=await sb("GET","casa_topup","", "?select=*&id=eq."+id); let item=r[0]; if(!item) return;
+  if(!confirm('Tolak Top Up '+fmt(item.nominal)+' dari '+item.member+'?')) return;
+  await sb("PATCH","casa_topup",{status:'Ditolak'}, "?id=eq."+id); alert('Top Up ditolak'); await loadNotifAdmin(false);
+}
+async function setujuiWithdrawReq(id){
+  let r=await sb("GET","casa_withdraw","", "?select=*&id=eq."+id); let item=r[0]; if(!item) return;
+  if(!confirm('Lu udah TF '+fmt(item.nominal)+' ke '+item.metode+' - '+item.nomor+' ('+item.nama_rek+')?\nKalau YA, saldo '+item.member+' akan dipotong '+fmt(item.nominal))) return;
+  try{ let m=await sb("GET","member","", "?select=*&id=eq."+item.member_id); if(m[0]) await sbAuto("PATCH","member",{saldo:Number(m[0].saldo||0)-Number(item.nominal)}, "?id=eq."+item.member_id); }catch(e){}
+  await sb("PATCH","casa_withdraw",{status:'Disetujui - Sudah Ditransfer'}, "?id=eq."+id);
+  alert('Penarikan '+fmt(item.nominal)+' dari '+item.member+' BERHASIL! ✅'); await loadAdmin(); await loadNotifAdmin(false);
+}
+async function tolakWithdrawReq(id){
+  let r=await sb("GET","casa_withdraw","", "?select=*&id=eq."+id); let item=r[0]; if(!item) return;
+  if(!confirm('Tolak penarikan '+fmt(item.nominal)+' dari '+item.member+'?\nSaldo dia TIDAK akan dipotong.')) return;
+  await sb("PATCH","casa_withdraw",{status:'Ditolak'}, "?id=eq."+id); alert('Penarikan ditolak'); await loadNotifAdmin(false);
+}
+setInterval(()=>{ loadNotifAdmin(true); }, 5000);
+
 async function loadAdmin(){
   try{
     await rpcEnsure();
@@ -314,7 +406,7 @@ async function loadAdmin(){
   document.getElementById('adminCode').innerText = "Code: "+codeAdmin+" • Supabase Baru";
   let adm = (DB.admin||[]).find(a=>String(a.code||'').toLowerCase()===String(codeAdmin).toLowerCase());
   if(adm){ document.getElementById('adminNama').innerText = adm.nama; document.getElementById('adminWA').innerText = "WA: "+(adm.WA||'-')+" • "+(adm.alamat||'Bandung'); }
-  buildKategoriAdmin(); renderAdmin(); renderAdminList(); renderPegawaiList(); renderMemberList();
+  buildKategoriAdmin(); renderAdmin(); renderAdminList(); renderPegawaiList(); renderMemberList(); loadNotifAdmin(false);
 }
 function buildKategoriAdmin(){
   let seen = [];
@@ -380,7 +472,6 @@ function renderLaporan(){
   let top = getPopuler();
   document.getElementById('lapTop').innerHTML = top.map(p=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #333"><span>${getNama(p)}</span><b style="color:#FFD700">${fmt(p.harga)} • Stok ${p.stok}</b></div>`).join('') || 'Belum ada produk';
 }
-// ===== KELOLA MEMBER + TOP UP SALDO =====
 function renderMemberList(){
   let cari = (document.getElementById('cariMember')?.value || '').trim().toLowerCase();
   let list = DB.member || [];
@@ -637,4 +728,4 @@ async function hapusPegawai(id){
 loadAdmin();
 </script>
 </body>
-</html>
+  </html>
